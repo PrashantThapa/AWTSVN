@@ -1,0 +1,25 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+namespace HRFA.Handlers.FAMS
+{
+    
+    public class CategoryHandler : BaseHandler
+    {
+
+        public object GetCategory(Int16? categoryID)
+        {
+            JsonResponse response = new JsonResponse();
+
+            BLLCategory bllCategory = new BLLCategory();
+            response = bllCategory.GetCategory(categoryID);
+
+            return JsonUtility.Serialize(response);
+
+        }
+
+      
+    }
+}

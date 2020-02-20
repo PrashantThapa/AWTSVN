@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace HRFA.ATT.PAYROLL
+{
+    public class ATTSalaryParameter
+    {
+        public Int64? OldSubmissionNo { get; set; }
+        public Int32? SPID { get; set; }
+        public Int32? EmpID { get; set; }
+        public string GradeName { get; set; }
+        public string GradeValue { get; set; }
+        public string CITPer { get; set; }
+        public string CITRs { get; set; }
+        public string PFPer { get; set; }
+        public string PFRs { get; set; }
+        public string EntryBy { get; set; }
+        public string EntryDate { get; set; }
+        public string Action { get; set; }
+		public string RStatus { get; set; }
+		public string TaxDeduction { get; set; }
+
+	}
+}

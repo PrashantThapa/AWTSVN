@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLSewa
+    {
+        public List<ATTSewa> GetSewa(int? sewaID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            List<ATTSewa> lstSewa = new List<ATTSewa>();
+
+            try
+            {
+                string SP = "CPR_GET_SEWA";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_SEWA_ID", sewaID, OracleDbType.Int16, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTSewa objSewa = new ATTSewa();
+                    objSewa.SewaID = string.IsNullOrEmpty(drow["Sewa_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["Sewa_ID"].ToString()); 
+                    objSewa.SewaName = drow["Sewa_NAME"].ToString();
+                    objSewa.Action = "";
+                    lstSewa.Add(objSewa);
+
+                }
+
+                return lstSewa;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+    }
+}

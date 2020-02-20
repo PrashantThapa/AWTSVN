@@ -1,0 +1,262 @@
+﻿<%--
+    The items hidden in the following view with class 'hide-this' will be exempted from validation
+    during post. The exemption is done on javascript file 'EmployeeGrade.js'.
+    The hidden field values will also be ignored during the database insert, the logic for which is in file
+    'DLLEmpGrade.cs'.
+    Affected elements are: Sawari, Transportation, Residence, UnitGradeAmount, and SelectedMonth
+--%>
+
+<%@ Page Title="" Language="C#" MasterPageFile="~/AdminMaster.Master" AutoEventWireup="true"
+    CodeBehind="EmployeeGrade.aspx.cs" Inherits="HRFA.Modules.PAYROLL.EmployeeGrade" %>
+
+<%@ Register Src="~/Modules/PIS/EmployeeSearchControl.ascx" TagPrefix="uc1" TagName="EmployeeSearchControl" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <uc1:EmployeeSearchControl runat="server" ID="EmployeeSearchControl" />
+    <section class="content" id="EmpGradeForm">
+        <div class="row pages">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Employee Salary Parameter</h3>
+                    </div>
+                    <!-- /.box-header -->
+
+                    <!-- form start -->
+                    <form role="form" runat="server" id="Form1">
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Employee's Name</label>
+                                        <input type="text" id="txtEmployeeID" data-bind="value: EmployeeName" class='required form-control' disabled />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-1 wordlong">
+                                    <button type="button" id="btnSearch" class="btn btn-primary search" data-toggle="modal" data-target="#modalEmpSearch" data-thissource="employee">Search</button>
+                                </div>
+                            </div>
+                            <!-- /.row -->
+                            <div class="row">
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Grade Name</label>
+                                       <%-- <input type="text" class='required form-control' data-bind="GradeNumber"
+                                            />--%>
+										<select id="" class="form-control select2"
+                                            data-bind='options: GradeUnits, optionsText: "GradeID",
+	optionsValue: $data, value: SelectedGradeID, event: { change: GradeChange },
+    optionsCaption: "------ Select One -------"'>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Grade Unit Amount<span class="red">*</span></label>
+                                        <input type="text" class='required form-control' 
+<%--											data-bind="GradeUnitAmont"--%>
+                                            data-bind='value:GradeAmount' 
+											onkeypress="return isNumberKey(event)" disabled/>
+										<%--<select id="" class="form-control select2"
+                                            data-bind='options: GradeUnitAmount, optionsText: "GradeUnitAmount",
+    optionsValue: "GradeUnitAmount", value: GradeUnitAmount,
+    optionsCaption: "------ Select One -------"' disabled>
+                                        </select>--%>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="checkbox">
+                                            <div class="row">
+                                                <div class="col-md-9">
+                                                    <span>CIT<span class="red">*</span></span>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="radio" name="CIT" value="1" data-bind="checked: CIT" class="minimal" />&nbsp%
+													<label></label>
+                                                    <input type="radio" name="CIT" value="0" data-bind="checked: CIT" class="minimal" />&nbsp;Rs
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="checkbox">
+                                            <div class="row">
+                                                <div class="col-md-9">
+                                                    <span>PF<span class="red">*</span></span>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="radio" name="PF" value="1" data-bind="checked: PF" class="minimal" />&nbsp;%
+													<label></label>
+                                                    <input type="radio" name="PF" value="0" data-bind="checked: PF" class="minimal" />&nbsp;Rs
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-6">
+
+                                    <div class="input-group" data-bind="visible: hasCIT">
+                                        <input type="text" class="form-control" placeholder="CIT in Percentage" data-bind ="value:CITPer">
+                                        <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                                    </div>
+
+                                    <div class="input-group" data-bind="visible: hasnoCIT">
+                                        <input type="text" class="form-control" placeholder="CIT in Rs" data-bind ="value:CITRs">
+                                        <span class="input-group-addon"><i class="">
+                                            <label>NRs</label></i></span>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="input-group" data-bind="visible: hasPF">
+                                        <input type="text" class="form-control" placeholder="PF in Percentage" data-bind ="value:PFPer">
+                                        <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                                    </div>
+
+                                    <div class="input-group" data-bind="visible: hasnoPF">
+                                        <input type="text" class="form-control" placeholder="PF in NRs" data-bind ="value:PFRs">
+                                        <span class="input-group-addon"><i class="">
+                                            <label>NRs</label></i></span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="row wordlong">
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Extra Allowances</label>
+                                        <input type="text" class="form-control" id="EAName"
+                                            data-bind="value: EAName"
+                                            data-required="true" />
+
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Value</label>
+                                        <input type="text" class="form-control" data-bind="value: EAValue" onkeypress=" return isNumberKey(event);" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- /.box-body -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+
+                                        <button type="submit" class="btn btn-info" data-bind="click: $root.AddExtraAllowance">Add</button>
+                                        <button type="submit" class="btn btn-default" data-bind="click: ClearControls">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-12">
+                                    <table data-bind="visible: true" border="0" class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>S.N
+                                                </th>
+                                                <th>Extra Allowances
+                                                </th>
+                                                <th>Value
+                                                </th>
+                                                <th>Action
+                                                </th>
+                                            </tr>
+
+                                        </thead>
+                                        <tbody data-bind="foreach: ExtraAllowances">
+                                            <tr>
+                                                <td>
+                                                    <span data-bind="text:($index() + 1)"></span><span data-bind="text: EAID" style="width: 100px; visibility: hidden;" /><span data-bind="text: Action" />
+                                                </td>
+                                                <td>
+                                                    <span data-bind="text: EAName" style="width: 120px;" />
+                                                </td>
+                                                <td>
+                                                    <span data-bind="text: EAValue" style="width: 120px;" />
+                                                </td>
+
+                                                <td>
+
+                                                    <a data-bind="click: $root.EditExtraAllowance">
+                                                        <span class="glyphicon glyphicon-edit" title="Edit"></span></a>
+                                                    <a data-bind="click: $root.DeleteExtraAllowance">
+                                                        <span class="glyphicon glyphicon-trash" title="Delete"></span>
+                                                    </a>
+
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+<%--                                    <button type="submit" class="btn btn-info pull-right" data-bind="click: SaveExtraAllowance">Submit</button>--%>
+
+                                </div>
+                            </div>
+
+                            <div class="row wordlong">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Tax Deduction<span class="red">*</span></label>
+                                        <select id="" class="form-control select2"
+                                            data-bind='options: TaxCats, optionsText: "DescNep",
+	optionsValue: $data,value:SelectedTaxDeduction,
+    optionsCaption: "------ Select One -------"'>
+                                        </select>
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <div class="row wordlong">
+                                <!-- /.box-body -->
+                                <div class="col-md-12">
+                                    <div class="form-group">
+
+                                        <button type="submit" class="btn btn-info" data-bind="click: SaveEmpGrade">Submit</button>
+                                        <button type="submit" class="btn btn-default" data-bind="click: ClearControls">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+              
+            </div>
+        
+        </div>
+    </section>
+
+    <script src="../../Scripts/PAYROLL/EmployeeGrade.js" type="text/javascript"></script>
+
+</asp:Content>

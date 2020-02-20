@@ -1,0 +1,210 @@
+﻿using System;
+using System.Data;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLBank
+    {
+        /// <summary>
+        /// Retrives a list of Bank(s)
+        /// </summary>
+        /// <param name="bankid"></param>
+        /// <returns>Bank or Null if Bank does not exist</returns>
+        public List<ATTBank> GetAllBank(int? bankid)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            List<ATTBank> lst = new List<ATTBank>();
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_BANKS";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":p_BANK_ID", bankid, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTBank obj = new ATTBank();
+
+                    obj.BankID = Int32.Parse(drow["BANK_ID"].ToString());
+                    obj.BankName = drow["BANK_NAME"].ToString();
+                    obj.BankNameEn = drow["BANK_NAME_ENG"].ToString();
+                    obj.BankCategory = drow["BANK_CATEGORY"].ToString();
+                    obj.BankAddress = drow["BANK_ADDRESS"].ToString();
+                    obj.BankAddressEn = drow["BANK_ADDRESS_ENG"].ToString();
+                    obj.Status = drow["STATUS"].ToString() == "A" ? true : false;
+                    obj.Action = "";
+                    //obj.AccountNo = GetAccountNum(obj.BankID, conn);
+                    lst.Add(obj);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+      
+        public List<string> GetAccountNum(int? bankid, OracleConnection conn)
+        {
+           
+
+            List<string> lst = new List<string>();
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_BANKS_ACCT";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":p_BANK_ID", bankid, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+                
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    
+                    //obj.AccountNo = drow["BANK_AC_NO"].ToString();
+                    lst.Add(drow["BANK_AC_NO"].ToString());
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+
+        }
+
+
+        /// <summary>
+        /// This method Save/Update Bank
+        /// </summary>
+        /// <param name="lst"></param>
+        /// <returns>String as a Message about Save/Update Bank</returns>
+        /// 
+        public string SaveBank(List<ATTBank> lst)
+        {
+            string sp = "";
+            string msg = "No Data To Save !!!";
+            string status = "";
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+
+            try
+            {
+                foreach (ATTBank obj in lst)
+                {
+
+                    if (obj.Status == true)
+                    {
+                        status = "A";
+                    }
+                    else
+                    {
+                        status = "I";
+                    }
+
+
+                    if (obj.Action == "A")
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_BANK";
+                        msg = "Successfully Saved.";
+                    }
+                    else if (obj.Action == "E")
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_BANK";
+                        msg = "Successfully Updated.";
+                    }
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+                                               
+
+                        paramList.Add(SqlHelper.GetOraParam(":p_BANK_ID", obj.BankID, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+                        paramList.Add(SqlHelper.GetOraParam(":p_BANK_NAME", obj.BankName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_BANK_NAME_ENG", obj.BankNameEn, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_BANK_CATEGORY", obj.BankCategory, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_BANK_ADDRESS", obj.BankAddress, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_BANK_ADDRESS_ENG", obj.BankAddressEn, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_STATUS", status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", obj.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                        SqlHelper.ExecuteNonQuery(conn, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                        paramList.Clear();
+                        sp = "";
+                    }
+                }
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error" + ex.Message);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+        /// <summary>
+        /// This method Delete Bank
+        /// </summary>
+        /// <param name="bankid">bankid to be deleted</param>
+        /// <returns>String as a Message about Delete Bank</returns>
+        ///
+        public string DeleteBank(int? bankid)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+
+
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_DEL_BANK";
+
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":p_BANK_ID", bankid, OracleDbType.Int32, ParameterDirection.InputOutput));
+                ParamList.Add(SqlHelper.GetOraParam(":P_TO_DATE", null, OracleDbType.Varchar2, ParameterDirection.Input));
+
+                SqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+                return "Deleted Successfully.";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+        }
+
+    }
+}

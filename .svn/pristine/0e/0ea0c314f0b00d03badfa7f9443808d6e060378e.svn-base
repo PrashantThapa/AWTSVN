@@ -1,0 +1,405 @@
+﻿function Grade(data) {
+    var self = this;
+    if (data != undefined) {
+        self.GradeLevelName = ko.observable(data.GradeLevelName);
+        self.GradeAmount = ko.observable(data.GradeAmount);
+        self.LevelID = ko.observable(data.LevelID);
+        self.EntryBy = ko.observable(data.EntryBy);
+        self.RStatus = ko.observable(data.RStatus);
+        self.Action = ko.observable(data.Action);
+        self.GradeID = ko.observable(data.GradeID);
+    }
+};
+
+
+var EmpGradeViewModel = function () {
+
+    var self = this;
+
+    self.Action = ko.observable("");
+    self.Grades = ko.observableArray([]);
+    self.GradeID = ko.observable();
+    self.LevelID = ko.observable();
+    self.GradeLevelName = ko.observable();
+    self.GradeAmount = ko.observable();
+    self.selectedItem = ko.observable();
+    self.GradeName = ko.observable();
+    var selfSubmissionNum = 0;
+
+    self.GradescaleLevel = ko.observable();
+    self.MinBasicSalary = ko.observable();
+    self.MinAllowance = ko.observable();
+    self.MaxBasicSalary = ko.observable();
+    self.MaxAllowance = ko.observable();
+    self.EntryBy = ko.observable();
+    self.Remarks = ko.observable();
+    self.RStatus = ko.observable();
+
+    //var entryby = $("#user").text();
+    //self.EntryBy = ko.observable(entryby);
+    self.EntryDate = ko.observable();
+    self.SubmissionNo = ko.observable();
+    self.EmployeeGradeScaleInfoes = ko.observableArray([]);
+
+
+    var entryBy = $("#user").text();
+
+    self.AddGrade = function () {
+        var errMsg = "";
+
+        var add = self.selectedItem();
+
+        //-----------in case to edit/update----------
+
+        if (add != undefined) {
+
+            //validating controls      
+            if (self.ValidationGrade()) {
+                add.LevelID(self.LevelID());
+                add.GradeLevelName(self.GradeLevelName());
+                add.GradeAmount(self.GradeAmount());
+                var action = self.Action() == "A" ? "A" : "E";
+                add.Action(action);
+
+
+                self.selectedItem(null);
+
+                var btnAdd = $("button.icon-ok");
+                btnAdd.removeClass("icon-ok").addClass("icon-add");
+                btnAdd.text("Add");
+
+                //self.ClearControl();
+            }
+        }
+
+        //---------in case of adding new record to grid----------------
+        else {
+            if (self.Validation()) {
+                add = {
+                    LevelID: null,
+                    GradeLevelName: self.GradeLevelName(),
+                    GradeAmount: self.GradeAmount(),
+                    Action: "A",
+                    EntryBy: entryBy,
+                };
+
+                if (self.Grades.indexOf(add) > -1) {
+                    return;
+                }
+                var match = ko.utils.arrayFirst(self.Grades(),
+                    function (item) {
+                        return add.GradeLevel == ko.toJS(item).GradeLevel;
+                    });
+                if (!match) {
+                    self.Grades.push(new Grade(add));
+                }
+                else {
+                    msg('Please already Exists! Please fill the correct Data', 'WARNING');
+                }
+
+
+                var btnAdd = $("button.icon-ok");
+                btnAdd.removeClass("icon-ok").addClass("icon-add");
+                btnAdd.text("Add");
+
+                //--clearing controls------
+
+                //self.ClearControl();
+
+            }
+        }
+
+
+
+    };
+
+    self.SaveEmployeeGradeScaleInfo = function () {
+
+        var gradelevels = FilteredJson(ko.toJS(self.Grades));
+          
+        if (self.ValidateEmpGradeScaleInfo()) {
+            var entryBy = $("#user").text();
+
+            var EmpGradeScaleInfoToAddorUpdate = {
+
+                OldSubmissionNo: self.SubmissionNo(),
+                SubmissionNo: self.SubmissionNo(),
+                GradeName: self.GradeName(),
+                MinBasicSalary: self.MinBasicSalary(),
+                MinAllowance: self.MinAllowance(),
+                MaxBasicSalary: self.MaxBasicSalary(),
+                MaxAllowance: self.MaxAllowance(),
+                Remarks: self.Remarks(),
+                EntryBy: entryBy ,
+                EntryDate: self.EntryDate(),
+                RStatus: "F",
+                GradeLevels: gradelevels
+
+            };
+            debugger;
+
+            var url = "/Handlers/PAYROLL/GradeScaleSetupHandler.ashx";
+            var method = "SaveGradeScaleSetup";
+            var appID = "FAMS";
+            var modID = "EMPGRADESCALE";
+
+            var data = { 'method': method, 'args': JSON.stringify(ko.toJS(EmpGradeScaleInfoToAddorUpdate)), 'appID': appID, 'modID': modID };
+
+            $.post(url, data, function (result) {
+                var obj = jQuery.parseJSON(result);
+                if (obj.IsSucess) {
+                    self.SubmissionNo(obj.Message.match(/\d+/g));
+                    msg(obj.Message, "SUCCESS");
+                    //self.ClearControls();
+                    //self.LoadEmployeeGradeScaleInfo();
+                }
+                else {
+                    msg("Oops! Error occured while saving data ...", "WARNING");
+                }
+            });
+        }
+        };
+
+
+        //self.SaveGrade = function () {
+        //    //waitMsg("Saving");
+        //    //waitMsg.show();
+
+        //    //var test = ko.toJS(self.Grades);
+        //    var jsonData = FilteredJson(ko.toJS(self.Grades));
+        //    //var jsonData = ko.toJS(self.Grades);
+
+        //    $.ajax({
+        //        type: "GET",
+        //        dataType: "json",
+        //        cache: false,
+        //        url: '../../Handlers/CENTRALLOOKUP/AddressTypeHandler.ashx',
+        //        data: { 'method': 'SaveGrade', 'grade': JSON.stringify(jsonData) },
+        //        contentType: "applicaton/json; character=utf -8",
+
+        //        success: function (result) {
+        //            waitMsg.hide();
+        //            //msg(result.Message);
+
+        //            if (result.IsSucess) {
+        //                msg(result.Message, 'SUCCESS');
+
+        //            }
+        //            else {
+        //                if (!result.IsToken)
+        //                    msg(result.Message, "WARNING", null, ClearSession);
+        //                else
+        //                    msg(result.Message, "WARNING");
+        //            }
+        //        },
+        //        error: function (err) {
+        //            waitMsg.hide();
+        //            msg(err.status + " - " + err.statusText, "FAILURE");
+        //        }
+
+
+        //    });
+
+
+
+        //};
+
+        //self.EditGrade = function (gradeid) {
+
+        //    self.LevelID(gradeid.LevelID());
+        //    self.GradeLevel(gradeid.GradeLevel());
+        //    self.GradeAmount(gradeid.GradeAmount());
+
+        //    if (gradeid.Action() == "A") {
+        //        self.Action("A");
+        //    }
+        //    else {
+        //        self.Action("E");
+        //    }
+        //    self.selectedItem(gradeid);
+
+
+
+        //    var btnAdd = $("button.icon-add");
+        //    btnAdd.removeClass("icon-add").addClass("icon-ok");
+        //    btnAdd.text("Update");
+
+        //}
+
+        //self.DeleteGrade = function (gradeid) {
+        //    Confirm('Are you sure to Delete?', 'Confirmation Dialog', function (r) {
+        //        if (r) {
+        //            waitMsg("Deleting");
+        //            waitMsg.show();
+        //            //var test = extraallowance;
+        //            //console.log(test);
+        //            $.ajax({
+        //                dataType: "json",
+        //                cache: false,
+        //                url: '../../../Handlers/CENTRALLOOKUP/AddressTypeHandler.ashx',
+        //                data: { 'method': 'DeleteGrade', 'gradeid': gradeid.LevelID },
+        //                success: function (result) {
+        //                    waitMsg.hide();
+        //                    if (result.IsSucess) {
+        //                        self.Grades.remove(gradeid);
+        //                        msg(result.Message);
+        //                    }
+        //                    else {
+        //                        if (!result.IsToken)
+        //                            msg(result.Message, "WARNING", null, ClearSession);
+        //                        else
+        //                            msg(result.Message, "WARNING");
+        //                    }
+
+        //                },
+        //                error: function (err) {
+        //                    waitMsg.hide();
+        //                    msg(err.status + " - " + err.statusText, "FAILURE");
+        //                }
+        //            });
+        //        }
+        //    });
+        //};
+
+        //self.GetGrade = function (gradeid) {
+
+        //    waitMsg("Loading");
+        //    waitMsg.show();
+
+        //    $.ajax({
+        //        dataType: "json",
+        //        cache: false,
+        //        url: '../../../Handlers/CENTRALLOOKUP/AddressTypeHandler.ashx',
+        //        data: { 'method': 'GetGrade', 'gradeid': null },
+        //        contentType: "application/json; charset=utf-8",
+        //        success: function (result) {
+        //            waitMsg.hide();
+        //            if (result.IsSucess) {
+        //                var mappedTask = $.map(result.ResponseData, function (item) {
+
+        //                    return new Grade(item)
+        //                });
+
+        //                self.Grades(mappedTask);
+        //            }
+        //            else {
+
+        //                if (!result.IsToken)
+        //                    msg(result.Message, "WARNING", null, ClearSession);
+        //                else
+        //                    msg(result.Message, "WARNING");
+        //            }
+
+
+        //        },
+        //        error: function (err) {
+        //            waitMsg.hide();
+        //            msg(err.status + " - " + err.statusText, "FAILURE");
+
+        //        }
+        //    });
+        //}
+
+        //self.GetGrade();
+
+
+        self.ValidateEmpGradeScaleInfo = function () {
+            var errMsg = "";
+
+            if (Validate.empty(self.GradeName())) {
+                errMsg += "Please fill level!!!<br>";
+            }
+            if (Validate.empty(self.MinBasicSalary())) {
+                errMsg += "Please fill minimum basic salary!!!<br>";
+            }
+
+            if (Validate.empty(self.MinAllowance())) {
+                errMsg += "Please fill minumum allowance!!!<br>";
+            }
+            if (Validate.empty(self.MaxBasicSalary())) {
+                errMsg += "Please fill maximum basic salary!!!<br>";
+            }
+            if (Validate.empty(self.MaxAllowance())) {
+                errMsg += "Please  fill Maximum Allowance!!!<br>";
+            }
+
+            if (errMsg !== "") {
+                msg(errMsg, "WARNING");
+
+                return false;
+            }
+            else {
+                return true;
+            }
+
+        }
+
+        self.ValidationGrade = function () {
+            var errMsg = "";
+
+            if (Validate.empty(self.GradeLevelName())) {
+                errMsg += "Please fill Grade Level!!!<br>";
+            }
+            if (Validate.empty(self.GradeAmount())) {
+                errMsg += "Please fill Grade Amount!!!<br>";
+            }
+
+            if (errMsg !== "") {
+                msg(errMsg, "WARNING");
+
+                return false;
+            }
+            else {
+                return true;
+            }
+
+        }
+
+        self.Validation = function () {
+
+            var errMsg = "";
+            var objFocus = null;
+
+
+            if (Validate.empty(self.GradeLevelName())) {
+                errMsg = "Please fill Grade Level Name !!!<br>";
+            }
+
+            if (Validate.empty(self.GradeAmount())) {
+
+                errMsg += "Please fill Grade Amount !!!<br>";
+            }
+
+            if (errMsg !== "") {
+                msg(errMsg, "WARNING");
+
+                return false;
+            }
+            else {
+                return true;
+            }
+        };
+
+};
+var EmployeeGradeScaleInfo = function (data) {
+    var self = this;
+    if (data !== undefined) {
+        self.SubmissionNo = ko.observable(data.SubmissionNo);
+        self.GradeName = ko.observable(data.GradeName)
+        self.MinBasicSalary = ko.observable(data.MinBasicSalary);
+        self.MinAllowance = ko.observable(data.MinAllowance);
+        self.MaxBasicSalary = ko.observable(data.MaxBasicSalary);
+        self.MaxAllowance = ko.observable(data.MaxAllowance);
+        self.Remarks = ko.observable(data.Remarks);
+        self.EntryBy = ko.observable(data.EntryBy);
+        self.EntryDate = ko.observable(data.EntryDate);
+        self.RStatus = ko.observable(data.RStatus);
+    }
+}
+
+
+    $(document).ready(function () {
+        ValidateSession();
+        var egvm = new EmpGradeViewModel();
+        ko.applyBindings(egvm, document.getElementById('Grade'));
+    });

@@ -1,0 +1,211 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLUserVerification
+    {
+
+        public List<ATTUserVerificationModule> GetUserVerificationModules(string applicationID, string moduleID)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+            try
+            {
+
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_USER_V_MODULES";
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":p_APPLICATION_ID", applicationID, OracleDbType.Varchar2, ParameterDirection.Input));
+                ParamList.Add(SqlHelper.GetOraParam(":p_MODULE_ID", moduleID, OracleDbType.Varchar2, ParameterDirection.Input));
+                ParamList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, ParamList.ToArray());   //
+
+                List<ATTUserVerificationModule> lst = new List<ATTUserVerificationModule>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTUserVerificationModule obj = new ATTUserVerificationModule();
+
+                    obj.ApplicationID = drow["APPLICATION_ID"].ToString();
+                    obj.ModuleID = drow["MODULE_ID"].ToString();
+                    obj.VMFromDate = drow["VM_FROM_DATE"].ToString();
+                    obj.UserID = drow["USER_ID"].ToString();
+                    obj.VerifyLevel = int.Parse(drow["VERI_LEVEL"].ToString());
+                    obj.LevelOfVerification = int.Parse(drow["VERI_LEVEL"].ToString());
+                    obj.FromDate = drow["FROM_DATE"].ToString();
+                    obj.ToDate = drow["TO_DATE"].ToString();
+                    obj.Action = "E";
+
+
+
+                    lst.Add(obj);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+        }
+
+        /*
+         * Added by Jayesh 
+         */
+        public List<ATTModule> GetVerificationModuleDetails(string appID, string moduleID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection dbConn = getConn.GetDbConn(getConn.LoginUser);
+            try
+            {
+
+
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_VERIFICATION_MODULES";
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":p_APPLICATION_ID", appID, OracleDbType.Varchar2, ParameterDirection.Input));
+                ParamList.Add(SqlHelper.GetOraParam(":p_MODULE_ID", moduleID, OracleDbType.Varchar2, ParameterDirection.Input));
+                ParamList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, ParamList.ToArray());   //
+
+                List<ATTModule> lst = new List<ATTModule>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTModule obj = new ATTModule();
+
+                    obj.ApplicationID = drow["APPLICATION_ID"].ToString();
+                    obj.ModuleID = drow["MODULE_ID"].ToString();
+                    obj.LevelOfVerification = int.Parse(drow["LEVEL_OF_VERIFICATION"].ToString());
+                    obj.FromDate = drow["FROM_DATE"].ToString();
+                    lst.Add(obj);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+        public string SaveUserVerificationModules(List<ATTUserVerificationModule> lst)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleTransaction Tran = GetConn.GetDbConn(GetConn.LoginUser).BeginTransaction();
+
+            //OracleAllDateDao objNepDate = new OracleAllDateDao();
+            //string date = objNepDate.GetDates(user).NepaliDate;
+            string msg = "";
+            foreach (ATTUserVerificationModule obj in lst)
+            {
+                string SP = "";
+               
+                if (obj.Action == "A")
+                {
+                    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_USER_V_MODULES";
+                    msg = "Record Added Successfully";
+
+                    //objR.FromDate = date;
+                }
+
+               // else if (obj.Action == "E")
+
+               //{
+               //     SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_USER_V_MODULES";
+               //     msg = "Record Added Successfully";
+               // }
+                //else
+                //{
+                //    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_USER_V_MODULES";
+                //    msg = "Record Updated Successfully";
+                //   // objR.ToDate = date;
+                //}
+
+                if (SP != "")
+                {
+                    List<OracleParameter> ParamList = new List<OracleParameter>();
+                    try
+                    {
+                        ParamList.Add(SqlHelper.GetOraParam(":p_APPLICATION_ID", obj.ApplicationID, OracleDbType.Varchar2, ParameterDirection.Input));
+                        ParamList.Add(SqlHelper.GetOraParam(":p_MODULE_ID", obj.ModuleID, OracleDbType.Varchar2, ParameterDirection.Input));
+                        ParamList.Add(SqlHelper.GetOraParam(":p_VM_FROM_DATE", obj.VMFromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                        // ParamList.Add(SqlHelper.GetOraParam(":p_VM_FROM_DATE", "2070.01.01", OracleDbType.Varchar2, ParameterDirection.Input));
+                        ParamList.Add(SqlHelper.GetOraParam(":p_USER_ID", obj.UserID, OracleDbType.Varchar2, ParameterDirection.Input));
+                        ParamList.Add(SqlHelper.GetOraParam(":p_VERI_LEVEL", obj.VerifyLevel, OracleDbType.Int32, ParameterDirection.Input));
+                        ParamList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                        //ParamList.Add(SqlHelper.GetOraParam(":p_TO_DATE", obj.ToDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                        ParamList.Add(SqlHelper.GetOraParam(":p_TO_DATE", obj.ToDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                        ParamList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                        ParamList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", DateTime.Now.Date, OracleDbType.Date, ParameterDirection.Input));
+                        SqlHelper.ExecuteNonQuery(Tran, CommandType.StoredProcedure, SP, ParamList.ToArray());
+                        ParamList.Clear();
+                        Tran.Commit();
+                    }
+                    catch (Exception )
+                    {
+                        msg = "Record not Added, Something went wrong";
+                        Tran.Rollback();
+
+                    }
+                    finally
+                    {
+                        GetConn.CloseDbConn();
+                    }
+                }
+            }
+           
+            return msg;
+        }
+
+        public string DeleteUserVerification(string applicationId, string moduleId, string vmFromDate, string userId, Int32 verifyLebel,string fromDate, string toDate)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+
+
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_DEL_USER_V_MODULES";
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":P_APPLICATION_ID", applicationId, OracleDbType.Varchar2, ParameterDirection.Input));
+                ParamList.Add(SqlHelper.GetOraParam(":P_MODULE_ID", moduleId, OracleDbType.Varchar2, ParameterDirection.Input));
+                ParamList.Add(SqlHelper.GetOraParam(":p_VM_FROM_DATE", vmFromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                ParamList.Add(SqlHelper.GetOraParam(":P_USER_ID", userId, OracleDbType.Varchar2, ParameterDirection.Input));
+                ParamList.Add(SqlHelper.GetOraParam(":p_VERI_LEVEL", verifyLebel, OracleDbType.Int32, ParameterDirection.Input));
+                ParamList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", fromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                ParamList.Add(SqlHelper.GetOraParam(":P_TO_DATE", null, OracleDbType.Varchar2, ParameterDirection.Input));
+
+                SqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+                return "Deleted Successfully.";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+        }
+    }
+}

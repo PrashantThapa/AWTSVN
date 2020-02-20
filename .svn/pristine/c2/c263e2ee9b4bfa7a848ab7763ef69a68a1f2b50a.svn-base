@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace HRFA.ATT.PIS
+{
+	public class ATTEmployeeAll
+	{
+		public string FnameNep { get; set; }
+		public string LnameNep { get; set; }
+		public string OfficeNameEng { get; set; }
+		public Int32? OfficeCode { get; set; }
+	}
+}

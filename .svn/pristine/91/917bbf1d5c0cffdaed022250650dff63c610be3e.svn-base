@@ -1,0 +1,84 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+
+namespace HRFA.BLL
+{
+    public  class BLLCompany
+    {
+
+      public JsonResponse SaveCompany(List<ATTCompany> lstCompany)
+        {
+
+            JsonResponse response = new JsonResponse();
+
+            try
+            {
+               
+                if (response.Message == "")
+                {
+                    DLLCompany objdllCompany= new DLLCompany();
+                    response.Message = objdllCompany.SaveCompany(lstCompany);
+                    response.IsSucess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+            return response;
+        }
+
+      public JsonResponse DeleteCompany(int? companyID)
+        {
+
+            JsonResponse response = new JsonResponse();
+
+            try
+            {
+                DLLCompany objdllCompany = new DLLCompany();
+                response.Message = objdllCompany.DeleteCompany(companyID);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+
+        }
+
+        public JsonResponse GetCompany(int? OfficeCode)
+         {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTCompany> lstCompany = new List<ATTCompany>();
+            DLLCompany objdllCompany = new DLLCompany();
+            try
+            {
+                lstCompany = objdllCompany.GetCompany(OfficeCode);
+
+                response.ResponseData = lstCompany;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+
+       
+    }
+}

@@ -1,0 +1,326 @@
+﻿using System;
+using System.Data;
+using System.Collections.Generic;
+
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLLiteracyType
+    {
+        /// <summary>
+        /// This method Save/Update Literacy Type
+        /// </summary>
+        /// <param name="lst"></param>
+        /// <returns>String as a Message about Save/Update Literacy Type</returns>
+        /// 
+        public  string SaveLiteracyType(List<ATTLiteracyType> lst)
+        {
+            string sp = "";
+            string msg = "No Data To Save !!!";
+            string status = "";
+
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+
+            try
+            {
+                foreach (ATTLiteracyType obj in lst)
+                {
+
+                    if (obj.Status == true)
+                    {
+                        status = "A";
+                    }
+                    else
+                    {
+                        status = "I";
+                    }
+
+
+                    if (obj.Action == "A")
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_LITERACY";
+                        msg = "Successfully Saved.";
+                    }
+                    else if (obj.Action == "E")
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_LITERACY";
+                        msg = "Successfully Updated.";
+                    }
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+
+                        paramList.Add(SqlHelper.GetOraParam(":p_LITERACY_ID", obj.LiteracyTypeID, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+                        paramList.Add(SqlHelper.GetOraParam(":p_LITERACY_NAME", obj.LiteracyTypeName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_LITERACY_NAME_ENG", obj.LiteracyTypeNameEng, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_STATUS", status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", obj.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                        paramList.Clear();
+                    }
+                }
+                tran.Commit();
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw new Exception("Error" + ex.Message);
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+
+        }
+
+
+
+        /// <summary>
+        /// Retrives a list of Literacy Type(s)
+        /// </summary>
+        /// <param name="litTypeID"></param>
+        /// <returns>Literacy Type or Null if Literacy Type does not exist</returns>
+        ///
+
+        public  List<ATTLiteracyType> GetLiteracyType(int? litTypeID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            List<ATTLiteracyType> lst = new List<ATTLiteracyType>();
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_LITERACY";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":p_LITERACY_ID", litTypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTLiteracyType obj = new ATTLiteracyType();
+
+                    obj.LiteracyTypeID = Int32.Parse(drow["LIT_ID"].ToString());
+                    obj.LiteracyTypeName = drow["LIT_NAME"].ToString();
+                    obj.LiteracyTypeNameEng = drow["LIT_NAME_ENG"].ToString();
+                    obj.Status = drow["STATUS"].ToString() == "A" ? true : false;
+                    obj.FromDate = drow["FROM_DATE"].ToString();
+                    obj.ToDate = drow["TO_DATE"].ToString();
+                    obj.Action = "";
+
+                    lst.Add(obj);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+        /// <summary>
+        /// This method Delete Literacy Type
+        /// </summary>
+        /// <param name="litTypeID">litTypeID to be deleted</param>
+        /// <returns>String as a Message about Delete Literacy Type</returns>
+        ///
+        public  string DeleteLiteracyType(int? litTypeID)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_DEL_LITERACY";
+
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":p_LITERACY_ID", litTypeID, OracleDbType.Int32, ParameterDirection.InputOutput));
+                ParamList.Add(SqlHelper.GetOraParam(":P_TO_DATE", "", OracleDbType.Varchar2, ParameterDirection.InputOutput));
+
+                SqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+                return "Deleted Successfully.";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+             finally
+            {
+                GetConn.CloseDbConn();
+            }
+        }
+
+        public bool SavePersonLiteracy(List<ATTLiteracyType> lst, Int64? PID, string entryBy, OracleTransaction tran)
+        {
+            try
+            {
+                string sp = "";
+
+                foreach (ATTLiteracyType obj in lst)
+                {
+
+                    if (obj.Action == "E")
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_PERSON_LITERACY";
+
+                    }
+                    else if (obj.Action == "A")
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_PERSON_LITERACY";
+                    }
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+
+                        paramList.Add(SqlHelper.GetOraParam(":p_PERSON_ID", PID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_LITERACY_ID", obj.LiteracyTypeID, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", entryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Date, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", obj.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                        paramList.Clear();
+                    }
+                    else
+                    {
+                        throw new Exception("Error in Saving Person Literacy !!!");
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+           
+        }
+
+        public List<ATTLiteracyType> GetPersonLiteracy(Int64? PID, Int32? seqNo, OracleConnection conn, bool isDirty = false)
+        {
+            List<ATTLiteracyType> lst = new List<ATTLiteracyType>();
+
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                string sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_PERSON_LITERACY";
+
+                if (isDirty)
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_PERSON_LITERACY";                    
+                }
+
+                
+
+                paramList.Add(SqlHelper.GetOraParam(":p_PERSON_ID", PID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_SEQNO", seqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    foreach (DataRow dr in ((DataTable)ds.Tables[0]).Rows)
+                    {
+
+                        ATTLiteracyType obj = new ATTLiteracyType();
+
+                        obj.LiteracyTypeID = int.Parse(dr["LIT_ID"].ToString());
+                        obj.LiteracyTypeName = dr["LIT_NAME"].ToString();
+                        obj.LiteracyTypeNameEng = dr["LIT_NAME_ENG"].ToString();
+                        obj.FromDate = dr["FROM_DATE"].ToString();
+                        obj.RStatus = dr["R_STAUS"].ToString();
+
+                        lst.Add(obj);
+
+                    }
+
+                }
+
+                return lst;
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        #region Dirty
+        public bool SaveDirtyPersonLiteracy(List<ATTLiteracyType> lst, Int64? submissionNo, int seqNo, string entryBy, OracleTransaction tran)
+        {
+            try
+            {
+                string sp = "";
+
+                foreach (ATTLiteracyType obj in lst)
+                {
+
+                    if (obj.Action == "E")
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_EDIT_PERSON_LITERACY";
+
+                    }
+                    else if (obj.Action == "A")
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_PERSON_LITERACY";
+                    }
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+
+
+                        paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", submissionNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_SEQ_NO", seqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_LITERACY_ID", obj.LiteracyTypeID, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", entryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Date, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", obj.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                        paramList.Clear();
+                    }
+                    else
+                    {
+                        throw new Exception("Error in Saving Person Literacy !!!");
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+        #endregion
+
+    }
+}

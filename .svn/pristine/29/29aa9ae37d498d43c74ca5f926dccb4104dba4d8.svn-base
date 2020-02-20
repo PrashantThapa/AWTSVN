@@ -1,0 +1,57 @@
+﻿using System;
+using System.Collections.Generic;
+using Oracle.DataAccess.Client;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+
+
+namespace HRFA.DataLayer
+{
+    public class DLLFAMSCategory
+    {
+        public List<ATTFAMSCategory> GetCategory(Int16? categoryID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            List<ATTFAMSCategory> lst = new List<ATTFAMSCategory>();
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_CATEGORY";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":p_CAT_ID", categoryID, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTFAMSCategory obj = new ATTFAMSCategory();
+
+                    obj.CategoryID = string.IsNullOrEmpty(drow["CAT_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["CAT_ID"].ToString());
+                    obj.CategoryDesc = drow["CAT_DESC"].ToString();
+
+
+                    lst.Add(obj);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+    }
+}

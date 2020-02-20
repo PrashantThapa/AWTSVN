@@ -1,0 +1,10 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTVoucherGroup
+    {
+        public Int16? VoucherGroupID { get; set; }
+        public string VoucherGroupDesc { get; set; }
+    }
+}

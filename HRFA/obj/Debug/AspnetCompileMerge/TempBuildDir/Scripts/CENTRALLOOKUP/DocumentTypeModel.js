@@ -1,0 +1,335 @@
+﻿function DocumentType(data) {
+    var self = this;
+
+    self.TypeID = ko.observable(data.TypeID);
+    self.TypeName = ko.observable(data.TypeName);
+    self.TypeNameEng = ko.observable(data.TypeNameEng);
+    self.isPerson = ko.observable(data.isPerson);
+    self.isEntity = ko.observable(data.isEntity);
+    self.Status = ko.observable(data.Status);
+    self.UsedFor = ko.observable(data.UsedFor);
+    self.IsUsed = ko.observable(data.IsUsed);
+  
+    if (self.UsedFor() == "Person") {
+        self.UsedFor = ko.observable("Person");
+    }
+    else if (self.UsedFor() == "Entity") {
+        self.UsedFor = ko.observable("Entity");
+    }
+    self.Status = ko.observable(data.Status);
+    self.FromDate = ko.observable(data.FromDate);
+    self.Action = ko.observable(data.Action);
+    self.EntryBy = ko.observable(data.EntryBy);
+    //console.log("data", data);
+};
+
+function DocumentTypeViewModel() {
+    var self = this;
+
+    self.TypeID = ko.observable();
+    self.TypeName = ko.observable();
+    self.TypeNameEng = ko.observable();
+    self.UsedFor = ko.observable();
+    self.Status = ko.observable(true);
+    self.FromDate = ko.observable();
+    self.DocumentTypes = ko.observableArray([]);
+    self.IsUsed = ko.observable("Person");
+    self.Action = ko.observable("");
+
+    //slected record for edit
+    self.selectedItem = ko.observable();
+    var entryBy = $("#user").text();
+
+    //--------------------------------------------------------------
+    // To Add New Data to  Grid
+    //--------------------------------------------------------------
+
+    self.AddDocumentType = function () {
+
+        var errMsg = "";
+
+        var doc = self.selectedItem();
+        self.TypeName($("#TypeName").val());
+
+        //-----------in case to edit/update----------
+
+        if (doc != undefined) {
+
+            //validating controls      
+            if (self.Validation()) {
+                doc.TypeID(self.TypeID());
+                doc.TypeName(self.TypeName());
+                doc.TypeNameEng(self.TypeNameEng());
+                doc.UsedFor(self.IsUsed());
+                doc.Status(self.Status());
+                doc.FromDate(self.FromDate());
+                var action = self.Action() == "A" ? "A" : "E";
+                doc.Action(action);
+
+                self.selectedItem(null);
+
+                var btnAdd = $("button.icon-ok");
+                btnAdd.removeClass("icon-ok").addClass("icon-add");
+                btnAdd.text("Add");
+
+                self.ClearControls();
+            }
+        }
+
+        //---------in case of adding new record to grid----------------
+        else {
+            //validating controls
+            if (self.Validation()) {
+                doc = {
+                    TypeID: null,
+                    TypeName: self.TypeName(),
+                    TypeNameEng: self.TypeNameEng(),
+                    UsedFor: self.IsUsed(),
+                    Status: self.Status(),
+                    FromDate: self.FromDate(),
+                    Action: "A",
+                    EntryBy: entryBy
+
+                };
+
+                if (self.DocumentTypes.indexOf(doc) > -1) {
+                    return;
+                }
+
+                self.DocumentTypes.push(new DocumentType(doc));
+
+
+                var btnAdd = $("button.icon-ok");
+                btnAdd.removeClass("icon-ok").addClass("icon-add");
+                btnAdd.text("Add");
+
+                //--clearing controls------
+
+                self.ClearControls();
+
+            }
+        }
+
+    };
+
+    //--------------------------------------------------------------
+    // To Clear Controls
+    //--------------------------------------------------------------
+    self.ClearControls = function () {
+        self.TypeID("");
+        self.TypeName("");
+        self.TypeNameEng("");
+        self.UsedFor("Person");
+        self.IsUsed("Person");
+        self.Status(true);
+        self.FromDate("");
+        self.Action("");
+        self.selectedItem(null);
+
+
+        var btnAdd = $("button.icon-ok");
+        btnAdd.removeClass("icon-ok").addClass("icon-add");
+        btnAdd.text("Add");
+    };
+
+    //--------------------------------------------------------------
+    //To Validate Controls
+    //--------------------------------------------------------------
+    self.Validation = function () {
+
+        var errMsg = "";
+        var objFocus = null;
+
+
+        if (Validate.empty(self.TypeName())) {
+            errMsg = "Please fill Document Type Name !!!<br>";
+        }
+
+        if (Validate.empty(self.TypeNameEng())) {
+
+            errMsg += "Please fill Document Type Name English !!!<br>";
+        }
+
+        if (errMsg !== "") {
+             msg(errMsg,"WARNING");
+
+            return false;
+        }
+        else {
+            return true;
+        }
+
+    };
+
+    //---------------------------------------- ----------------------
+    // To Load Data Intially
+    //--------------------------------------------------------------
+    self.LoadControls = function () {
+
+        waitMsg("Loading");
+        waitMsg.show();
+
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            url: '../../Handlers/CENTRALLOOKUP/DocumentTypeHandler.ashx',
+            data: { 'method': 'GetDocumentTypes', 'doctypeid': null, 'token': $("#token").text() },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                waitMsg.hide();
+                if (result.IsSucess) {
+                    var mappedTask = $.map(result.ResponseData, function (item) {
+
+                        return new DocumentType(item)
+                    });
+
+                    self.DocumentTypes(mappedTask);
+                }
+                else {
+
+                    if (!result.IsToken)
+                        msg(result.Message, "WARNING", null, ClearSession);
+                    else
+                        msg(result.Message, "WARNING");
+                }
+
+
+            },
+            error: function (err) {
+                waitMsg.hide();
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+    }
+
+
+    //--------------------------------------------------------------
+    // To Remove Grid Data
+    //--------------------------------------------------------------
+
+    self.DeleteDocument = function (document) {
+        Confirm('Are you sure to Delete?', 'Confirmation Dialog', function (r) {
+            if (r) {
+                waitMsg("Deleting");
+                waitMsg.show();
+
+                $.ajax({
+                    dataType: "json",
+                    cache: false,
+                    url: '../../Handlers/CENTRALLOOKUP/DocumentTypeHandler.ashx',
+                    data: { 'method': 'DeleteDocumentType', 'doctypeid': document.TypeID, 'token': $("#token").text() },
+                    success: function (result) {
+                        waitMsg.hide();
+                        if (result.IsSucess) {
+                            self.DocumentTypes.remove(document);
+                            msg(result.Message);
+                        }
+                        else {
+                            msg(result.Message, "WARNING");
+                        }
+
+                    },
+                    error: function (err) {
+                        waitMsg.hide();
+                        msg(err.status + "-" + err.statusText);
+                    }
+                });
+            }
+        });
+    };
+    
+
+    //--------------------------------------------------------------
+    //NB: To Edit Grid Data
+    //--------------------------------------------------------------
+
+    self.EditDocument = function (document) {
+        
+        self.TypeID(document.TypeID());
+        self.TypeName(document.TypeName());
+        self.TypeNameEng(document.TypeNameEng());
+
+        if (document.UsedFor() == "Person") {
+            self.IsUsed("Person");
+        }
+        else if (document.UsedFor() == "Entity") {
+            self.IsUsed("Entity");
+        }
+        self.Status(document.Status());
+        self.FromDate(document.FromDate());
+        
+        if (document.Action() == "A") {
+            self.Action("A");
+        }
+        else {
+            self.Action("E");
+        }
+        
+        self.selectedItem(document);
+        
+
+        var btnAdd = $("button.icon-add");
+        btnAdd.removeClass("icon-add").addClass("icon-ok");
+        btnAdd.text("Update");
+
+    }
+
+
+    //--------------------------------------------------------------
+    // To Clear Controls
+    //--------------------------------------------------------------
+    self.ClearDocumentType = function () {
+        self.ClearControls();
+        self.DocumentTypes.removeAll();
+    };
+
+
+    //--------------------------------------------------------------
+    //NB: To Save
+    //--------------------------------------------------------------
+
+    self.SaveDocumentType = function (Document) {
+        waitMsg("Saving");
+        waitMsg.show();
+
+        var jsonData = FilteredJson(ko.toJS(self.DocumentTypes));
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            cache: false,
+            url: '../../Handlers/CENTRALLOOKUP/DocumentTypeHandler.ashx',
+            data: { 'method': 'SaveDocumentType', 'doctype': JSON.stringify(jsonData), 'token': $("#token").text() },
+            contentType: "applicaton/json; character=utf -8",
+
+            success: function (result) {
+                waitMsg.hide();
+                msg(result.Message);
+
+                if (result.IsSucess) {
+                    msg(result.Message);
+
+                }
+                else {
+                    if (!result.IsToken)
+                        msg(result.Message, "WARNING", null, ClearSession);
+                    else
+                        msg(result.Message, "WARNING");
+                }
+            },
+            error: function (err) {
+                waitMsg.hide();
+                msg(err.status + " - " + err.statusText);
+            }
+
+
+        });
+    };
+    self.LoadControls();
+};
+$(document).ready(function () {
+
+    ValidateSession();
+    ko.applyBindings(new DocumentTypeViewModel());
+  
+  });

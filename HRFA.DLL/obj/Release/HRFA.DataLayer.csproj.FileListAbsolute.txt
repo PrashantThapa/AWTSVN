@@ -1,0 +1,12 @@
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\Release\HRFA.DataLayer.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\Release\HRFA.DataLayer.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\Release\HRFA.ATT.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\Release\HRFA.COMMON.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\Release\Interop.zkemkeeper.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\Release\Newtonsoft.Json.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\Release\HRFA.ATT.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\Release\HRFA.COMMON.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\obj\Release\HRFA.DataLayer.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\obj\Release\HRFA.DataLayer.csproj.CopyComplete
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\obj\Release\HRFA.DataLayer.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\obj\Release\HRFA.DataLayer.pdb

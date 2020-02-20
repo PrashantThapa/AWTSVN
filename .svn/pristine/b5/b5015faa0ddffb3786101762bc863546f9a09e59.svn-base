@@ -1,0 +1,403 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public  class DLLOfficeCompanyAccChart
+    {
+
+      public List<ATTOfficeCompanyAccChart> GetGLCodewithSubsidary(int? OfficeID, int? AccCode)
+      {
+          GetConnection getConn = new GetConnection();
+          OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+          List<ATTOfficeCompanyAccChart> lstOfficeCompanyAccChart = new List<ATTOfficeCompanyAccChart>();
+
+          try
+          {
+              string SP = "APR_GET_OFF_SUBACCT";
+
+              List<OracleParameter> paramList = new List<OracleParameter>();
+              paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_ID", OfficeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+              paramList.Add(SqlHelper.GetOraParam(":P_AC_CODE", AccCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+              paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+
+              DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+              foreach (DataRow drow in ds.Tables[0].Rows)
+              {
+                  ATTOfficeCompanyAccChart objOfficeCompanyAccChart = new ATTOfficeCompanyAccChart();
+
+                  objOfficeCompanyAccChart.Company.Office.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_ID"].ToString());
+                  objOfficeCompanyAccChart.AccountChart.AcNo = drow["ACCNO"].ToString();
+                  
+                  objOfficeCompanyAccChart.AccountChart.AccName = drow["ACCNAME"].ToString();
+  //                objOfficeCompanyAccChart.AccountChart.ACNameEng = drow["AC_NAME_ENG"].ToString();
+                  
+
+                  objOfficeCompanyAccChart.Action = "";
+                  lstOfficeCompanyAccChart.Add(objOfficeCompanyAccChart);
+
+              }
+
+              return lstOfficeCompanyAccChart;
+          }
+          catch (Exception ex)
+          {
+
+              throw (ex);
+          }
+          finally
+          {
+              getConn.CloseDbConn();
+          }
+      }
+
+      public string SaveOfficeComAcchart(List<ATTOfficeCompanyAccChart> lstOfficeComAcchart)
+        {
+           
+            string msg = "No Data To Save !!!";
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+            try
+            {
+                foreach (ATTOfficeCompanyAccChart OfficeCompanyAccChart in lstOfficeComAcchart)
+                {
+                    string sp = "";
+                    
+                    msg = "Successfully Saved.";
+                    if (OfficeCompanyAccChart.Action == "A")
+                    {
+                        sp = "APR_ADD_OFF_ACCHART";
+                        msg = "Successfully Saved.";
+                    }
+                    else if (OfficeCompanyAccChart.Action == "E")
+                    {
+                        sp = "APR_EDIT_OFF_ACCHART";
+                        msg = "Successfully Updated.";
+                    }
+                    else if (OfficeCompanyAccChart.Action == "D")
+                    {
+                        sp = "APR_ADD_OFF_ACCHART";
+                        msg = "Successfully Updated.";
+                    }
+
+                    if (sp != "")
+                    {                       
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+                        paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_ID", OfficeCompanyAccChart.Company.Office.OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", OfficeCompanyAccChart.Company.CompanyID, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+                        paramList.Add(SqlHelper.GetOraParam(":P_AC_CODE", OfficeCompanyAccChart.AccountChart.AccCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", OfficeCompanyAccChart.AccountChart.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", OfficeCompanyAccChart.AccountChart.ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", OfficeCompanyAccChart.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", OfficeCompanyAccChart.EntryDate, OracleDbType.Date, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", OfficeCompanyAccChart.Rstatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_TRAN_NO", OfficeCompanyAccChart.TranNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                        SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                        paramList.Clear();
+                       
+                    }
+                }
+                tran.Commit();
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw new Exception("Error" + ex.Message);
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+
+        }
+
+      public List<ATTOfficeCompanyAccChart> GetOfficeComanyAcchart(int? OfficeID, int? companyID,string P_all, string VType)
+      {
+          GetConnection getConn = new GetConnection();
+          OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+          List<ATTOfficeCompanyAccChart> lstOfficeCompanyAccChart = new List<ATTOfficeCompanyAccChart>();
+
+         try
+          {
+              string SP = "APR_GET_COMPANY_ACCHART";
+
+              List<OracleParameter> paramList = new List<OracleParameter>();
+              paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_ID", OfficeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+              paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", companyID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+             
+              paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+              paramList.Add(SqlHelper.GetOraParam(":p_all", P_all, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+              paramList.Add(SqlHelper.GetOraParam(":P_VOUCHER_TYPE", VType, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+             
+              DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+              foreach (DataRow drow in ds.Tables[0].Rows)
+              {
+                  ATTOfficeCompanyAccChart objOfficeCompanyAccChart = new ATTOfficeCompanyAccChart();
+                  objOfficeCompanyAccChart.AccountChart.AccName = drow["AC_NAME"].ToString();
+                  objOfficeCompanyAccChart.AccountChart.ACNameEng = drow["AC_NAME_ENG"].ToString();
+                  objOfficeCompanyAccChart.AccountChart.GlCode = drow["GL_CODE"].ToString();
+                  objOfficeCompanyAccChart.AccountChart.FromDate = drow["from_date"].ToString();
+                  objOfficeCompanyAccChart.AccountChart.HeadTran = drow["HEAD_TRAN"].ToString();
+                  objOfficeCompanyAccChart.AccountChart.AccCode = string.IsNullOrEmpty(drow["AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["AC_CODE"].ToString());
+                    objOfficeCompanyAccChart.AccountChart.PaACCode = string.IsNullOrEmpty(drow["PA_AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["PA_AC_CODE"].ToString());
+                    objOfficeCompanyAccChart.AccountChart.GLGroup.GroupName = drow["GROUP_NAME"].ToString();
+                  objOfficeCompanyAccChart.Selected = drow["SELECTED"].ToString();
+                  objOfficeCompanyAccChart.AccountChart.BORC = drow["BORC"].ToString();
+                  objOfficeCompanyAccChart.Action = "";
+                  objOfficeCompanyAccChart.AccountChart.HaveSubs = drow["HAVESUBS"].ToString(); 
+                  lstOfficeCompanyAccChart.Add(objOfficeCompanyAccChart);
+
+              }
+
+              return lstOfficeCompanyAccChart;
+          }
+          catch (Exception ex)
+          {
+
+              throw (ex);
+          }
+          finally
+          {
+              getConn.CloseDbConn();
+          }
+      }
+
+      public List<ATTOfficeCompanyAccChart> GetOfficeComanyAcchartLedger(int? OfficeID, int? companyID, string P_all, string VType)
+      {
+          GetConnection getConn = new GetConnection();
+          OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+          List<ATTOfficeCompanyAccChart> lstOfficeCompanyAccChart = new List<ATTOfficeCompanyAccChart>();
+
+          try
+          {
+              string SP = "apr_GET_COMPANY_ACCHART_ledger";
+
+              List<OracleParameter> paramList = new List<OracleParameter>();
+              paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_ID", OfficeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+              paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", companyID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+
+              paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+              paramList.Add(SqlHelper.GetOraParam(":p_all", P_all, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+              paramList.Add(SqlHelper.GetOraParam(":P_VOUCHER_TYPE", VType, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+              DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+              foreach (DataRow drow in ds.Tables[0].Rows)
+              {
+                  ATTOfficeCompanyAccChart objOfficeCompanyAccChart = new ATTOfficeCompanyAccChart();
+
+                  objOfficeCompanyAccChart.AccountChart.HeadTran = drow["HEAD_TRAN"].ToString();
+                  if (objOfficeCompanyAccChart.AccountChart.HeadTran == "T")
+                  {
+                      objOfficeCompanyAccChart.AccountChart.AccName = drow["AC_NAME"].ToString();
+                      objOfficeCompanyAccChart.AccountChart.ACNameEng = drow["AC_NAME_ENG"].ToString();
+                      objOfficeCompanyAccChart.AccountChart.GlCode = drow["GL_CODE"].ToString();
+                      objOfficeCompanyAccChart.AccountChart.FromDate = drow["from_date"].ToString();
+
+                      objOfficeCompanyAccChart.AccountChart.AccCode = string.IsNullOrEmpty(drow["AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["AC_CODE"].ToString());
+                      objOfficeCompanyAccChart.AccountChart.GLGroup.GroupName = drow["GROUP_NAME"].ToString();
+                      objOfficeCompanyAccChart.Selected = drow["SELECTED"].ToString();
+                      objOfficeCompanyAccChart.AccountChart.BORC = drow["BORC"].ToString();
+                      objOfficeCompanyAccChart.Action = "";
+                      objOfficeCompanyAccChart.AccountChart.HaveSubs = drow["HAVESUBS"].ToString(); ;
+                      lstOfficeCompanyAccChart.Add(objOfficeCompanyAccChart);
+                  }
+
+              }
+
+              return lstOfficeCompanyAccChart;
+          }
+          catch (Exception ex)
+          {
+
+              throw (ex);
+          }
+          finally
+          {
+              getConn.CloseDbConn();
+          }
+      }
+
+      public List<ATTOfficeCompanyAccChart> GetOfficeComanyAcchartBorC(int? OfficeID, int? companyID, string btype)
+      {
+          GetConnection getConn = new GetConnection();
+          OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+          List<ATTOfficeCompanyAccChart> lstOfficeCompanyAccChart = new List<ATTOfficeCompanyAccChart>();
+
+          try
+          {
+              string SP = "APR_GET_COMPANY_ACCHART_BORC";
+
+              List<OracleParameter> paramList = new List<OracleParameter>();
+              paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_ID", OfficeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+              paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", companyID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+              paramList.Add(SqlHelper.GetOraParam(":P_BORC", btype, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+              // paramList.Add(SqlHelper.GetOraParam(":p_all","N", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+              paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+              DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+              foreach (DataRow drow in ds.Tables[0].Rows)
+              {
+                  ATTOfficeCompanyAccChart objOfficeCompanyAccChart = new ATTOfficeCompanyAccChart();
+                  objOfficeCompanyAccChart.AccountChart.AccName = drow["AC_NAME"].ToString();
+                  objOfficeCompanyAccChart.AccountChart.ACNameEng = drow["AC_NAME_ENG"].ToString();
+                  objOfficeCompanyAccChart.AccountChart.GlCode = drow["GL_CODE"].ToString();
+                  objOfficeCompanyAccChart.AccountChart.HeadTran = drow["HEAD_TRAN"].ToString();
+                  objOfficeCompanyAccChart.AccountChart.AccCode = string.IsNullOrEmpty(drow["AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["AC_CODE"].ToString());
+                  objOfficeCompanyAccChart.AccountChart.GLGroup.GroupName = drow["GROUP_NAME"].ToString();
+                  objOfficeCompanyAccChart.Selected = drow["SELECTED"].ToString();
+                  objOfficeCompanyAccChart.Action = "";
+                  lstOfficeCompanyAccChart.Add(objOfficeCompanyAccChart);
+
+              }
+
+              return lstOfficeCompanyAccChart;
+          }
+          catch (Exception ex)
+          {
+
+              throw (ex);
+          }
+          finally
+          {
+              getConn.CloseDbConn();
+          }
+      }
+
+
+      public List<ATTGetAccounts> GetAccounts(int? args)
+      {
+          GetConnection getConn = new GetConnection();
+          OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+          List<ATTGetAccounts> lstOfficeCompanyAccChart = new List<ATTGetAccounts>();
+
+          try
+          {
+              string SP = "APR_GET_ACCOUNTS";
+
+              List<OracleParameter> paramList = new List<OracleParameter>();
+              
+              paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+              DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+              foreach (DataRow drow in ds.Tables[0].Rows)
+              {
+                  ATTGetAccounts objOfficeCompanyAccChart = new ATTGetAccounts();
+                  objOfficeCompanyAccChart.AccountID = string.IsNullOrEmpty(drow["ACCOUNT_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["ACCOUNT_ID"].ToString());
+                  objOfficeCompanyAccChart.AccNameNep = drow["ACCT_NAME_NEP"].ToString();
+                  objOfficeCompanyAccChart.AccNameEng = drow["ACCT_NAME_ENG"].ToString();
+                  lstOfficeCompanyAccChart.Add(objOfficeCompanyAccChart);
+
+              }
+
+              return lstOfficeCompanyAccChart;
+          }
+          catch (Exception ex)
+          {
+
+              throw (ex);
+          }
+          finally
+          {
+              getConn.CloseDbConn();
+          }
+      }
+
+
+      public List<ATTOfficeCompanyAccChart> GetOfficeComAcchart(int? OfficeID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            List<ATTOfficeCompanyAccChart> lstOfficeCompanyAccChart = new List<ATTOfficeCompanyAccChart>();
+
+            try
+            {
+                string SP = "APR_GET_OFF_ACCHART";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_ID", OfficeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTOfficeCompanyAccChart objOfficeCompanyAccChart = new ATTOfficeCompanyAccChart();
+
+                    objOfficeCompanyAccChart.Company.Office.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_ID"].ToString());
+                    objOfficeCompanyAccChart.AccountChart.AccCode = string.IsNullOrEmpty(drow["AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["AC_CODE"].ToString());
+                    objOfficeCompanyAccChart.FromDate = drow["FROM_DATE"].ToString();
+                    objOfficeCompanyAccChart.ToDate = drow["TO_DATE"].ToString();
+                    objOfficeCompanyAccChart.EntryBy = drow["ENTRY_BY"].ToString();
+                    objOfficeCompanyAccChart.EntryDate = drow["ENTRY_DATE"].ToString();
+                    objOfficeCompanyAccChart.Rstatus = drow["R_STATUS"].ToString();
+                    objOfficeCompanyAccChart.TranNo = string.IsNullOrEmpty(drow["TRAN_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["TRAN_NO"].ToString());
+                    objOfficeCompanyAccChart.Action = "";
+                    lstOfficeCompanyAccChart.Add(objOfficeCompanyAccChart);
+
+                }
+
+                return lstOfficeCompanyAccChart;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+      public string DeleteOfficeComAcchart(int? OfficeID)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+
+
+
+            try
+            {
+                string SP = "APR_DELETE_";
+
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":P_", OfficeID, OracleDbType.Int32, ParameterDirection.InputOutput));
+
+                SqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+                return "Deleted Successfully.";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+        }
+
+
+
+    }
+}

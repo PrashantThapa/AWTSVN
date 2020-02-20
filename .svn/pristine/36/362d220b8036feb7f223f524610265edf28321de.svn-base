@@ -1,0 +1,637 @@
+﻿function structureModule(data) {
+    var self = this;
+    self.ModuleID = ko.observable(data.ModuleID);
+    self.ModuleCount = ko.observable(data.ModuleCount);
+    self.RoleID = ko.observable(data.RoleID);
+    self.VerifyLevel = ko.observable(data.VerifyLevel);
+    self.EntryBY = ko.observable(data.EntryBY);
+    self.Action = ko.observable(data.LevelOfVerification);
+};
+
+function VerifiedContributors(data) {
+    var self = this;
+    self.username = ko.observable(data.username);
+    self.name = ko.observable(data.name);
+    self.password = ko.observable(data.password);
+    self.ssid = ko.observable(data.ssid);
+}
+
+var structureTransactions = function Transactions(data) {
+    var self = this;
+
+    self.TranNo = ko.observable(data.TranNo);
+    self.ModuleID = ko.observable(data.ModuleID);
+    self.EntryBY = ko.observable(data.EntryBY);
+    self.UpdatedBY = ko.observable(data.UpdatedBY);
+    self.Verified = ko.observable(data.Verified);
+    self.Action = ko.observable(data.Action);
+    self.PreviousStatus = ko.observable(data.PreviousStatus);
+    self.Remarks = ko.observable(data.Remarks);
+
+};
+
+
+
+//NB: View Model Goes Here--------------------------------------------------------------------------------------------------------(1)
+var ViewModelModule = function () {
+    var self = this;
+    self.ModuleID = ko.observable();
+    self.Module = ko.observable();
+    self.VMFromDate = ko.observable();
+    self.UserID = ko.observable();
+    self.Action = ko.observable();
+
+    //-------------------------------
+    self.username = ko.observable();
+    self.name = ko.observable();
+    self.password = ko.observable();
+    self.ssid = ko.observable();
+    self.GlobalArray = ko.observableArray([]);
+    //-------------------------------
+    self.ModName = ko.observable();
+
+
+    //setting empty for Transaction-------
+    self.ModuleID = ko.observable();
+    self.EntryBY = ko.observable();
+    self.UpdatedBY = ko.observable();
+    self.FromDate = ko.observable();
+    self.TranNo = ko.observable();
+    self.Verified = ko.observable();
+    self.LevelDone = ko.observable();
+    self.Action = ko.observable();
+    self.PreviousStatus = ko.observable();
+    self.Remarks = ko.observable();
+    self.TransacNo = ko.observable();
+
+    self.SeqNo = ko.observable();
+    self.VerifyStatus = ko.observable();
+    self.VerifyDate = ko.observable();
+    self.VerifyRemarks = ko.observable();
+    self.ForwardTo = ko.observable();
+    self.UFromDate = ko.observable();
+    self.NoOfLevelReq = ko.observable();
+    self.PrevStatus = ko.observable();
+    self.RowIndex = ko.observable();
+
+
+
+    //NB: List --------------------------------------------------------------------------------------------------(3)
+    self.LoadModuleLST = ko.observableArray([]);
+    self.TransactionLST = ko.observableArray([]);
+    //NB: End of List -------------------------------------------------------------------------------------------(3;)
+
+    //NB: Modules  onLoad-----------------------------------------------------------------------------------------(4)
+
+
+
+    //NB: Get Employer By Submission/Tran Number ----------------------------------------------------------------------------------------(8)
+
+    self.GetApplicationByTranNumber = function (TranNumber) {
+        var tranNo = ko.toJS(TranNumber.TranNo);
+        var hght = screen.height;
+        var wdth = screen.width;        
+        //var objData = ko.toJS(self.LoadModuleLST());
+        //var modID = objData[0].ModuleID;
+        var index = ko.toJS(self.RowIndex());
+
+        var modID = ko.toJS(self.LoadModuleLST()[index].ModuleID);
+        // var ModuleName = ko.toJS(self.LoadModuleLST()[index].Module);
+        //var res = ModuleName.match(/\(([^)]+)\)/)[1];
+        //console.log(modID);
+        // alert(modID + " " + tranNo);
+        /****************************************** PIS Begin ***********************************************/
+        if (modID == "EMPREG") {
+            var url = "/Modules/PIS/EmployeeD.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "EMPAPP") {
+
+            var url = "/Modules/PIS/Appointment.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F&Editable=Y";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "EMPPOS") {
+
+            var url = "/Modules/PIS/EmployeePosting.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F&Editable=Y";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "EMPPRO") {
+
+            var url = "/Modules/PIS/Promotion.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "EMPPNS") {
+            var url = "/Modules/PIS/Punishment.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "EMPAWD") {
+            var url = "/Modules/PIS/Award.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "EMPRTM") {
+            var url = "/Modules/PIS/Retirement.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "EMPRES") {
+            var url = "/Modules/PIS/Resignation.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        if (modID == "EMPLCAN") {
+            var url = "/Modules/PIS/LeaveCancellation.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "EMPRWN") {
+
+            var url = "/Modules/PIS/EmployeeRawana.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "EMPTRA") {
+
+            var url = "/Modules/PIS/EmployeeTransfer.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        if (modID == "EMPDEPT") {
+
+            var url = "/Modules/PIS/EmployeeDeputation.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "EMPDEPTRTN") {
+
+            var url = "/Modules/PIS/EmpDeputationReturn.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "EMPATT") {
+
+            var url = "/Modules/PIS/EmployeeAttendanceForm.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        /****************************************** PIS End ***********************************************/
+
+
+        /****************************************** Payroll Begin ***********************************************/
+        if (modID == "EMPSALITEM") {
+            var url = "/Modules/PAYROLL/EmployeeSalary.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        if (modID == "POSTSALITEM") {
+            var url = "/Modules/PAYROLL/PostWiseSalaryItemSetup.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        //if (modID == "EMPGRADESCALE") {
+        //    var url = "/Modules/PAYROLL/EmployeeGradeScaleSetup.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+        //    window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        //}
+
+
+        /****************************************** Payroll End ***********************************************/
+
+        /****************************************** Accounts Begin ***********************************************/
+
+        if (modID == "VENTRY") {
+            var url = "/Modules/ACCOUNTS/OfficeTransaction.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        /****************************************** Accounts End ***********************************************/
+
+
+
+        /****************************************** FAMS Begin ***********************************************/
+
+
+        if (modID == "BUDREQST") {
+            var url = "/Modules/FAMS/BudgetRequest.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "APPRBUDGET") {
+
+            var url = "/Modules/FAMS/BudgetApprove.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+        if (modID == "BUDGETREL") {
+
+            var url = "/Modules/FAMS/BudgetRelease.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        if (modID == "PURORDER") {
+            var url = "/Modules/FAMS/PurchaseOrder.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        if (modID == "VENDORREG") {
+            var url = "/Modules/FAMS/VendorRegistration.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        if (modID == "BUDGETTRAN") {
+            var url = "/Modules/FAMS/BudgetTransfer.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+
+        if (modID == "BLANKETPUR") {
+            var url = "/Modules/FAMS/BlanketPurchase.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        if (modID == "EMPDEPTCOSTCENTER") {
+            var url = "/Modules/PIS/EmpDeptCostAssign.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        if (modID == "EMPSALPAY") {
+            var url = "/Modules/PAYROLL/EmployeeSalaryPayment.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        if (modID == "EMPGRADE") {
+            var url = "/Modules/PAYROLL/EmployeeGrade.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        if (modID == "BVENRTY") {
+            var url = "/Modules/ACCOUNTS/OfficeVoucherTransaction.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+                if (modID == "EMPSAL") {
+                    var url = "/Modules/FAMS/SalarySheetAdjustment.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+                    window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+                }
+
+        if (modID == "EMPSAL") {
+            var url = "/Modules/ACCOUNTS/OfficeVoucherTransaction.aspx?SubmissionNumber=" + tranNo + "&MenuOptions=F";
+            window.open(url, '_blank', 'width=' + wdth + ', height=' + hght + ',scrollbars=yes');
+        }
+
+        //if (modID == "EMPSAL") {
+
+        //    var data = {
+        //        TranNo: tranNo
+
+        //    }
+
+        //    var hght = screen.height;
+        //    var left = (screen.width / 2) - (900 / 2);
+        //    var url = "/Reporting/Payroll/ReportHandlers/EmployeeSalaryRepHandler.ashx";
+        //    var winOption = "width=900,resizable=yes,scrollbars=yes,left=" + 230 + ",height=" + hght + "";
+        //    OpenWindowWithPost(url, winOption, "NewFile", data);
+
+        //}
+
+
+
+        /********************************************** FAMS End *************************************************/
+    };
+
+    self.VerifyTransaction = function (TranNumber) {
+        var index = ko.toJS(self.RowIndex());
+        var modID = ko.toJS(self.LoadModuleLST()[index].ModuleID);
+        Confirm('Are You Sure?', 'Confirmation Dialog', function (r) {
+            if (r) {
+                VerifyReject(TranNumber, modID, "V");
+                self.LoadModules();
+            }
+        });
+
+    }
+
+
+
+    self.RejectTransaction = function (TranNumber) {
+        $('#RejectModal').modal('toggle');
+        self.TransacNo(TranNumber);
+    }
+
+    self.RejectTran = function () {
+        if (Validate.empty(self.Remarks())) {
+            msg("Please Fill Remarks!!", "WARNING");
+        }
+        else {
+            Confirm('Are You Sure To Reject? !!', 'Confirmation Dialog', function (r) {
+                if (r) {
+                    VerifyReject(self.TransacNo(), "", "R");
+                    self.LoadModules();
+                }
+            });
+
+        }
+    }
+
+    VerifyReject = function (TranNumber, modulename, verifyStatus) {
+        var index = ko.toJS(self.RowIndex());
+        var moduledata = ko.toJS(self.LoadModuleLST()[index]);
+        var tranNo = ko.toJS(TranNumber).TranNo;
+        var mdlID = moduledata.ModuleID;
+        var uid = moduledata.EntryBY;
+        var tran = {
+            //ApplicationID: appID,
+            ModuleID: mdlID,
+            //FromDate: uFrmDate,
+            //TranNo: tranNo.TranNo(),
+            TranNo: tranNo,
+            UpdatedBY: uid,
+            EntryBY: uid,
+            //SeqNo: null,
+            //UserID: uid,
+            //VerifyLevel: veriLevel,
+            VerifyStatus: verifyStatus,
+            //VerifyDate: getDate(),
+            //VerifyRemarks: self.Remarks(),
+            //ForwardTo: self.ForwardTo(),
+    
+            //NoOfLevelReq: self.NoOfLevelReq(),
+            //PrevStatus: TranNumber.PreviousStatus(),
+            Action: "A"
+        }
+        waitMsg("Saving");
+        waitMsg.show();
+
+        var jsonData = FilteredJson(ko.toJS(self.ContactTypes));
+
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            cache: false,
+            url: '../../../Handlers/VERIFICATION/ModuleVerificationHandler.ashx',
+            data: { 'method': 'VerifyTransaction', 'args': JSON.stringify(tran) },
+            contentType: "applicaton/json; character=utf -8",
+            success: function (result) {
+                waitMsg.hide();
+                msg(result.Message);                
+                if (result.IsSucess) {
+                    if (modulename == "CONTREG") {
+                        debugger;
+                        contMsg = result.Message;
+                        var str_split = contMsg.split(".");
+                        var str_data = [];
+                        for (var i = 0; i < str_split.length - 1; i++) {
+                            var str_spn = str_split[i].split(",");
+                            var name, username, password, ssid;
+                            for (var j = 0; j < str_spn.length; j++) {
+                                var str_spnn = str_spn[j].split(":")[1];
+                                switch (j) {
+                                    case 0:
+                                        name = str_spnn;
+                                        break;
+                                    case 1:
+                                        username = str_spnn;
+                                        break;
+                                    case 2:
+                                        password = str_spnn;
+                                        break;
+                                    case 3:
+                                        ssid = str_spnn;
+                                        break;
+                                }
+                                str_data = {
+                                    name: name,
+                                    username: username,
+                                    password: password,
+                                    ssid: ssid
+                                };
+                            }
+
+                            self.GlobalArray.push(new VerifiedContributors(str_data));
+
+                        }
+                        $('#modalVerifiedContributors').modal('show');
+                    }
+                    else {
+                        msg(result.Message, "ALERT", "Success");
+                        self.TransactionLST.remove(tranNo);
+                        var len = res.length + 2;
+                        var num = res - 1;
+                        var modName = ModuleName.substring(0, ModuleName.length - len);
+                        var moduleNames = modName + "(" + num + ")";
+
+                        self.LoadModuleLST()[index].Module(moduleNames);
+
+                    }
+                }
+                else {
+                    if (!result.IsToken)
+
+                        msg("Oops! Error occured while verifying modules..", "WARNING");
+                    //msg('', "WARNING", null, ClearSession);
+                    else
+                        //debugger;
+                        //msg(result.Message, "WARNING");
+                        msg("Oops! Error occured while verifying modules..", "WARNING");
+                }
+
+            },
+            error: function (err) {
+                waitMsg.hide();
+                msg("Oops! Error occured while Searching modules.. ...", "WARNING");
+                //	msg(err.status + " - " + err.statusText);
+            }
+
+
+        });
+        $("#spnSubmissionNo").text(ko.toJS(tranNo.TranNo));
+        if (verifyStatus == "R") {
+            self.Remarks('');
+            $('#RejectModal').modal('toggle');
+        }
+    }
+
+    //NB: Get Employer By Submission/Tran Number End Here--------------------------------------------------------------------------------(8)
+
+
+    self.LoadModules = function () {
+        waitMsg("Loading");
+        waitMsg.show();
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            url: '../../../Handlers/VERIFICATION/ModuleVerificationHandler.ashx',
+            data: { 'method': 'GetUnverifiedModulesWithCount', 'roleID': '1' },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                waitMsg.hide();
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new structureModule(item)
+                });
+                self.LoadModuleLST(mappedTask);
+                /* Return Back From ContributorList */
+                if (getUrlParamVal('V') != '') {
+
+                    for (var i = 0; i < result.ResponseData.length; i++) {
+                        if (result.ResponseData[i].ModuleID == 'CONTREG')
+                            self.LoadTransaction(result.ResponseData[i]);
+                    }
+
+                }
+            },
+            error: function (err) {
+                //msg(err.status + " - " + err.statusText, "FAILURE");
+                msg("Oops! Error occured while verifying modules...", "WARNING");
+
+            }
+        });
+
+    }
+    //NB: End of Modules onLoad---------------------------------------------------------------------------------(4;)
+
+
+    //NB: Loading Transaction while clicking row of Modules of select------------------------------------------(7)
+    self.LoadTransaction = function (dataModules) {
+
+
+        var table = document.getElementById("tblModule");
+        var rows = table.getElementsByTagName("tbody tr");
+
+
+        for (var i = 0; i < self.LoadModuleLST().length; i++) {
+
+            if (ko.toJS(self.LoadModuleLST()[i].ModuleID) === ko.toJS(dataModules.ModuleID)) {
+                self.RowIndex(i);
+
+            }
+
+
+        }
+
+
+        var jsonData = ko.toJS(dataModules);
+        //var applicationId = jsonData.ApplicationID;
+        var moduleId = jsonData.ModuleID;
+
+        //var entryBY = jsonData.EntryBY;
+        //var fromDate = jsonData.VMFromDate;
+        //var userId = jsonData.UserID;
+        var VerifyLevel = jsonData.VerifyLevel;
+        waitMsg("Loading");
+        waitMsg.show();
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            url: '../../../Handlers/VERIFICATION/ModuleVerificationHandler.ashx',
+            data: { 'method': 'GetUnverifiedTransactions', 'moduleID': moduleId, 'roleID': '1' },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                waitMsg.hide();
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new structureTransactions(item)
+                });
+                self.TransactionLST(mappedTask);
+
+                //NB: For Pagination
+                if (self.TransactionLST().length > 0) {
+
+                    var initval = 0;
+                    var subno = getUrlParamVal('SubmissionNumber');
+                    if (subno != '') {
+                        for (var i = 0; i < self.TransactionLST().length; i++) {
+                            if (subno == ko.toJS(self.TransactionLST()[i].TranNo)) {
+                                i = i + 1;
+                                if (i > 10) {
+                                    var inumber = (i / 10) + 1;
+                                    var sindex = String(inumber).indexOf(".");
+                                    initval = String(inumber).substring(0, sindex);
+
+                                }
+                            }
+                        }
+                    }
+                    var width = document.getElementById('tblModuleVarification').offsetWidth;
+                    //document.getElementById('green').style.width = width + "px";
+                    var rowCount = $('#tblModuleVarification >tbody >tr').length;
+                    //$('#green').smartpaginator({ totalrecords: rowCount, recordsperpage: 10, datacontainer: 'tblModuleVarification', dataelement: 'tbody tr', initval: initval, next: '>', prev: '<', first: '<<', last: '>>', "theme": 'green' });
+                    $("#green").show();
+
+                }
+
+                //End of Pagination
+
+
+            },
+            error: function (err) {
+                waitMsg.hide();
+                //msg(err.status + " - " + err.statusText, "FAILURE");
+                msg("Oops! Error occured while Searching modules Transaction Data.....", "WARNING");
+            }
+
+
+
+
+        });
+
+
+
+
+
+
+
+    };
+
+    self.LoadModules(); 
+
+    //NB: End of Loading Transaction while clicking row of Modules of select------------------------------------------(7;)
+
+
+    //#region Begin of Searching Module by Name---------------------------------------------------------------------
+
+    self.SearchModule = function () {
+        var obj = {
+            //UserID: getUser(),
+            //Module: ko.toJS(self.Module)
+            roleID: ko.toJS(self.roleID)
+        }
+        console.log(obj);
+
+        $.ajax({
+            dataType: "json",
+            url: '/Handlers/VERIFICATION/ModuleVerificationHandler.ashx',
+            data: { 'method': 'SearchModuleByName', 'args': JSON.stringify(ko.toJS(obj)) },
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            success: function (result) {
+                waitMsg.hide();
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new structureModule(item)
+                });
+                self.LoadModuleLST(mappedTask);
+                /* Return Back From ContributorList */
+                if (getUrlParamVal('V') != '') {
+                    for (var i = 0; i < result.ResponseData.length; i++) {
+                        if (result.ResponseData[i].ModuleID == 'CONTREG')
+                            self.LoadTransaction(result.ResponseData[i]);
+                    }
+                }
+            },
+
+            error: function (err) {
+                msg("Oops! Error occured while searching modules.....", "WARNING");
+                //msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+
+    }
+
+
+    //#endregion End of Searching Module by Name----------------------------------------------------------------------------------------
+};
+//NB: End of ViewModel Goes Here----------------------------------------------------------------------------------------------------(1;)
+
+
+
+//NB: Binding goes here--------------------------------------------------------------------------------------------------------------(2)
+$(document).ready(function () {
+
+    ValidateSession();
+    ko.applyBindings(new ViewModelModule());
+
+
+});
+//NB:  End of Binding goes here------------------------------------------------------------------------------------------------------(2;)
+
+
+

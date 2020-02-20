@@ -1,0 +1,86 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLOfficeTran
+    {
+       public JsonResponse SaveOfficeTran(ATTOfficeTran objOfficeTran)
+        {
+            JsonResponse response = new JsonResponse();
+            try
+            {
+                DLLOfficeTran objdllOfficeTran = new DLLOfficeTran();
+                response.Message = objdllOfficeTran.SaveOfficeTran(objOfficeTran);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+
+
+       public JsonResponse GetOfficeTran(Int64? tranNo)
+        {
+            JsonResponse response = new JsonResponse();
+
+            try
+            {
+                ATTOfficeTran obj = new ATTOfficeTran();
+                DLLOfficeTran objdllOfficeTran = new DLLOfficeTran();
+                obj = objdllOfficeTran.GetOfficeTran(tranNo);
+                response.Message = "";
+                response.IsSucess = true;
+                response.ResponseData = obj;
+
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+
+       public JsonResponse ValidateBudgetAmount(string fiscalYr, Int64 officeID, Int64 costCenterID, Int64 accCode, double amount)
+       {
+
+           JsonResponse response = new JsonResponse();
+
+           try
+           {
+               DLLOfficeTran objDLLOfficeTran = new DLLOfficeTran();
+               response.Message = objDLLOfficeTran.ValidateBudgetAmount(fiscalYr, officeID, costCenterID, accCode, amount);
+
+               if (response.Message != "OK")
+               {
+                   response.IsSucess = false;
+               }
+               else
+               {
+                   response.IsSucess = true;
+               }
+
+           }
+           catch (Exception ex)
+           {
+               response.IsSucess = false;
+               response.Message = ex.Message;
+
+           }
+
+           return response;
+
+
+       }
+
+    }
+}

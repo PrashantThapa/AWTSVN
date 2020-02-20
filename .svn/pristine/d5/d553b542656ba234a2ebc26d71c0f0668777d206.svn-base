@@ -1,0 +1,84 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT.REPORTING;
+using HRFA.COMMON;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer.REPORTING
+{
+    public class DLLRepPaySlip
+	{
+		public List<ATTRepPaySlip> GetPaySlip(Int64? officeCd, Int64? year, Int64? month, Int64? empId)
+		{
+			GetConnection GetConn = new GetConnection();
+			OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUsers);
+
+			try
+			{
+				string SP = "RPR_VIEW_PAYSLIP";
+
+				List<OracleParameter> paramList = new List<OracleParameter>();
+
+				paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", officeCd, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_YEAR", year, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_MONTH", month, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_EMP_ID", empId, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+				DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+				List<ATTRepPaySlip> lst = new List<ATTRepPaySlip>();
+
+				foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+				{
+					ATTRepPaySlip obj = new ATTRepPaySlip();
+
+					obj.OFFICE_CD = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int64?)null : Int64.Parse(drow["OFFICE_CD"].ToString());
+					obj.OFFICE_NAME_NEPALI = drow["OFFICE_NAME_NEPALI"].ToString();
+					obj.SAL_YEAR = string.IsNullOrEmpty(drow["SAL_YEAR"].ToString()) ? (Int64?)null : Int64.Parse(drow["SAL_YEAR"].ToString());
+					obj.SAL_MONTH = string.IsNullOrEmpty(drow["SAL_MONTH"].ToString()) ? (Int64?)null : Int64.Parse(drow["SAL_MONTH"].ToString());
+					obj.EMP_ID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int64?)null : Int64.Parse(drow["EMP_ID"].ToString());
+					obj.EMP_NAME = drow["EMP_NAME"].ToString();
+					obj.SALARY = drow["SALARY"].ToString();
+					obj.GRADE_AMOUNT = drow["GRADE_AMOUNT"].ToString();
+					obj.PF = drow["PF"].ToString();
+					obj.BARSIK_UTSAB_ALLOWANCE = drow["BARSIK_UTSAB_ALLOWANCE"].ToString();
+					obj.WATER_AND_SEWAGE = drow["WATER_AND_SEWAGE"].ToString();
+					obj.DRESS_ALLOWANCE = drow["DRESS_ALLOWANCE"].ToString();
+					obj.SAWARI_TAX = drow["SAWARI_TAX"].ToString();
+					obj.RESIDENCE_TAX = drow["RESIDENCE_TAX"].ToString();
+					obj.DEARNESS_ALLOWANCE = drow["DEARNESS_ALLOWANCE"].ToString();
+					obj.NLK = drow["NLK"].ToString();
+					obj.SSF = drow["SSF"].ToString();
+					obj.INCOME_TAX = drow["INCOME_TAX"].ToString();
+					obj.KHAJA = drow["KHAJA"].ToString();
+					obj.YATAYAT = drow["YATAYAT"].ToString();
+					obj.A = drow["A"].ToString();
+					obj.D = drow["D"].ToString();
+					obj.POST_DESC = drow["POST_DESC"].ToString();
+					obj.GRADE_MONTH = drow["GRADE_MONTH"].ToString();
+					obj.GRADE_NUMBER = drow["GRADE_NUMBER"].ToString();
+					obj.CIT_NUMBER = drow["CIT_NUMBER"].ToString();
+					obj.PF_NUMBER = drow["PF_NUMBER"].ToString();
+					obj.ACCOUNT_NO = drow["ACCOUNT_NO"].ToString();
+					obj.BANK = string.IsNullOrEmpty(drow["BANK"].ToString()) ? (Int64?)null : Int64.Parse(drow["BANK"].ToString());
+					obj.ATTENDANCE_DAYS = string.IsNullOrEmpty(drow["ATTENDANCE_DAYS"].ToString()) ? (Int64?)null : Int64.Parse(drow["ATTENDANCE_DAYS"].ToString());
+
+					lst.Add(obj);
+
+				}
+				return lst;
+			}
+			catch (Exception ex)
+			{
+				return new List<ATTRepPaySlip>();
+
+			}
+			finally
+			{
+				GetConn.CloseDbConn();
+			}
+		}
+	}
+}

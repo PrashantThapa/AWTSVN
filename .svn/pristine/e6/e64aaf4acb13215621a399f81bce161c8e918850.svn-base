@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5186634F-7A0E-4093-A5A4-1DC382182974}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HRFA.DataLayer</RootNamespace>
+    <AssemblyName>HRFA.DataLayer</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RegisterForComInterop>true</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Interop.zkemkeeper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <HintPath>..\HRFA\JsLibrary\Interop.zkemkeeper.dll</HintPath>
+    </Reference>
+    <Reference Include="Oracle.DataAccess">
+      <HintPath>..\..\..\..\..\..\app\Printer-2\product\11.2.0\client_2\ODP.NET\bin\2.x\Oracle.DataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ACCOUNT\DLLAccountChart.cs" />
+    <Compile Include="ACCOUNT\DLLCompany.cs" />
+    <Compile Include="ACCOUNT\DLLACCEmployee.cs" />
+    <Compile Include="ACCOUNT\DLLGLGroup.cs" />
+    <Compile Include="ACCOUNT\DLLOfficeCompanyAccChart.cs" />
+    <Compile Include="ACCOUNT\DLLOfficeTran.cs" />
+    <Compile Include="ACCOUNT\DLLOfficeTranDetail.cs" />
+    <Compile Include="ACCOUNT\DLLOfficeVoucherTran.cs" />
+    <Compile Include="ACCOUNT\DLLSchedule.cs" />
+    <Compile Include="ACCOUNT\DLLSubsidaryAC.cs" />
+    <Compile Include="ALMS\DLLAttendence.cs" />
+    <Compile Include="ALMS\DLLBalanceLeaveType.cs" />
+    <Compile Include="ALMS\DLLDeviceRegistration.cs" />
+    <Compile Include="ALMS\DLLHolidays.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLAddressType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLAppointmentType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLBank.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLBankAccount.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLBFICapital.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLCategory.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLContactType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLCountry.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLDesignation.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLDistrict.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLDocumentType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLEmployerType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLEmploymentType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLEthinicity.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLFiscalYear.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLLanguage.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLLiteracyType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLLoanType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLMaritalStatus.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLMarkingType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLMedicalAtt.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLOffice.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLOTSetting.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLPosition.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLProvince.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLProduct.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLQualification.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLRelationType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLReligionType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLServiceType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLSkillType.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLState.cs" />
+    <Compile Include="CENTRALLOOKUP\DLLVDC.cs" />
+    <Compile Include="COMMON\DLLDate.cs" />
+    <Compile Include="COMMON\DLLDepartment.cs" />
+    <Compile Include="COMMON\DLLFunction.cs" />
+    <Compile Include="COMMON\DLLLeaveType.cs" />
+    <Compile Include="COMMON\DLLLevel.cs" />
+    <Compile Include="COMMON\DLLOfficePost.cs" />
+    <Compile Include="COMMON\DLLOfficePostDarbandi.cs" />
+    <Compile Include="COMMON\DLLPortalLogin.cs" />
+    <Compile Include="COMMON\DLLPost.cs" />
+    <Compile Include="COMMON\DLLPostWiseLeaveType.cs" />
+    <Compile Include="COMMON\DLLSamuha.cs" />
+    <Compile Include="COMMON\DLLSewa.cs" />
+    <Compile Include="COMMON\DLLShift.cs" />
+    <Compile Include="COMMON\DLLSubmission.cs" />
+    <Compile Include="COMMON\DLLUpaSamuha.cs" />
+    <Compile Include="FAMS\DLLBlanketPurchase.cs" />
+    <Compile Include="FAMS\DLLBudgetApprove.cs" />
+    <Compile Include="FAMS\DLLBudgetItem.cs" />
+    <Compile Include="FAMS\DLLBudgetRelease.cs" />
+    <Compile Include="FAMS\DLLBudgetRequest.cs" />
+    <Compile Include="FAMS\DLLBudgetTransfer.cs" />
+    <Compile Include="FAMS\DLLFAMSCategory.cs" />
+    <Compile Include="FAMS\DLLCostCenter.cs" />
+    <Compile Include="FAMS\DLLItem.cs" />
+    <Compile Include="FAMS\DLLPurchaseOrder.cs" />
+    <Compile Include="FAMS\DLLSalarySheet.cs" />
+    <Compile Include="FAMS\DLLType.cs" />
+    <Compile Include="FAMS\DLLUnit.cs" />
+    <Compile Include="FAMS\DLLVendor.cs" />
+    <Compile Include="PAYROLL\DLLAllowance.cs" />
+    <Compile Include="PAYROLL\DLLEmpGrade.cs" />
+    <Compile Include="PAYROLL\DLLEmpLoan.cs" />
+    <Compile Include="PAYROLL\DLLEmpSalaryItem.cs" />
+    <Compile Include="PAYROLL\DLLEmpSalaryItemRate.cs" />
+    <Compile Include="PAYROLL\DLLEmpSalaryPayment.cs" />
+    <Compile Include="PAYROLL\DLLEmpSalaryPaymentDet.cs" />
+    <Compile Include="PAYROLL\DLLGrade.cs" />
+    <Compile Include="PAYROLL\DLLGradeScaleSetup.cs" />
+    <Compile Include="PAYROLL\DLLPayrollEmployeeSalaryRep.cs" />
+    <Compile Include="PAYROLL\DLLPayrollSalarySheetAdjustment.cs" />
+    <Compile Include="PAYROLL\DLLPostWiseSalaryItem.cs" />
+    <Compile Include="PAYROLL\DLLSalaryItem.cs" />
+    <Compile Include="PAYROLL\DLLSalaryItemGL.cs" />
+    <Compile Include="PAYROLL\DLLSalaryParameter.cs" />
+    <Compile Include="PAYROLL\DLLShowAttendance.cs" />
+    <Compile Include="PAYROLL\DLLTiming.cs" />
+    <Compile Include="PERSON\DLLAddress.cs" />
+    <Compile Include="PERSON\DLLPerson.cs" />
+    <Compile Include="PERSON\DLLPersonAddress.cs" />
+    <Compile Include="PERSON\DLLPersonContact.cs" />
+    <Compile Include="PERSON\DLLPersonContPri.cs" />
+    <Compile Include="PERSON\DLLPersonDependent.cs" />
+    <Compile Include="PERSON\DLLPersonDoc.cs" />
+    <Compile Include="PERSON\DLLPersonLanguage.cs" />
+    <Compile Include="PERSON\DLLPersonNominee.cs" />
+    <Compile Include="PERSON\DLLPersonQualification.cs" />
+    <Compile Include="PIS\DLLAppointment.cs" />
+    <Compile Include="PIS\DLLAppraisal.cs" />
+    <Compile Include="PIS\DLLAward.cs" />
+    <Compile Include="PIS\DLLDeputation.cs" />
+    <Compile Include="PIS\DLLDeputationReturn.cs" />
+    <Compile Include="PIS\DLLEmpConfirmation.cs" />
+    <Compile Include="PIS\DLLEmpDeptCostAssign.cs" />
+    <Compile Include="PIS\DLLEmpLeaveApplication.cs" />
+    <Compile Include="PIS\DLLEmployee.cs" />
+    <Compile Include="PIS\DLLEmployeeAttendance.cs" />
+    <Compile Include="PIS\DLLEmployeeDevice.cs" />
+    <Compile Include="PIS\DLLEmployeeExperience.cs" />
+    <Compile Include="PIS\DLLEmployeeInsurance.cs" />
+    <Compile Include="PIS\DLLEmployeeMedicalAttr.cs" />
+    <Compile Include="PIS\DLLEmployeeRawana.cs" />
+    <Compile Include="PIS\DLLEmployeeSearch.cs" />
+    <Compile Include="PIS\DLLEmployeeTraining.cs" />
+    <Compile Include="PIS\DLLEmployeeTransfer.cs" />
+    <Compile Include="PIS\DLLEmpPosting.cs" />
+    <Compile Include="PIS\DLLEmpSalary.cs" />
+    <Compile Include="PIS\DLLEmpSalaryPayment.cs" />
+    <Compile Include="PIS\DLLGetDepartmentList.cs" />
+    <Compile Include="PIS\DLLLeaveApprovedRecommend.cs" />
+    <Compile Include="PIS\DLLLeaveCancellation.cs" />
+    <Compile Include="PIS\DLLPromotion.cs" />
+    <Compile Include="PIS\DLLPunishment.cs" />
+    <Compile Include="PIS\DLLResignation.cs" />
+    <Compile Include="PIS\DLLRetirement.cs" />
+    <Compile Include="PAYROLL\DLLEmpSalarySheet.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="REPORTING\DLLRepAttendence.cs" />
+    <Compile Include="REPORTING\DLLRepHoliday.cs" />
+    <Compile Include="REPORTING\DLLRepEmployee.cs" />
+    <Compile Include="REPORTING\DLLRepEmployeePostHist.cs" />
+    <Compile Include="REPORTING\DLLRepEmployeeQualification.cs" />
+    <Compile Include="REPORTING\DLLRepLeave.cs" />
+    <Compile Include="REPORTING\DLLRepLeaveDetail.cs" />
+    <Compile Include="REPORTING\DLLRepOfficeInfo.cs" />
+    <Compile Include="REPORTING\DLLRepOfficePost.cs" />
+    <Compile Include="REPORTING\DLLRepOfficePostReport.cs" />
+    <Compile Include="REPORTING\DLLRepPayRoll.cs" />
+    <Compile Include="REPORTING\DLLRepPaySlip.cs" />
+    <Compile Include="REPORTING\DLLRepShiftSchedule.cs" />
+    <Compile Include="REPORTING\DLLRepShiftWiseInfo.cs" />
+    <Compile Include="SECURITY\DLLSECApplication.cs" />
+    <Compile Include="SECURITY\DLLApplicationRole.cs" />
+    <Compile Include="SECURITY\DLLMenu.cs" />
+    <Compile Include="SECURITY\DLLModuleFunction.cs" />
+    <Compile Include="SECURITY\DLLOfficeUser.cs" />
+    <Compile Include="SECURITY\DLLRole.cs" />
+    <Compile Include="SECURITY\DLLRoleModuleFunction.cs" />
+    <Compile Include="SECURITY\DLLUser.cs" />
+    <Compile Include="SECURITY\DLLUserDesignation.cs" />
+    <Compile Include="SECURITY\DLLUserStatus.cs.cs" />
+    <Compile Include="VERIFICATION\DLLApplication.cs" />
+    <Compile Include="VERIFICATION\DLLModule.cs" />
+    <Compile Include="VERIFICATION\DLLModuleVerification.cs" />
+    <Compile Include="VERIFICATION\DLLUserTranVerification.cs" />
+    <Compile Include="VERIFICATION\DLLUserVerification.cs" />
+    <Compile Include="VERIFICATION\DLLVerificationModule.cs" />
+    <Compile Include="WFMS\DLLDeptWiseShift.cs" />
+    <Compile Include="WFMS\DLLEmployeeShiftAssignment.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HRFA.ATT\HRFA.ATT.csproj">
+      <Project>{b4e4872e-4169-40fc-85c6-b94fadce8bf4}</Project>
+      <Name>HRFA.ATT</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HRFA.COMMON\HRFA.COMMON.csproj">
+      <Project>{80c785e4-3e93-42c2-94d8-c10acaeb56f9}</Project>
+      <Name>HRFA.COMMON</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,0 +1,258 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class   DLLOfficePost
+    {
+
+        public string SaveOfficePost(ATTOfficePost objOfficePost)
+        {
+            string SP = "";
+            string msg = "";
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+            OracleTransaction tran = dbConn.BeginTransaction();
+            try
+            {
+
+                if (objOfficePost.Action == "A")
+                {
+                    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_OFFICE_POST";
+                    msg = "Successfully Saved.";
+                }
+                
+
+                if (SP != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CODE", objOfficePost.Office.OfficeCode, OracleDbType.Int64, ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":p_POST_ID", objOfficePost.Post.PostID, OracleDbType.Varchar2, ParameterDirection.Input));
+                    //paramList.Add(SqlHelper.GetOraParam(":P_POST_SEQ", objOfficePost.Post_Seq, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_STATUS", objOfficePost.Status, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", objOfficePost.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", objOfficePost.ToDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", objOfficePost.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", objOfficePost.EntryDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList[0].Size = 50;
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+                }
+                //objOfficePost.OfficeDarbandi = new List<ATTOfficePostDarbandi>();
+                for (var i = 0; i < objOfficePost.OfficeDarbandi.Count; i++)
+                {
+                    msg = "Successfully Saved.";
+
+                    DLLOfficePostDarbandi dllFunction = new DLLOfficePostDarbandi();
+
+                    dllFunction.SaveOfficePostDarbandi(objOfficePost, objOfficePost.OfficeDarbandi[i], tran);
+                }
+
+
+
+                tran.Commit();
+
+
+
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw new Exception("Error" + ex.Message);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+
+
+        }
+
+        public List<ATTOffice> GetOffice()
+        {
+            GetConnection conn = new GetConnection();
+
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_OFFICES";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CODE", null, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTOffice> lst = new List<ATTOffice>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTOffice obj = new ATTOffice();
+
+                    obj.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_CODE"].ToString());
+                    obj.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+
+
+                    //obj.Action = "E";
+                    lst.Add(obj);
+                }
+
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+                // tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+        public string GetOfficePostFromDate(Int64? OfficeCD, Int64? PostID)
+        {
+            GetConnection conn = new GetConnection();
+            
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_FROM_DATE";
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", OfficeCD, OracleDbType.Int64, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_POST_ID", PostID, OracleDbType.Int64, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", null, OracleDbType.Varchar2, ParameterDirection.Output));
+                paramList[2].Size = 50;
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                string FromDate = paramList[2].Value.ToString();
+                //List<ATTPost> lst = new List<ATTPost>();
+
+                //foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                //{
+                //    ATTPost obj = new ATTPost();
+
+                //   // obj.PostID  = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_ID"].ToString());
+                //  //  obj.PostDesc = drow["POST_DESC"].ToString();
+                //    obj.FromDate = drow["FROM_DATE"].ToString();
+
+                //   // obj.Action = "E";
+                //    lst.Add(obj);
+                //}
+
+                return FromDate;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+        public List<ATTPost> GetOfficePostListWithCount(string OfficeCD)
+        {
+            GetConnection conn = new GetConnection();
+
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_OFFICE_POST";
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", OfficeCD, OracleDbType.Int16, ParameterDirection.Input));
+
+                // paramList.Add(SqlHelper.GetOraParam(":P_POST_ID", null, OracleDbType.Int16, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTPost> lst = new List<ATTPost>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTPost obj = new ATTPost();
+
+                    obj.PostID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_ID"].ToString());
+                    obj.PostDesc = drow["POST_DESC"].ToString();
+                    // obj.FromDate = drow["FROM_DATE"].ToString();
+
+                    // obj.Action = "E";
+                    lst.Add(obj);
+                }
+
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+        public List<ATTPost> GetOfficePostList(string OfficeCD)
+        {
+            GetConnection conn = new GetConnection();
+
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+
+            try
+            {
+                //string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_OFFICE_POST_DET";
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_OFFICE_POST_DET";
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", OfficeCD, OracleDbType.Int16, ParameterDirection.Input));
+
+                // paramList.Add(SqlHelper.GetOraParam(":P_POST_ID", null, OracleDbType.Int16, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTPost> lst = new List<ATTPost>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTPost obj = new ATTPost();
+
+                    obj.PostID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_ID"].ToString());
+                    obj.PostDesc = drow["POST_DESC"].ToString();
+                    obj.FromDate = drow["FROM_DATE"].ToString();
+
+                    // obj.Action = "E";
+                    lst.Add(obj);
+                }
+
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+
+    }
+}

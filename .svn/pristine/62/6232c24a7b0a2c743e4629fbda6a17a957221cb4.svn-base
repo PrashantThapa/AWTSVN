@@ -1,0 +1,45 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AdminMaster.Master" AutoEventWireup="true" CodeBehind="CompanyForOfficeTransaction.aspx.cs" Inherits="IDS.Modules.ACCOUNTS.CompanyForOfficeTransaction" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+<div class="wrapper">
+<div class="col-md-10">
+   <h3 class=" margin-top-15 margin-left-25">
+                Voucher Entry</h3>
+            <form class="form-horizontal" role="form">
+         <div class="row">
+        <div class="col-md-2">Office <span class="mandatory">*</span>
+        </div>    
+        <div class="col-md-3">
+            <div class="dropdown margin-left-0" style="width:100%;">
+            <select id="ddlGLGroup" class="dropdown-select"
+                            data-bind='options: OfficeArray, 
+                            optionsText: "OfficeNameNep",
+                            optionsValue:$data,
+                            value:SelectedOffice, 
+                            optionsCaption:"------छान्नुहोस्-------", event:{ change: $data.GetCostCenter }'>
+              </select> 
+                   </div>
+        </div> 
+            
+                <div class="col-md-2">
+                    Cost Center <span class="mandatory">*</span>
+                </div>
+                <div class="col-md-3">
+                    <div class="dropdown one-seventy margin-left-0">
+                        <select id="Select2" class="dropdown-select" data-bind='options:CostCenters, 
+                            optionsText: "CostCenterName",
+                            optionsValue:$data,
+                            value:SelectedCostCenter, 
+                            optionsCaption:"------छान्नुहोस्-------"'><%-- optionsCaption:"------छान्नुहोस्-------", event:{ change: $data.GetACChartWithOfficeCostcenter }'><%--, event:{ change: $data.GetACChart }--%>--%>
+                        </select>
+                    </div>
+                    
+                </div>
+                <div class="col-md-1">
+                     <button id="btnGo" class="btn btn-primary" data-bind="click:Go">
+                        Go</button></div>
+             </form>
+             </div></div>
+              <script src="../../Scripts/ACCOUNT/OfficeCompanyAccChart.js" type="text/javascript"></script>
+</asp:Content>

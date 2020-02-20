@@ -1,0 +1,98 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEmpConfirmation
+    {
+        public string SaveEmpConfirmation(ATTEmpConfirmation objEmpConfirm)
+        {
+            string msg = "";
+            string sp = "";
+            bool isDirty = true;
+
+            if (objEmpConfirm.Action == "A")
+            {
+                sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_CONFIRMATION";
+                msg = "Successfully Saved!!";
+            }
+            //else
+            //{
+            //    //sp = "";
+            //    //msg = "!!";
+            //}
+
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+            OracleTransaction tran = dbConn.BeginTransaction();
+
+            try
+            {
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", null, OracleDbType.Int64, ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CD", objEmpConfirm.Office.OfficeCode, OracleDbType.Int32, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_POST_ID", objEmpConfirm.Post.PostID, OracleDbType.Int32, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_POST_SEQ", objEmpConfirm.OfficeDarbandi.PostSeq, OracleDbType.Int32, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", objEmpConfirm.EmpID, OracleDbType.Int64, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CLETTER_ISSUE_DATE", objEmpConfirm.ConfirmationLetterDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EFFECTIVE_DATE", objEmpConfirm.EffectiveDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_STYPE_ID", objEmpConfirm.ServiceType.STypeID, OracleDbType.Int32, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", objEmpConfirm.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_TO_DATE", objEmpConfirm.ToDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objEmpConfirm.RStatus, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objEmpConfirm.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objEmpConfirm.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+
+                    paramList[0].Size = 13;
+
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    objEmpConfirm.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+
+                    #region Person Documents
+
+                    if (objEmpConfirm.PersonDoc != null)
+                    {
+                        DLLPersonDoc dllPersonDoc = new DLLPersonDoc();
+
+                        if (isDirty)
+                        {
+                            dllPersonDoc.SaveDirtyPersonDocs(objEmpConfirm.PersonDoc, objEmpConfirm.SubmissionNo,objEmpConfirm.OfficeDarbandi.PostSeq, objEmpConfirm.EntryBy, tran);
+                        }
+                        else
+                        {
+                            //dllPersonDoc.SavePersonDocs(objEmpConfirm.PersonDoc, object., objEmpConfirm.EntryBy, tran);
+                        }
+                    }
+
+                    #endregion 
+                    tran.Commit();
+                    paramList.Clear();
+                }
+                else
+                {
+                    msg = " Error in Saving Confirmation!!!";
+                    throw new Exception(msg);
+                }
+            }
+            catch (Exception ex)
+            {
+                msg = "Error!!";
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+            return msg + "</br> Please Note Your Submission No.</br><b>" + objEmpConfirm.SubmissionNo + "</b>";
+        }
+    }
+}

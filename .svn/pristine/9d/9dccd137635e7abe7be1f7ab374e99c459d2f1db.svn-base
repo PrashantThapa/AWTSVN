@@ -1,0 +1,407 @@
+﻿
+
+function GLGroup(data) {
+    var self = this;
+    self.GroupID =ko.observable(data.GroupID);   
+    self.GroupName =ko.observable(data.GroupName);   
+    //self.EntryBy =ko.observable(data.EntryBy);   
+    //self.EntryDate =ko.observable(data.EntryDate);   
+    //self.RStatus =ko.observable(data.RStatus);   
+    //self.TranNo =ko.observable(data.TranNo);
+    //self.Action = ko.observable(data.Action);   
+}
+var ParentGL = function (data) {
+    var self = this;
+    self.AccCode = ko.observable(data.AccCode);
+    self.AccName = ko.observable(data.AccName);
+    self.GroupID = ko.observable(data.GLGroup.GroupID);
+    self.PaACCode = ko.observable(data.PaACCode);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.TranNo = ko.observable(data.TranNo);
+    self.HeadTran = ko.observable(data.HeadTran);
+    self.Balance = ko.observable(data.Balance);
+    self.GlCode = ko.observable(data.GlCode);
+    self.ACNameEng = ko.observable(data.ACNameEng);
+    self.Action = ko.observable(data.Action);
+    self.DRCR = ko.observable(data.DRCR);
+    self.Subsidery = ko.observable(data.Subsidery);
+    self.PaACCode = ko.observable(data.PaACCode);
+    self.ScheduleCode = ko.observable(data.ScheduleCode);
+}
+
+function AccountChart(data) {
+    var self = this;    
+    self.AccCode = ko.observable(data.AccCode);
+    self.AccName = ko.observable(data.AccName);
+    self.ACNameEng = ko.observable(data.ACNameEng);
+    self.GlCode = ko.observable(data.GlCode);
+    self.GLGroup = ko.observable(data.GLGroup);
+    self.PaACCode = ko.observable(data.PaACCode);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.TranNo = ko.observable(data.TranNo);
+    self.HeadTran = ko.observable(data.HeadTran);
+    self.Balance = ko.observable(data.Balance);
+    self.DRCR = ko.observable(data.DRCR);
+    self.Action = ko.observable(data.Action);
+    self.SubsideryBool = ko.observable(data.SubsideryBool);
+    self.ScheduleCode = ko.observable(data.ScheduleCode);
+ }
+
+function AccountChartSetupModel () {
+    var self = this;
+    self.ScheduleCode = ko.observable();
+    self.AccCode = ko.observable();
+    self.AccName = ko.observable();
+    self.GroupID = ko.observable();
+    self.PaACCode = ko.observable();
+    self.EntryBy = ko.observable();
+    self.EntryDate = ko.observable();
+    self.Rstatus = ko.observable();
+    self.TranNo = ko.observable();
+    self.HeadTran = ko.observable();
+    self.Balance = ko.observable();
+    self.GlCode = ko.observable();
+    self.ACNameEng = ko.observable();
+    self.DRCR = ko.observable();
+    self.Action = ko.observable();
+
+    self.SelectedParentGL = ko.observable();
+    self.ParentGL_Array = ko.observableArray([]);
+    
+
+    self.ParentGL_ArrayHead = ko.observableArray([]);
+    
+
+    self.GroupID = ko.observable();
+    self.GroupName = ko.observable();
+    self.EntryBy = ko.observable();
+    self.EntryDate = ko.observable();
+    self.RStatus = ko.observable();
+    self.TranNo = ko.observable();
+    self.Action = ko.observable("A");
+    self.SelectedGLGroup = ko.observable();
+    self.GLGroup_Array = ko.observableArray([]);
+
+    self.SubmitArray = ko.observableArray([]);
+    self.Subsidery = ko.observable();
+    self.SubsideryBool = ko.observable();
+
+    //#region Function to Get Parent GL
+
+    self.getTreegridClass = function (item) {
+        
+        var className = '';
+        if (ko.toJS(item).AccCode)
+            className += 'treegrid-' + ko.toJS(item).AccCode;
+        if (ko.toJS(item).PaACCode)
+            className += ' treegrid-parent-' + ko.toJS(item).PaACCode;
+
+        return className;
+    }
+    self.LoadAllGL = function () {
+        self.ClearFieldsForGroupChange();
+        self.GetParentGL();
+		self.GetAccountChartHead();
+        
+       
+    }
+
+    self.GetParentGL = function () {
+        self.ClearFieldsForGroupChange();
+        if (self.SelectedGLGroup() == undefined) {
+            self.ParentGL_Array([]);
+            self.ParentGL_ArrayHead([]);
+        }
+        else {
+			var glroupID = ko.toJS(self.SelectedGLGroup).GroupID;
+            var PLgrCode = ko.toJS(self.SelectedParentGL) != undefined ? ko.toJS(self.SelectedParentGL).AccCode : null;
+            var Office_Cd = $('#offcode').text();
+
+            $.ajax({
+                type: 'GET',
+                async: false,
+                dataType: "json",
+                url: '/Handlers/ACCOUNT/AccountChartHandler.ashx',
+                data: { 'method': 'GetAccountChart', 'accCode': glroupID, 'PLgrCode': PLgrCode, 'Office_Cd': Office_Cd},
+                contentType: "application/json; charset=utf-8",
+				success: function (data) {
+                    self.ParentGL_Array([]);
+                    
+                    var mappedTasks = $.map(data.ResponseData, function (item) {
+                        return new ParentGL(item)
+                    });
+                    console.log(mappedTasks);
+                    self.ParentGL_Array(mappedTasks);
+                    console.log(ko.toJSON(mappedTasks));
+                    //$('.tree tr').detach();
+                    $('.tree').treegrid();
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+                }
+            });
+        }
+    };
+
+
+    self.GetAccountChartHead = function () {      
+		if (self.SelectedGLGroup() != undefined) {
+            var glroupID = ko.toJS(self.SelectedGLGroup).GroupID;
+
+            $.ajax({
+                type: 'GET',
+                async: false,
+                dataType: "json",
+                url: '/Handlers/ACCOUNT/AccountChartHandler.ashx',
+                data: { 'method': 'GetAccountChartHead', 'accCode': glroupID },
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+
+                    var mappedTasks = $.map(data.ResponseData, function (item) {
+                        return new ParentGL(item)
+                    });
+                   
+                    self.ParentGL_ArrayHead(mappedTasks);
+                   
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+                }
+            });
+        }
+    };
+
+    
+
+//#endregion
+
+   //#region Function to Get Group GL
+
+    self.GetGLGroup=function(){
+    $.ajax({
+            type: 'GET',
+            async: false,
+            dataType: "json",
+            url: '/Handlers/ACCOUNT/GLGroupHandler.ashx',
+            data: { 'method': 'GetGLGroup', 'groupID': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                var mappedTasks = $.map(data.ResponseData, function (item) {
+                    return new GLGroup(item)
+                });
+                self.GLGroup_Array(mappedTasks);
+               
+               
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+            }
+        });
+    };
+
+    //#endregion
+
+   //#region Function to Submit Account Chart Setup
+
+    self.SaveAccountChart = function () {
+
+        if (self.Validation()) {
+
+            Confirm('एकपटक Submit गरिसकेपछि अर्को पटक विवरण फेरि परिवर्तन गर्न पाइने छैन। \n के तपाई Submit गर्न चाहनुहन्छ ?', 'Confirmation Dialog', function (r) {
+                if (r) {
+                    var accCodeOfSelectedPArentGL = self.SelectedParentGL() !== undefined ? self.SelectedParentGL().AccCode : null;
+            if (self.Action() == "A") {
+                var glgroup = {
+                    GroupID: self.SelectedGLGroup().GroupID,
+                    GroupName: self.SelectedGLGroup().GroupName
+                }
+                
+                var SaveChart = {
+                    AccCode: null,
+                    AccName: $("#txtGLNameNep").val(),
+                    ACNameEng: self.ACNameEng(),
+                    GlCode: self.GlCode(),
+                    GLGroup: glgroup,
+                    PaACCode: accCodeOfSelectedPArentGL,
+                    EntryBy: $("#user").text(),
+                    EntryDate: null,
+                    Rstatus: "F",
+                    TranNo: null,
+                    HeadTran: self.HeadTran(),
+                    Balance: null,
+                    DRCR: self.DRCR(),
+                    Action: "A",
+                    SubsideryBool: self.SubsideryBool(),
+                    ScheduleCode: self.ScheduleCode()
+                }
+                self.SubmitArray([]);
+                self.SubmitArray.push(new AccountChart(SaveChart));
+            }
+
+            else if (self.Action() == "E") {
+                var glgroup2 = {
+                    GroupID: self.SelectedGLGroup().GroupID,
+                    GroupName: self.SelectedGLGroup().GroupName
+                }
+                var SaveChart2 = {
+                    AccCode: null,
+                    AccName: $("#txtGLNameNep").val(),
+                    ACNameEng: self.ACNameEng(),
+                    GlCode: self.GlCode(),
+					GLGroup: glgroup2,
+                    PaACCode: accCodeOfSelectedPArentGL,//self.SelectedParentGL().AccCode,
+                    EntryBy: $("#user").text(),
+                    EntryDate: null,
+                    Rstatus: "F",
+                    TranNo: null,
+                    HeadTran: self.HeadTran(),
+                    Balance: null,
+                    DRCR: self.DRCR(),
+                    Action: "E",
+                    SubsideryBool: self.SubsideryBool(),
+                    ScheduleCode: self.ScheduleCode()
+                }
+                self.SubmitArray([]);
+				self.SubmitArray.push(new AccountChart(SaveChart2));
+            }
+             }
+
+            var url = "../../Handlers/ACCOUNT/AccountChartHandler.ashx";
+            var data = { 'method': "SaveAccountChart", 'args': JSON.stringify(ko.toJS(self.SubmitArray())) };
+				async: false,
+					$.post(url, data,
+						function (result) {
+                            var obj = jQuery.parseJSON(result);
+                                                       
+                            if (obj.IsSucess === true) {
+                                msg('डेटा सुरक्षित भयो ।', 'SUCCESS');
+                                self.ClearFields();
+                            }
+                            else {
+                                msg('डेटा सुरक्षित गर्दा त्रुटिहरु पता लगाईयो ।', 'WARNING');
+                            }
+							
+						});
+             });
+        }
+    }
+
+            //#endregion
+
+    self.EditGL = function (row) {
+        var data = ko.toJS(row);
+
+        for (var i = 0; i < self.GLGroup_Array().length; i++) {
+            if (data.GroupID == ko.toJS(self.GLGroup_Array())[i].GroupID) {
+                self.SelectedGLGroup(self.GLGroup_Array()[i]);
+            }
+        }
+
+
+        for (var j = 0; j < self.ParentGL_ArrayHead().length; j++) {
+            if (data.PaACCode == ko.toJS(self.ParentGL_ArrayHead())[j].AccCode) {
+                self.SelectedParentGL(self.ParentGL_ArrayHead()[j]);
+            }
+        }
+
+        self.GlCode(data.AccCode);
+        self.AccName(data.AccName)
+        self.ACNameEng(data.ACNameEng);
+        self.HeadTran(data.HeadTran);
+        self.DRCR(data.DRCR);
+        self.ScheduleCode(data.ScheduleCode);
+        if (data.Subsidery == "Y") {
+            self.SubsideryBool(true);
+        }
+        else if (data.Subsidery == "N") {
+            self.SubsideryBool(false);
+        }
+
+        $("#txtGLCode").attr("disabled", true);
+        self.Action("E");
+
+    }
+
+
+    self.Validation = function () {
+
+
+        var errMsg = "";
+        var objFocus = null;
+
+        if (self.SelectedGLGroup() == undefined) {
+            errMsg += "Please Select GL Group !!!<br>";
+
+        }
+        if (self.GlCode() == undefined || self.GlCode() == "") {
+            errMsg += "Please Enter GLCode !!!<br>";
+        }
+        if ($("#txtGLNameNep").val() == "") {
+            errMsg += "Please Enter GL Name Nepali !!!<br>";
+
+        }
+        
+        //        if (self.SelectedParentGL() == undefined) {
+        //            errMsg += "Please Select Parent GL !!!<br>";
+
+        //        }
+        if (self.HeadTran() == undefined || self.HeadTran() == "") {
+            errMsg += "Please Select Type !!!<br>";
+
+        }
+        if (self.DRCR() == null || self.DRCR() == "") {
+            errMsg += "Please Select Dr/Cr !!!<br>";
+        }
+        if (errMsg !== "") {
+             msg(errMsg,"WARNING");
+
+            return false;
+        }
+        else {
+            return true;
+        }
+
+
+    }
+
+
+    self.ClearFields = function () {
+        self.GlCode("");
+        self.AccName("");
+        self.ACNameEng("");
+        self.SelectedGLGroup(null);
+        self.SelectedParentGL(null);
+        self.HeadTran("");
+        self.DRCR("");
+        self.SubsideryBool(false);
+        self.Action("A");
+        $("#txtGLCode").attr("disabled", false);
+        self.ParentGL_Array([]);
+        self.ParentGL_ArrayHead([]);
+        self.ScheduleCode("");
+    }
+    self.ClearFieldsForGroupChange=function(){
+        self.GlCode("");
+        self.AccName("");
+        self.ACNameEng("");
+        self.HeadTran("");
+        self.DRCR("");
+        self.SubsideryBool(false);
+        self.Action("A");
+        $("#txtGLCode").attr("disabled", false);       
+        self.ScheduleCode("");
+    }
+    self.GetGLGroup();
+    
+
+}
+
+$(document).ready(function () {
+    ValidateSession();
+    ko.applyBindings(new AccountChartSetupModel());   
+    
+});

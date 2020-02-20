@@ -1,0 +1,48 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLLeaveApprovedRecommend
+    {
+
+        public JsonResponse SaveLeaveApprovedRecommend(ATTLeaveApprovedRecommend objEmpLeaveApp)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLLeaveApprovedRecommend objDll = new DLLLeaveApprovedRecommend();
+            try
+            {
+                response.Message = objDll.SaveLeaveApprovedRecommend(objEmpLeaveApp);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public JsonResponse GetLeaveApprovedRecommend(Int32? empID)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLLeaveApprovedRecommend objDll = new DLLLeaveApprovedRecommend();
+            try
+            {
+                response.ResponseData = objDll.GetLeaveApprovedRecommend(empID);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+
+        
+        
+    }
+}

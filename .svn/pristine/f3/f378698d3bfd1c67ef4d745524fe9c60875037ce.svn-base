@@ -1,0 +1,391 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.COMMON;
+using HRFA.ATT;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLAccountChart
+    {
+
+       public string SaveAccountChart(List<ATTAccountChart> lstAccountChart)
+        {
+            string sp = "";
+            string msg = "No Data To Save !!!";
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+            string status = "";
+
+            try
+            {
+                foreach (ATTAccountChart objAccountChart in lstAccountChart)
+                {
+                    if (objAccountChart.Action == "A")
+                    {
+                        sp = "APR_ADD_AC_CHART";
+                        msg = "Successfully Saved.";
+                    }
+                    else if (objAccountChart.Action == "E")
+                    {
+                        sp = "APR_EDIT_AC_CHART";
+                        msg = "Successfully Updated.";
+                    }
+                    if (objAccountChart.SubsideryBool == true)
+                    {
+                        status = "Y";
+                       // objAccountChart.HeadTran = "H";
+                    }
+                    else
+                    {
+                        status = "N";
+                    }
+
+                    if (sp != "")
+                    {
+
+                       
+
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+                        paramList.Add(SqlHelper.GetOraParam(":P_AC_CODE", objAccountChart.GlCode, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+                        paramList.Add(SqlHelper.GetOraParam(":P_AC_NAME", objAccountChart.AccName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_GROUP_ID", objAccountChart.GLGroup.GroupID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_PA_AC_CODE", objAccountChart.PaACCode, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", objAccountChart.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", objAccountChart.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", objAccountChart.Rstatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_Tran_No", objAccountChart.TranNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_HEAD_TRAN", objAccountChart.HeadTran, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_BALANCE", objAccountChart.Balance, OracleDbType.Double, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_GL_CODE", objAccountChart.GlCode, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_AC_NAME_ENG", objAccountChart.ACNameEng, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_DRCR", objAccountChart.DRCR, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_HAVESUBS", status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_SCHEDULE_CODE", objAccountChart.ScheduleCode, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                        paramList[0].Size = 16;
+                        SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                        paramList.Clear();
+
+
+                    }
+                }
+                tran.Commit();
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw new Exception("Error" + ex.Message);
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+
+        }
+
+
+       public List<ATTAccountChart> GetAccountChart(int? accCode,int? PLgrCode,int? Office_Cd)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            List<ATTAccountChart> lstAccountChart = new List<ATTAccountChart>();
+
+            try
+            {
+                string SP = "APR_GET_AC_CHART";
+               // string SP = "APR_GET_AC_CHART_H";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_AC_CODE", accCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_PA_AC_CODE", PLgrCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", Office_Cd, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTAccountChart objAccountChart = new ATTAccountChart();
+                    objAccountChart.AccCode = string.IsNullOrEmpty(drow["AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["AC_CODE"].ToString());
+                       
+                    objAccountChart.AccName = drow["AC_NAME"].ToString();
+                    objAccountChart.GLGroup.GroupID = string.IsNullOrEmpty(drow["GROUP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["GROUP_ID"].ToString());
+                    objAccountChart.PaACCode = string.IsNullOrEmpty(drow["PA_AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["PA_AC_CODE"].ToString());
+                    objAccountChart.EntryBy = drow["ENTRY_BY"].ToString();
+                    objAccountChart.EntryDate = drow["ENTRY_DATE"].ToString();
+                    objAccountChart.Rstatus = drow["R_STATUS"].ToString();
+                    objAccountChart.TranNo = string.IsNullOrEmpty(drow["TRAN_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["TRAN_NO"].ToString());
+                    objAccountChart.HeadTran = drow["HEAD_TRAN"].ToString();
+                    objAccountChart.Balance = string.IsNullOrEmpty(drow["BALANCE"].ToString()) ? (double?)null : double.Parse(drow["BALANCE"].ToString());
+                    objAccountChart.GlCode = drow["GL_CODE"].ToString();
+                    objAccountChart.ACNameEng = drow["AC_NAME_ENG"].ToString();
+                    objAccountChart.DRCR = drow["DRCR"].ToString();
+                    objAccountChart.Subsidery = drow["HAVESUBS"].ToString();
+                    objAccountChart.ScheduleCode = drow["SCHEDULE_ID"].ToString();
+                    objAccountChart.Action = "";
+                    lstAccountChart.Add(objAccountChart);
+
+                }
+
+                return lstAccountChart;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+       public List<ATTAccountChart> GetAccountChartExp(int? accCode)
+       {
+           GetConnection getConn = new GetConnection();
+           OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+           List<ATTAccountChart> lstAccountChart = new List<ATTAccountChart>();
+
+           try
+           {
+               string SP = "APR_GET_AC_CHARTEXP";
+               // string SP = "APR_GET_AC_CHART_H";
+
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":P_AC_CODE", accCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+               DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+               foreach (DataRow drow in ds.Tables[0].Rows)
+               {
+                   ATTAccountChart objAccountChart = new ATTAccountChart();
+                   objAccountChart.AccCode = string.IsNullOrEmpty(drow["AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["AC_CODE"].ToString());
+
+                   objAccountChart.AccName = drow["AC_NAME"].ToString();
+                   objAccountChart.GLGroup.GroupID = string.IsNullOrEmpty(drow["GROUP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["GROUP_ID"].ToString());
+                   objAccountChart.PaACCode = string.IsNullOrEmpty(drow["PA_AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["PA_AC_CODE"].ToString());
+                   objAccountChart.EntryBy = drow["ENTRY_BY"].ToString();
+                   objAccountChart.EntryDate = drow["ENTRY_DATE"].ToString();
+                   objAccountChart.Rstatus = drow["R_STATUS"].ToString();
+                   objAccountChart.TranNo = string.IsNullOrEmpty(drow["TRAN_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["TRAN_NO"].ToString());
+                   objAccountChart.HeadTran = drow["HEAD_TRAN"].ToString();
+                   objAccountChart.Balance = string.IsNullOrEmpty(drow["BALANCE"].ToString()) ? (double?)null : double.Parse(drow["BALANCE"].ToString());
+                   objAccountChart.GlCode = drow["GL_CODE"].ToString();
+                   objAccountChart.ACNameEng = drow["AC_NAME_ENG"].ToString();
+                   objAccountChart.DRCR = drow["DRCR"].ToString();
+                   objAccountChart.Subsidery = drow["HAVESUBS"].ToString();
+                   objAccountChart.Action = "";
+                   lstAccountChart.Add(objAccountChart);
+
+               }
+
+               return lstAccountChart;
+           }
+           catch (Exception ex)
+           {
+
+               throw (ex);
+           }
+           finally
+           {
+               getConn.CloseDbConn();
+           }
+       }
+
+       public List<ATTAccountChart> GetAccountChartSubsideryGL(int? accCode)
+       {
+           GetConnection getConn = new GetConnection();
+           OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+           List<ATTAccountChart> lstAccountChart = new List<ATTAccountChart>();
+
+           try
+           {
+               string SP = "APR_GET_AC_CHART_SUBSIDERY";
+               // string SP = "APR_GET_AC_CHART_H";
+
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":P_AC_CODE", accCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+               DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+               foreach (DataRow drow in ds.Tables[0].Rows)
+               {
+                   ATTAccountChart objAccountChart = new ATTAccountChart();
+                   objAccountChart.AccCode = string.IsNullOrEmpty(drow["AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["AC_CODE"].ToString());
+
+                   objAccountChart.AccName = drow["AC_NAME"].ToString();
+                   objAccountChart.GLGroup.GroupID = string.IsNullOrEmpty(drow["GROUP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["GROUP_ID"].ToString());
+                   objAccountChart.PaACCode = string.IsNullOrEmpty(drow["PA_AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["PA_AC_CODE"].ToString());
+                   objAccountChart.EntryBy = drow["ENTRY_BY"].ToString();
+                   objAccountChart.EntryDate = drow["ENTRY_DATE"].ToString();
+                   objAccountChart.Rstatus = drow["R_STATUS"].ToString();
+                   objAccountChart.TranNo = string.IsNullOrEmpty(drow["TRAN_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["TRAN_NO"].ToString());
+                   objAccountChart.HeadTran = drow["HEAD_TRAN"].ToString();
+                   objAccountChart.Balance = string.IsNullOrEmpty(drow["BALANCE"].ToString()) ? (double?)null : double.Parse(drow["BALANCE"].ToString());
+                   objAccountChart.GlCode = drow["GL_CODE"].ToString();
+                   objAccountChart.ACNameEng = drow["AC_NAME_ENG"].ToString();
+                   objAccountChart.DRCR = drow["DRCR"].ToString();
+                   objAccountChart.Subsidery = drow["HAVESUBS"].ToString();
+                   objAccountChart.Action = "";
+                   lstAccountChart.Add(objAccountChart);
+
+               }
+
+               return lstAccountChart;
+           }
+           catch (Exception ex)
+           {
+
+               throw (ex);
+           }
+           finally
+           {
+               getConn.CloseDbConn();
+           }
+       }
+       //
+       public List<ATTAccountChart> GetAccountChartHead(int? accCode)
+       {
+           GetConnection getConn = new GetConnection();
+           OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+           List<ATTAccountChart> lstAccountChart = new List<ATTAccountChart>();
+
+           try
+           {
+              // string SP = "APR_GET_AC_CHART";
+               string SP = "APR_GET_AC_CHART_H";
+
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":P_AC_CODE", accCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+               DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+               foreach (DataRow drow in ds.Tables[0].Rows)
+               {
+                   ATTAccountChart objAccountChart = new ATTAccountChart();
+                   objAccountChart.AccCode = string.IsNullOrEmpty(drow["AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["AC_CODE"].ToString());
+
+                   objAccountChart.AccName = drow["AC_NAME"].ToString();
+                   objAccountChart.GLGroup.GroupID = string.IsNullOrEmpty(drow["GROUP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["GROUP_ID"].ToString());
+                   objAccountChart.PaACCode = string.IsNullOrEmpty(drow["PA_AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["PA_AC_CODE"].ToString());
+                   objAccountChart.EntryBy = drow["ENTRY_BY"].ToString();
+                   objAccountChart.EntryDate = drow["ENTRY_DATE"].ToString();
+                   objAccountChart.Rstatus = drow["R_STATUS"].ToString();
+                   objAccountChart.TranNo = string.IsNullOrEmpty(drow["TRAN_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["TRAN_NO"].ToString());
+                   objAccountChart.HeadTran = drow["HEAD_TRAN"].ToString();
+                   objAccountChart.Balance = string.IsNullOrEmpty(drow["BALANCE"].ToString()) ? (double?)null : double.Parse(drow["BALANCE"].ToString());
+                   objAccountChart.GlCode = drow["GL_CODE"].ToString();
+                   objAccountChart.ACNameEng = drow["AC_NAME_ENG"].ToString();
+                   objAccountChart.DRCR = drow["DRCR"].ToString();
+                   objAccountChart.Subsidery = drow["HAVESUBS"].ToString();
+                    objAccountChart.ScheduleCode = drow["SCHEDULE_ID"].ToString();
+                    objAccountChart.Action = "";
+                   lstAccountChart.Add(objAccountChart);
+
+               }
+
+               return lstAccountChart;
+           }
+           catch (Exception ex)
+           {
+
+               throw (ex);
+           }
+           finally
+           {
+               getConn.CloseDbConn();
+           }
+       }
+
+       public List<ATTAccountChart> GetAccountChartHeadSubsidery(int? accCode)
+       {
+           GetConnection getConn = new GetConnection();
+           OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+           List<ATTAccountChart> lstAccountChart = new List<ATTAccountChart>();
+
+           try
+           {
+               // string SP = "APR_GET_AC_CHART";
+               string SP = "APR_GET_AC_CHART_H_HAVESUBS";
+
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":P_AC_CODE", accCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+               paramList.Add(SqlHelper.GetOraParam(":P_HAVESUBS", "Y", OracleDbType.Int32, System.Data.ParameterDirection.Input));
+               DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+               foreach (DataRow drow in ds.Tables[0].Rows)
+               {
+                   ATTAccountChart objAccountChart = new ATTAccountChart();
+                   objAccountChart.AccCode = string.IsNullOrEmpty(drow["AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["AC_CODE"].ToString());
+
+                   objAccountChart.AccName = drow["AC_NAME"].ToString();
+                   objAccountChart.GLGroup.GroupID = string.IsNullOrEmpty(drow["GROUP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["GROUP_ID"].ToString());
+                   objAccountChart.PaACCode = string.IsNullOrEmpty(drow["PA_AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["PA_AC_CODE"].ToString());
+                   objAccountChart.EntryBy = drow["ENTRY_BY"].ToString();
+                   objAccountChart.EntryDate = drow["ENTRY_DATE"].ToString();
+                   objAccountChart.Rstatus = drow["R_STATUS"].ToString();
+                   objAccountChart.TranNo = string.IsNullOrEmpty(drow["TRAN_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["TRAN_NO"].ToString());
+                   objAccountChart.HeadTran = drow["HEAD_TRAN"].ToString();
+                   objAccountChart.Balance = string.IsNullOrEmpty(drow["BALANCE"].ToString()) ? (double?)null : double.Parse(drow["BALANCE"].ToString());
+                   objAccountChart.GlCode = drow["GL_CODE"].ToString();
+                   objAccountChart.ACNameEng = drow["AC_NAME_ENG"].ToString();
+                   objAccountChart.DRCR = drow["DRCR"].ToString();
+                   objAccountChart.Subsidery = drow["HAVESUBS"].ToString();
+                   objAccountChart.Action = "";
+                   lstAccountChart.Add(objAccountChart);
+
+               }
+
+               return lstAccountChart;
+           }
+           catch (Exception ex)
+           {
+
+               throw (ex);
+           }
+           finally
+           {
+               getConn.CloseDbConn();
+           }
+       }
+
+        public string DeleteAccountChart(int?  accCode)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+
+        try
+            {
+                string SP = "";
+
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":P_", accCode, OracleDbType.Int32, ParameterDirection.InputOutput));
+
+                SqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+                return "Deleted Successfully.";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+        }
+    }
+}

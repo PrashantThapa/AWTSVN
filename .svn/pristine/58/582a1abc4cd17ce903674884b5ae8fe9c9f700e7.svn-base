@@ -1,0 +1,170 @@
+﻿using HRFA.ATT;
+using HRFA.COMMON;
+using Oracle.DataAccess.Client;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Configuration;
+
+namespace HRFA.DataLayer
+{
+    public  class DLLGradeScaleSetup
+    {
+        public string SaveGradeScaleSetup(ATTGradeScaleSetup GradeScale, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+            string entryby = "";
+            Int64? submissionNo = null;
+            Int64? oldSubmissionNo = null;
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_INS_UP_GRADE_SCALE_SETUP";
+                msg = "Successfully Saved.";
+                GradeScale.EntryDate = DateTime.Now.ToShortDateString();
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+                    paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", GradeScale.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":P_EMP_LEVEL", GradeScale.EmpLevel, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_STARTING_SCALE_SALARY", GradeScale.StartingScaleSalary, OracleDbType.Decimal, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_GRADE_AMOUNT", GradeScale.GradeAmount, OracleDbType.Decimal, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_MAX_GRADE_NO", GradeScale.MaxGradeNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_MAX_SCALE_SALARY", GradeScale.MaxScaleSalary, OracleDbType.Decimal, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_REMARKS", GradeScale.Remarks, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));                    
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", GradeScale.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", GradeScale.EntryDate  , OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", GradeScale.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                    paramList[0].Size = 10;
+					var result = SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+					if (oldSubmissionNo != null)
+                    {
+                        DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                        dllUTV.SaveVerifyLog(tran, entryby, oldSubmissionNo, submissionNo, appID, modID);
+                    }
+                    
+                    //if (result == -1) { tran.Rollback();throw new Exception("Data cannot be saved"); }
+                    submissionNo = Int64.Parse(paramList[0].Value.ToString());
+                    oldSubmissionNo = GradeScale.OldSubmissionNo;
+                    entryby = GradeScale.EntryBy;
+                    paramList.Clear();
+                }
+               
+                
+                tran.Commit();
+            }
+            catch (Exception ex)
+				{
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            //return msg;
+            return msg + "Data saved! Please Note your submission number!! " + "</b>" + submissionNo + "</b>";
+        }
+
+        public List<ATTGradeScaleSetup> GetALLGradeScaleSettings()
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_EMPGRADESCALEDATA";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTGradeScaleSetup> lst = new List<ATTGradeScaleSetup>();
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTGradeScaleSetup objEmpGradeScale = new ATTGradeScaleSetup();
+                    objEmpGradeScale.SubmissionNo =  DBNull.Value.Equals(drow["SUBMISSION_NO"])? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                    objEmpGradeScale.EmpLevel = DBNull.Value.Equals(drow["EMP_LEVEL"]) ? string.Empty : drow["EMP_LEVEL"].ToString();
+                    objEmpGradeScale.StartingScaleSalary = DBNull.Value.Equals(drow["STARTING_SCALE_SALARY"]) ? 0 : Convert.ToDecimal(drow["STARTING_SCALE_SALARY"]);
+                    objEmpGradeScale.GradeAmount = DBNull.Value.Equals(drow["GRADE_AMOUNT"]) ? 0 : Convert.ToDecimal(drow["GRADE_AMOUNT"]);
+                    objEmpGradeScale.MaxGradeNo = DBNull.Value.Equals(drow["MAX_GRADE_NO"]) ? 0 : Int32.Parse(drow["MAX_GRADE_NO"].ToString());
+                    objEmpGradeScale.MaxScaleSalary = DBNull.Value.Equals(drow["MAX_SCALE_SALARY"]) ? 0 : Convert.ToDecimal(drow["MAX_SCALE_SALARY"]);
+                    objEmpGradeScale.Remarks = DBNull.Value.Equals(drow["REMARKS"]) ? string.Empty : drow["REMARKS"].ToString();
+                    objEmpGradeScale.EntryBy = DBNull.Value.Equals(drow["ENTRY_BY"]) ? string.Empty : drow["ENTRY_BY"].ToString();
+                    objEmpGradeScale.EntryDate = DBNull.Value.Equals(drow["ENTRY_DATE"]) ? string.Empty : drow["ENTRY_DATE"].ToString();
+                    // objEmpGradeScale.EntryDate = DBNull.Value.Equals(drow["ENTRY_DATE"]) ? DateTime.MinValue : Convert.ToDateTime(drow["ENTRY_DATE"]);
+                    objEmpGradeScale.RStatus = DBNull.Value.Equals(drow["R_STATUS"]) ? string.Empty : drow["R_STATUS"].ToString();
+                    lst.Add(objEmpGradeScale);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+        public List<ATTGradeScaleSetup> GetGradeScaleSettingsByEmpLevel(int EmpLevel)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_GRADESCALE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_EMP_LEVEL", EmpLevel, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTGradeScaleSetup> lst = new List<ATTGradeScaleSetup>();
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTGradeScaleSetup objEmpGradeScale = new ATTGradeScaleSetup();
+                    objEmpGradeScale.SubmissionNo = DBNull.Value.Equals(drow["SUBMISSION_NO"]) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                    objEmpGradeScale.EmpLevel = DBNull.Value.Equals(drow["EMP_LEVEL"]) ? string.Empty : drow["EMP_LEVEL"].ToString();
+                    objEmpGradeScale.StartingScaleSalary = DBNull.Value.Equals(drow["STARTING_SCALE_SALARY"]) ? 0 : Convert.ToDecimal(drow["STARTING_SCALE_SALARY"]);
+                    objEmpGradeScale.GradeAmount = DBNull.Value.Equals(drow["GRADE_AMOUNT"]) ? 0 : Convert.ToDecimal(drow["GRADE_AMOUNT"]);
+                    objEmpGradeScale.MaxGradeNo = DBNull.Value.Equals(drow["MAX_GRADE_NO"]) ? 0 : Int32.Parse(drow["MAX_GRADE_NO"].ToString());
+                    objEmpGradeScale.MaxScaleSalary = DBNull.Value.Equals(drow["MAX_SCALE_SALARY"]) ? 0 : Convert.ToDecimal(drow["MAX_SCALE_SALARY"]);
+                    objEmpGradeScale.Remarks = DBNull.Value.Equals(drow["REMARKS"]) ? string.Empty : drow["REMARKS"].ToString();
+                    objEmpGradeScale.EntryBy = DBNull.Value.Equals(drow["ENTRY_BY"]) ? string.Empty : drow["ENTRY_BY"].ToString();
+                    //objEmpGradeScale.EntryDate = DBNull.Value.Equals(drow["ENTRY_DATE"]) ? DateTime.MinValue : Convert.ToDateTime(drow["ENTRY_DATE"]);
+                    objEmpGradeScale.EntryDate = DBNull.Value.Equals(drow["ENTRY_DATE"]) ? string.Empty : drow["ENTRY_DATE"].ToString();
+                    objEmpGradeScale.RStatus = DBNull.Value.Equals(drow["R_STATUS"]) ? string.Empty : drow["R_STATUS"].ToString();
+                    lst.Add(objEmpGradeScale);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+    }
+}

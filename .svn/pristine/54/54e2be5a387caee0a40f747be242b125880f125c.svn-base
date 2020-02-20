@@ -1,0 +1,515 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Web.UI;
+using System.Data;
+using Account.Report.BLL;
+using Account.Report.ATT;
+using CrystalDecisions.CrystalReports.Engine;
+using HRFA.Modules.ACCOUNTS.REPORT;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+
+namespace HRFA.Modules.ACCOUNT.REPORT
+{
+    public partial class FinancialStatementReport : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                this.LoadOffice(null);
+            }
+
+        }
+
+        private void LoadOffice(int? officeID)
+        {
+
+            ddlOffice.DataSource = GetAllOffice(officeID);
+            ddlOffice.DataBind();
+        }
+
+       private List<ATTOffice> GetAllOffice(int? officeID)
+        {
+            DLLOffice objoffice = new DLLOffice();
+            List<ATTOffice> lst = objoffice.GetAllOffice(officeID);
+            ATTOffice obj = new ATTOffice();
+            obj.OfficeNameNep = "-- छान्नुहोस् -- ";
+            obj.OfficeCode = -1;
+            lst.Insert(0, obj);
+
+            return lst;
+
+        }
+
+
+       private void LoadCostCenter(Int32? officeCode, Int16? CostCenterID)
+       {
+
+           ddlCostCenter.DataSource = GetCostCenterByOffice(officeCode, CostCenterID);
+           ddlCostCenter.DataBind();
+       }
+
+       private List<ATTCostCenter> GetCostCenterByOffice(Int32? officeCode, Int16? CostCenterID)
+       {
+           DLLCostCenter objCostCenter = new DLLCostCenter();
+           List<ATTCostCenter> lst = objCostCenter.GetCostCenter(officeCode, CostCenterID);
+           ATTCostCenter obj = new ATTCostCenter();
+           obj.CostCenterName = "-- छान्नुहोस् -- ";
+           obj.CostCenterID = -1;
+           lst.Insert(0, obj);
+
+           return lst;
+
+       }
+
+
+       protected void ddlOffice_SelectedIndexChanged(object sender, EventArgs e)
+       {
+           this.ddlCostCenter.Items.Clear();
+           LoadCostCenter(int.Parse(ddlOffice.SelectedValue),null);
+       }
+
+       //public List<ATTCostCenter> GetCostCenter(Int32? officeCode, Int16? CostCenterID)// string UpToDate = txtUptoDate.Value;
+
+      // FinancialStatementReport report = new FinancialStatementReport();
+       PeriodicReportGeneration report = new PeriodicReportGeneration();
+
+        private void GetBalanceSheetReport(int OfficeCode, string UpToDate, int HideZero, Int32? costcenterID)
+        {
+            string Title = "Balance Sheet Report";
+            BLLPeriodicReportGeneration service = new BLLPeriodicReportGeneration();
+            DataSet ds = service.GetBalanceSheetReport(OfficeCode, UpToDate, HideZero, costcenterID);
+            report.SetDataSource(ds.Tables[0]);
+            foreach (DataRow drow in ds.Tables[0].Rows)
+            {
+                TextObject optional = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["oprational"];
+                optional.Text = "Operational P/L";
+                if (drow["GL_NAME"].ToString() == "Operational P/L")
+                {
+                    //string.IsNullOrEmpty(drow["AMOUNT"].ToString()) ? (double?)null : double.Parse(drow["AMOUNT"].ToString());
+
+                    if (drow["GL_SUM_DRAMT"].ToString() == "")
+                    {
+                        decimal? sumcrcal = string.IsNullOrEmpty(drow["GL_SUM_CRAMT"].ToString()) ? (decimal?)null : decimal.Parse(drow["GL_SUM_CRAMT"].ToString());
+                        //if (drow["GL_SUM_CRAMT"].ToString() == "")
+                        //{
+                        decimal sumcr;
+                        sumcr = sumcrcal ?? 0; 
+                            //decimal sumcr = decimal.Parse(drow["GL_SUM_CRAMT"].ToString());
+                       // }
+                        TextObject OpCr = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["OpCr"];
+                       OpCr.Text = string.Format(sumcr.ToString("#,##,##,###0.00"));
+                    }
+                    else
+                    {
+                       decimal sumdr = decimal.Parse(drow["GL_SUM_DRAMT"].ToString());
+                       // decimal? sumdr = string.IsNullOrEmpty(drow["GL_SUM_DRAMT"].ToString()) ? (decimal?)null : decimal.Parse(drow["GL_SUM_DRAMT"].ToString());
+                        TextObject OpDr = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["OpDr"];
+                       OpDr.Text = string.Format(sumdr.ToString("#,##,##,###0.00"));
+                       
+                    }
+                }
+            }
+            Guid g = Guid.NewGuid();
+            string fileName = g.ToString();
+            SetReportTextFields(Title, UpToDate);
+            ReportParams.Report.Add(fileName, report);
+            Session["rptFileName"] = fileName;
+            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "report", "window.open('/Modules/ACCOUNTS/REPORT/ReportViewer.aspx','_blank')", true);
+        }
+
+        public void GetTrialBalanceReport(int? OfficeCode, string UpToDate, int HideZero, Int32? costcenterID)
+        {
+            string Title = "Trial Balance Report";
+            BLLPeriodicReportGeneration service = new BLLPeriodicReportGeneration();
+            DataSet ds = service.GetTrialBalanceReport(OfficeCode, UpToDate, HideZero, costcenterID);
+            report.SetDataSource(ds.Tables[0]);
+            Guid g = Guid.NewGuid();
+            string fileName = g.ToString();
+            SetReportTextFields(Title, UpToDate);
+            TextObject optional = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["oprational"];
+            optional.Text = "";
+            ReportParams.Report.Add(fileName, report);
+            Session["rptFileName"] = fileName;
+            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "report", "window.open('/Modules/ACCOUNTS/REPORT/ReportViewer.aspx','_blank')", true);
+        }
+
+        private void GetProfitAndLossReport(int OfficeCode, string UpToDate, int HideZero, Int32? costcenterID)
+        {
+            string Title = "Profit And Loss Account Report";
+            BLLPeriodicReportGeneration service = new BLLPeriodicReportGeneration();
+            DataSet ds = service.GetProfitAndLossReport(OfficeCode, UpToDate, HideZero, costcenterID);
+            report.SetDataSource(ds.Tables[0]);
+            foreach (DataRow drow in ds.Tables[0].Rows)
+            {
+                if (drow["GL_NAME"].ToString() == "Operational P/L")
+                {
+                    TextObject optional = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["oprational"];
+                    optional.Text = "Operational P/L";
+                    if (drow["GL_SUM_DRAMT"].ToString() == "")
+                    {
+                        decimal? sumcrcal = string.IsNullOrEmpty(drow["GL_SUM_CRAMT"].ToString()) ? (decimal?)null : decimal.Parse(drow["GL_SUM_CRAMT"].ToString());
+                        decimal sumcr;
+                        sumcr = sumcrcal ?? 0; 
+
+                       // decimal sumcr = decimal.Parse(drow["GL_SUM_CRAMT"].ToString());
+                        TextObject OpCr = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["OpCr"];
+                        OpCr.Text = string.Format(sumcr.ToString("#,##,##,###0.00"));
+                    }
+                    else
+                    {
+                        decimal sumdr = decimal.Parse(drow["GL_SUM_DRAMT"].ToString());
+                        TextObject OpDr = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["OpDr"];
+                        OpDr.Text = string.Format(sumdr.ToString("#,##,##,###0.00"));
+                    }
+                }
+            }
+            report.SetDataSource(ds.Tables[0]);
+            Guid g = Guid.NewGuid();
+            string fileName = g.ToString();
+            SetReportTextFields(Title, UpToDate);
+            ReportParams.Report.Add(fileName, report);
+            Session["rptFileName"] = fileName;
+            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "report", "window.open('/Modules/ACCOUNTS/REPORT/ReportViewer.aspx','_blank')", true);
+        }
+
+        private void GetBalanceSheetReportByDateRange(int OfficeCode, string FromDate, string ToDate, int HideZero, Int32? costcenterID)
+        {
+            string Title = "Balance Sheet Report";
+            BLLPeriodicReportGeneration service = new BLLPeriodicReportGeneration();
+            DataSet ds = service.GetBalanceSheetReportByDateRange(OfficeCode, FromDate, ToDate, HideZero, costcenterID);
+            report.SetDataSource(ds.Tables[0]);
+            foreach (DataRow drow in ds.Tables[0].Rows)
+            {
+                TextObject optional = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["oprational"];
+                optional.Text = "Operational P/L";
+                if (drow["GL_NAME"].ToString() == "Operational P/L")
+                {
+                    //string.IsNullOrEmpty(drow["AMOUNT"].ToString()) ? (double?)null : double.Parse(drow["AMOUNT"].ToString());
+
+                    if (drow["GL_SUM_DRAMT"].ToString() == "")
+                    {
+                        // decimal? sumcr = string.IsNullOrEmpty(drow["GL_SUM_CRAMT"].ToString()) ? (decimal?)null : decimal.Parse(drow["GL_SUM_CRAMT"].ToString());
+                        //if (drow["GL_SUM_CRAMT"].ToString() == "")
+                        //{
+                     decimal sumcr = decimal.Parse(drow["GL_SUM_CRAMT"].ToString());
+                        // }
+                        TextObject OpCr = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["OpCr"];
+                        OpCr.Text = string.Format(sumcr.ToString("#,##,##,###0.00"));
+                    }
+                    else
+                    {
+                        decimal sumdr = decimal.Parse(drow["GL_SUM_DRAMT"].ToString());
+                        // decimal? sumdr = string.IsNullOrEmpty(drow["GL_SUM_DRAMT"].ToString()) ? (decimal?)null : decimal.Parse(drow["GL_SUM_DRAMT"].ToString());
+                        TextObject OpDr = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["OpDr"];
+                        OpDr.Text = string.Format(sumdr.ToString("#,##,##,###0.00"));
+
+                    }
+                }
+            }
+            Guid g = Guid.NewGuid();
+            string fileName = g.ToString();
+            SetReportTextFieldsByDateRange(Title, FromDate,ToDate);
+            ReportParams.Report.Add(fileName, report);
+            Session["rptFileName"] = fileName;
+            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "report", "window.open('/Modules/ACCOUNTS/REPORT/ReportViewer.aspx','_blank')", true);
+        }
+
+        private void GetTrialBalanceReportByDateRange(int OfficeCode, string FromDate, string ToDate, int HideZero, Int32? costcenterID)
+        {
+            string Title = "Trial Balance Report";
+            BLLPeriodicReportGeneration service = new BLLPeriodicReportGeneration();
+            DataSet ds = service.GetTrialBalanceReportByDateRange(OfficeCode, FromDate,ToDate, HideZero, costcenterID);
+            report.SetDataSource(ds.Tables[0]);
+            Guid g = Guid.NewGuid();
+            string fileName = g.ToString();
+            SetReportTextFieldsByDateRange(Title, FromDate,ToDate);
+            TextObject optional = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["oprational"];
+            optional.Text = "";
+            ReportParams.Report.Add(fileName, report);
+            Session["rptFileName"] = fileName;
+            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "report", "window.open('/Modules/ACCOUNTS/REPORT/ReportViewer.aspx','_blank')", true);
+        }
+
+        private void GetProfitAndLossReportByDateRange(int OfficeCode, string FromDate, string ToDate, int HideZero, Int32? costcenterID)
+        {
+            string Title = "Profit And Loss Account Report";
+            BLLPeriodicReportGeneration service = new BLLPeriodicReportGeneration();
+            DataSet ds = service.GetProfitAndLossReportByDateRange(OfficeCode, FromDate,ToDate, HideZero, costcenterID);
+            report.SetDataSource(ds.Tables[0]);
+            foreach (DataRow drow in ds.Tables[0].Rows)
+            {
+                if (drow["GL_NAME"].ToString() == "Operational P/L")
+                {
+                    TextObject optional = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["oprational"];
+                    optional.Text = "Operational P/L";
+                    if (drow["GL_SUM_DRAMT"].ToString() == "")
+                    {
+                        decimal sumcr = decimal.Parse(drow["GL_SUM_CRAMT"].ToString());
+                        TextObject OpCr = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["OpCr"];
+                        OpCr.Text = string.Format(sumcr.ToString("#,##,##,###0.00"));
+                    }
+                    else
+                    {
+                        decimal sumdr = decimal.Parse(drow["GL_SUM_DRAMT"].ToString());
+                        TextObject OpDr = (TextObject)report.ReportDefinition.Sections["Section4"].ReportObjects["OpDr"];
+                        OpDr.Text = string.Format(sumdr.ToString("#,##,##,###0.00"));
+                    }
+                }
+            }
+            report.SetDataSource(ds.Tables[0]);
+            Guid g = Guid.NewGuid();
+            string fileName = g.ToString();
+            SetReportTextFieldsByDateRange(Title,FromDate, ToDate);
+            ReportParams.Report.Add(fileName, report);
+            Session["rptFileName"] = fileName;
+            ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "report", "window.open('/Modules/ACCOUNTS/REPORT/ReportViewer.aspx','_blank')", true);
+        }
+        protected void btnPrint_Click(object sender, EventArgs e)
+        {
+            string errorMsg = "";
+            int count = 0;
+            if (this.ddlOffice.SelectedIndex == 0)
+            {
+                count++;
+                errorMsg += count.ToString() + ") Please select Office !!!<br/>";
+
+            }
+            if (this.ddlDataType.SelectedIndex == -1)
+            {
+                count++;
+                errorMsg += count.ToString() + ") Please Select Report Type !!!<br/>";
+
+            }
+
+            //if (this.ddlBeforeClosing.SelectedIndex == -1)
+            //{
+            //    count++;
+            //    errorMsg += count.ToString() + ") Please Select Closing Status !!!<br/>";
+
+            //}
+            
+            if (this.ddlHideZero.SelectedIndex == -1)
+            {
+                count++;
+                errorMsg += count.ToString() + ") Please Select  Hide Zero Status !!!<br/>";
+
+            }
+
+
+            //if (count > 0)
+            //{
+            //    this.lblStatusMessage.Text = errorMsg;
+            //    this.programmaticModalPopup.Show();
+            //    return;
+            //}
+
+            if (count > 0)
+            {
+                this.lblMessage.Text = errorMsg;
+               
+                return;
+            }
+
+                 int offid = int.Parse(ddlOffice.SelectedValue.ToString());
+
+                string UpToDate = txtUptoDate.Value;
+                int HideZero = int.Parse(ddlHideZero.Value);
+                int Type = int.Parse(ddlType.Value);
+                //Int32? costcenterID = int.Parse(ddlCostCenter.SelectedValue.ToString());
+                Int32? costcenterID = string.IsNullOrEmpty(ddlCostCenter.SelectedValue.ToString()) ? (Int32?)null : Int32.Parse(ddlCostCenter.SelectedValue.ToString());
+                Int32? SelectedcostcenterID;
+            
+            if (costcenterID == -1)
+                {
+                    SelectedcostcenterID = null;
+                }
+                else
+                {
+                    SelectedcostcenterID = costcenterID;
+                }
+                string FromDate = txtFromDate.Value;
+                string ToDate = txtFromDate.Value;  //
+                if (UpToDate != "")
+                {
+                if (Type == 1)
+                {
+                    GetBalanceSheetReport(offid, UpToDate, HideZero, SelectedcostcenterID);
+                }
+                if (Type == 2)
+                {
+                    GetProfitAndLossReport(offid, UpToDate, HideZero, SelectedcostcenterID);
+                }
+                if (Type == 3)
+                {
+                    GetTrialBalanceReport(offid, UpToDate, HideZero, SelectedcostcenterID);
+                }
+                }
+                else
+                {
+                if (Type == 1)
+                {
+                    GetBalanceSheetReportByDateRange(offid, FromDate, ToDate, HideZero, SelectedcostcenterID);
+                }
+                if (Type == 2)
+                {
+                    GetProfitAndLossReportByDateRange(offid, FromDate, ToDate, HideZero, SelectedcostcenterID);
+                }
+                if (Type == 3)
+                {
+                    GetTrialBalanceReportByDateRange(offid, FromDate, ToDate, HideZero, SelectedcostcenterID);
+                }
+
+                }
+            //}
+        }
+        protected void btnBranchTrialPrint_Click(object sender, EventArgs e)
+        {
+            string errorMsg = "";
+            int count = 0;
+            if (this.ddlOffice.SelectedIndex == 0)
+            {
+                count++;
+                errorMsg += count.ToString() + ") Please select Office !!!<br/>";
+
+            }
+            if (this.ddlDataType.SelectedIndex == -1)
+            {
+                count++;
+                errorMsg += count.ToString() + ") Please Select Report Type !!!<br/>";
+
+            }
+
+            
+
+            if (this.ddlHideZero.SelectedIndex == -1)
+            {
+                count++;
+                errorMsg += count.ToString() + ") Please Select  Hide Zero Status !!!<br/>";
+
+            }
+
+
+            //if (count > 0)
+            //{
+            //    this.lblStatusMessage.Text = errorMsg;
+            //    this.programmaticModalPopup.Show();
+            //    return;
+            //}
+
+            if (count > 0)
+            {
+                this.lblMessage.Text = errorMsg;
+
+                return;
+            }
+
+            int offid = int.Parse(ddlOffice.SelectedValue.ToString());
+
+            string UpToDate = txtUptoDate.Value;
+            int HideZero = int.Parse(ddlHideZero.Value);
+            int Type = int.Parse(ddlType.Value);
+            //Int32? costcenterID = int.Parse(ddlCostCenter.SelectedValue.ToString());
+            Int32? costcenterID = string.IsNullOrEmpty(ddlCostCenter.SelectedValue.ToString()) ? (Int32?)null : Int32.Parse(ddlCostCenter.SelectedValue.ToString());
+            Int32? SelectedcostcenterID;
+
+            if (costcenterID == -1)
+            {
+                SelectedcostcenterID = null;
+            }
+            else
+            {
+                SelectedcostcenterID = costcenterID;
+            }
+            string FromDate = txtFromDate.Value;
+            string ToDate = txtFromDate.Value;  //
+            if (UpToDate != "")
+            {
+       if (Type == 4)
+           
+       {
+        CrystalReport objReport = new CrystalReport();
+
+        objReport.ReportFilePath = Server.MapPath("~") + "/MODULES/PMES/Reports/BudgetHeadInformation.rpt";
+       // objReport.SelectionCriteria = SetCriteria();
+        objReport.UserID = "PMES_ADMIN";
+        objReport.Password = "PMES_ADMIN";
+
+        objReport.ParamList.Add(new ReportParameter("p_office_id",null));
+        objReport.ParamList.Add(new ReportParameter("p_upto_date",null));
+
+        Session["HRACT_Report"] = objReport;
+        
+       // Session["PMESReportTitle"] = "PMES | Budget Information";
+
+        ScriptManager.RegisterStartupScript(this.Page, this.GetType(), "report", "window.open('/Modules/ACCOUNTS/REPORT/ReportViewer.aspx','_blank')", true);
+
+    }
+      
+ }
+            
+}
+
+
+        protected void hiddenTargetControlForModalPopup_Click(object sender, EventArgs e)
+        {
+           // this.programmaticModalPopup.Hide();
+
+        }
+        protected void hideModalPopupViaServer_Click(object sender, EventArgs e)
+        {
+
+        }
+        private string GetPrintDate()
+        {
+            BLLPeriodicReportGeneration service = new BLLPeriodicReportGeneration();
+            string PrintDate = service.GetNepaliDate().NepaliDate;
+            return PrintDate;
+        }
+
+        private void SetReportTextFields(string Title, string UpToDate)
+        {
+            // int DateType = int.Parse(ddlDataType.Value);
+            TextObject CompanyName = (TextObject)report.ReportDefinition.Sections["Section1"].ReportObjects["txtCompanyName"];
+            CompanyName.Text = "काठमाण्डौ  उपत्यका  खानेपानी  लिमिटेड";
+            TextObject SubHeader = (TextObject)report.ReportDefinition.Sections["Section1"].ReportObjects["PeriodicRptDate"];
+            TextObject Header = (TextObject)report.ReportDefinition.Sections["Section1"].ReportObjects["txtPeriodicReportHeader"];
+            TextObject PrintDate = (TextObject)report.ReportDefinition.Sections["Section1"].ReportObjects["txtPrintDate"];
+           // PictureObject CompanyLogo = (PictureObject)report.ReportDefinition.Sections["Section1"].ReportObjects["CompanyLogo"];
+            PrintDate.Text = GetPrintDate();
+            Header.Text = Title;
+            SubHeader.Text = "AT  " + UpToDate + "";
+        }
+
+
+        private void SetReportTextFieldsByDateRange(string Title, string FromDate, string ToDate)
+        {
+            int DateType = int.Parse(ddlDataType.Value);
+           // UpToDate = txtUptoDate.Value;
+             FromDate = txtFromDate.Value;
+             ToDate = txtToDate.Value;
+            TextObject CompanyName = (TextObject)report.ReportDefinition.Sections["Section1"].ReportObjects["txtCompanyName"];
+            CompanyName.Text = "काठमाण्डौ  उपत्यका  खानेपानी  लिमिटेड";
+            TextObject SubHeader = (TextObject)report.ReportDefinition.Sections["Section1"].ReportObjects["PeriodicRptDate"];
+            TextObject Header = (TextObject)report.ReportDefinition.Sections["Section1"].ReportObjects["txtPeriodicReportHeader"];
+            TextObject PrintDate = (TextObject)report.ReportDefinition.Sections["Section1"].ReportObjects["txtPrintDate"];
+            // PictureObject CompanyLogo = (PictureObject)report.ReportDefinition.Sections["Section1"].ReportObjects["CompanyLogo"];
+            PrintDate.Text = GetPrintDate();
+            Header.Text = Title;
+            if (DateType == 2)
+            {
+                SubHeader.Text = "From " + FromDate + " To " + ToDate + "";
+            }
+            else if (DateType == 1)
+            {
+                SubHeader.Text = "AT  " + ToDate + "";
+            }
+            else
+            {
+                SubHeader.Text = "AS ON  " + ToDate + "";
+            }
+        }
+    }
+}

@@ -1,0 +1,178 @@
+﻿using System;
+using System.Data;
+using System.Collections.Generic;
+
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLPersonNominee
+    {
+        public bool SaveNominee(ATTPersonDependent obj,OracleTransaction tran)
+        {
+            try
+            {
+                string sp = "";
+                
+                if (obj.Action == "E")
+                    sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_PERSON_NOMINEE";
+                else if (obj.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_PERSON_NOMINEE";
+                }
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_PERSON_ID",obj.Person.PID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_RELATION_TYPE_ID", obj.RelType.RelTypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_RELATIVE_ID", obj.Relative.PID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", obj.PersonNominee.NomineeFromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY",obj.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Date, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", obj.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    paramList.Clear();
+                }
+
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+        public ATTPersonNominee GetPersonNominee(Int64? ID, Int64? RelativeID, Int32? seqNo, int? rseqNo, OracleConnection conn, bool isDirty = false)
+        {
+            ATTPersonNominee obj = new ATTPersonNominee();
+
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                string sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_PERSON_NOMINEE";
+
+                if (isDirty)
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_PERSON_NOMINEE";                    
+                }
+
+                
+
+                paramList.Add(SqlHelper.GetOraParam(":p_ID", ID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_SEQNO", seqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_RSEQ_NO", rseqNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_RELATIVE_ID", RelativeID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow dr = ds.Tables[0].Rows[0];
+
+                    if (isDirty)
+                    {
+                        obj.Person.SubmissionNo = string.IsNullOrEmpty(dr["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(dr["SUBMISSION_NO"].ToString());
+                        obj.Person.SeqNo = string.IsNullOrEmpty(dr["P_SEQ_NO"].ToString()) ? (Int32?)null : Int32.Parse(dr["P_SEQ_NO"].ToString());
+
+                        obj.Relative.SubmissionNo = string.IsNullOrEmpty(dr["RELATIVE_ID"].ToString()) ? (Int64?)null : Int64.Parse(dr["RELATIVE_ID"].ToString());
+                        obj.Relative.SeqNo = string.IsNullOrEmpty(dr["R_SEQ_NO"].ToString()) ? (Int32?)null : Int32.Parse(dr["R_SEQ_NO"].ToString());
+                    }
+                    else
+                    {
+                        obj.Person.PID = string.IsNullOrEmpty(dr["P_ID"].ToString()) ? (Int64?)null : Int64.Parse(dr["P_ID"].ToString());
+                        obj.Relative.PID = string.IsNullOrEmpty(dr["RELATIVE_ID"].ToString()) ? (Int64?)null : Int64.Parse(dr["RELATIVE_ID"].ToString());
+                    }
+
+                    obj.RelType.RelTypeID = int.Parse(dr["RELTYPE_ID"].ToString());
+                    obj.RelType.RelTypeName = dr["RELTYPE_NAME"].ToString();
+                    obj.RelType.RelTypeNameEng = dr["RELTYPE_NAME_ENG"].ToString();
+                    obj.Status = dr["R_STAUS"].ToString();
+                    obj.NomineeFromDate = dr["FROM_DATE"].ToString();
+                    //obj.TranNo = string.IsNullOrEmpty(dr["TRAN_NO"].ToString()) ? (Int64?)null : Int64.Parse(dr["TRAN_NO"].ToString());
+
+                    DLLPersonDoc dllPersonDoc = new DLLPersonDoc();
+                    if (isDirty) {
+                        obj.NomineeDoc = dllPersonDoc.GetPersonDocs(obj.Relative.SubmissionNo, obj.Relative.SeqNo, conn, true);
+                    }
+
+                }
+                else
+                {
+                    obj = null; 
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+
+            return obj;
+        }
+
+        #region Dirty
+        public bool SaveDirtyNominee(ATTPersonNominee obj, OracleTransaction tran)
+        {
+            try
+            {
+                string sp = "";
+
+                if (obj.Action == "E")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_EDIT_PERSON_NOMINEE";
+                }
+                else if (obj.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_PERSON_NOMINEE";
+                }
+                else if (obj.Action == "D")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_DEL_PERSON_NOMINEE";
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", obj.Person.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_PERSON_SEQ_NO", obj.Person.SeqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    paramList.Clear();
+
+                    return true;
+                }
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO",obj.Person.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_PERSON_SEQ_NO", obj.Person.SeqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_RELATION_TYPE_ID", obj.RelType.RelTypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_RELATIVE_ID",obj.Relative.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_RELATIVE_SEQ_NO",obj.Relative.SeqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", obj.NomineeFromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Date, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", obj.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    paramList.Clear();
+                }
+
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+        #endregion
+    }
+}

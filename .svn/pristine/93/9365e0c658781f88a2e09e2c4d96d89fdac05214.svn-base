@@ -1,0 +1,458 @@
+﻿function OfficeCompanyAccChart(data){
+    var self = this;
+    self.Company = ko.observable(data.Company);
+    self.AccountChart = ko.observable(data.AccountChart);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.FromDate = ko.observable(data.FromDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.ToDate = ko.observable(data.ToDate);
+    self.TranNo = ko.observable(data.TranNo);
+    self.Action = ko.observable(data.Action);
+    self.Selected = ko.observable(data.Selected);
+}
+
+function CostCenter(data) {
+    var self = this;
+    if (data != undefined) {
+        self.OfficeCode = ko.observable(data.OfficeCode);
+
+        //   self.OfficeCD = ko.observable(data.OfficeCD);
+
+        self.CostCenterID = ko.observable(data.CostCenterID);
+        self.CostCenterName = ko.observable(data.CostCenterName);
+        self.CostCenterNameEng = ko.observable(data.CostCenterNameEng);
+
+        self.Status = ko.observable(data.Status);
+        self.FromDate = ko.observable(data.FromDate);
+        self.ToDate = ko.observable(data.ToDate);
+        self.EntryBy = ko.observable(data.EntryBy);
+        self.EntryDate = ko.observable(data.EntryDate);
+        self.Action = ko.observable(data.Action);
+    }
+}
+
+function Company(data) {
+     {
+        var self = this;
+        self.Office = ko.observable(data.Office);
+        self.CompanyID = ko.observable(data.CompanyID);
+        self.CompanyName = ko.observable(data.CompanyName);
+        self.CompanyNameEng = ko.observable(data.CompanyNameEng);
+        self.EntryBy = ko.observable(data.EntryBy);
+        self.EntryDate = ko.observable(data.EntryDate);
+        self.RStatus = ko.observable(data.RStatus);
+        self.TranNo = ko.observable(data.TranNo);
+        self.Action = ko.observable(data.Action);
+    }
+};
+
+function Office(data) {
+    var self = this;
+    self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+    self.OfficeCode = ko.observable(data.OfficeCode);
+}
+
+function AccountChart(data) {
+    var self = this;
+    self.AccCode = ko.observable(data.AccCode);
+    self.AccName = ko.observable(data.AccName);
+    self.GLGroup = ko.observable(data.GLGroup);
+    self.PaACCode = ko.observable(data.PaACCode);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.TranNo = ko.observable(data.TranNo);
+    self.HeadTran = ko.observable(data.HeadTran);
+    self.Balance = ko.observable(data.Balance);
+    self.GlCode = ko.observable(data.GlCode);
+    self.ACNameEng = ko.observable(data.ACNameEng);
+    self.Action = ko.observable(data.Action);
+
+}
+
+function GLGroup(data) {
+    var self = this;
+    self.GroupID = ko.observable(data.GroupID);
+    self.GroupName = ko.observable(data.GroupName);
+    
+}
+
+
+var OfficeAccountSetupViewModel = function () {
+    var self = this;
+
+    //FOR OFFICE
+    self.OfficeNameNep = ko.observable();
+    self.OfficeCode = ko.observable();
+    self.SelectedOffice = ko.observable();
+
+    //Cost Center
+    self.OfficeCode = ko.observable();
+    self.CostCenterID = ko.observable();
+    self.CostCenterName = ko.observable();
+    self.CostCenterNameEng = ko.observable();
+    self.Status = ko.observable();
+    self.FromDate = ko.observable();
+    self.ToDate = ko.observable();
+    self.EntryBy = ko.observable();
+    self.EntryDate = ko.observable();
+    self.Action = ko.observable("A");
+    self.ParentOffID = ko.observable();
+    self.ParentCostCenterID = ko.observable();
+    self.ParentID = ko.observable();
+    self.OfficeName = ko.observable();
+    self.Offices = ko.observableArray([]);
+    self.CostCenters = ko.observableArray([]);
+    self.SelectedCostCenter = ko.observable();
+
+
+
+    //FOR COMPANY
+    self.CompanyID = ko.observable();
+    self.CompanyName = ko.observable();
+    self.CompanyNameEng = ko.observable();
+    self.EntryBy = ko.observable();
+    self.EntryDate = ko.observable();
+    self.RStatus = ko.observable();
+    self.TranNo = ko.observable();
+    self.Action = ko.observable();
+    self.SelectedCompany = ko.observable();
+    self.IsCheck = ko.observable();
+
+
+    //FOR ACCOUNT CHART
+    self.AccCode = ko.observable();
+    self.AccName = ko.observable();
+    self.PaACCode = ko.observable();
+    self.HeadTran = ko.observable();
+    self.Balance = ko.observable();
+    self.GlCode = ko.observable();
+    self.ACNameEng = ko.observable();
+
+
+    //FOR GLGROUP
+    self.GroupID = ko.observable();
+    self.GroupName = ko.observable();
+
+    self.Selected = ko.observable();
+    self.OfficeArray = ko.observableArray([]);
+    self.CompanyArray = ko.observableArray([]);
+    self.GLArray = ko.observableArray([]);
+    self.ApplicationItemsChecked = ko.observableArray([]);
+
+    self.AddedOfficeAccountArray = ko.observableArray([]);
+
+    //#region Function to get all offices
+
+    self.GetOffice = function () {
+        waitMsg("Loading");
+        waitMsg.show();
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/CENTRALLOOKUP/OfficeHandler.ashx',
+            data: { 'method': 'GetAllOffice', 'args': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new Office(item)
+
+                });
+                self.OfficeArray(mappedTask);
+
+                waitMsg.hide();
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+
+    };
+
+    //#endregion
+    /* Begin Get cost center ***/
+
+    self.GetCostCenter = function () {
+        // ID = ko.toJS(self.SelectedOffice().OfficeCode);
+        var OfficeCD = ko.toJS(self.SelectedOffice).OfficeCode;
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            url: '/Handlers/FAMS/CostCenterHandler.ashx',
+
+            data: { 'method': 'GetCostCenter', 'officeCode': OfficeCD, 'CostCenterID': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new CostCenter(item)
+                });
+
+                self.CostCenters(mappedTask);
+
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+
+    }
+
+
+    // self.GetCostCenter();
+
+
+    /* End Get cost center*/
+
+    //#region Function to get Company Details
+
+    self.GetCompany = function () {
+
+        waitMsg("Loading");
+        waitMsg.show();
+        ID = ko.toJS(self.SelectedOffice().OfficeCode);
+        //self.OfficeCode(ko.toJS(self.SelectedOffices().OfficeCode));
+
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/Account/CompanyHandler.ashx',
+            data: { 'method': 'GetCompany', 'OfficeCode': ID, 'token': $("#token").text() },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                waitMsg.hide();
+                if (result.IsSucess) {
+                    var mappedTask = $.map(result.ResponseData, function (item) {
+
+                        return new Company(item)
+
+                    });
+                    self.CompanyArray([]);
+                    self.CompanyArray(mappedTask);
+
+                }
+                else {
+
+                    if (!result.IsToken)
+                        msg(result.Message, "WARNING", null, ClearSession);
+                    else
+                        msg(result.Message, "WARNING");
+                }
+
+
+            },
+            error: function (err) {
+                waitMsg.hide();
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+    }
+
+    //#endregion
+
+    $("#checkAll").change(function () {
+        $("input:checkbox").prop('checked', $(this).prop("checked"));
+    });
+
+    //#region Function to get GL Details
+
+    self.GetACChart = function () {
+
+        waitMsg("Loading");
+        waitMsg.show();
+        ID = ko.toJS(self.SelectedOffice().OfficeCode);
+       // CID = 0;
+        CID =  ko.toJS(self.SelectedCostCenter().CostCenterID); //company id is same as costcentre id
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/Account/OfficeCompanyAccChartHandler.ashx',
+            data: { 'method': 'GetOfficeComanyAcchart', 'OfficeID': ID, 'companyID': CID, 'P_all': 'Y', 'token': $("#token").text() },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                waitMsg.hide();
+
+                if (result.IsSucess) {
+
+                    self.GLArray(result.ResponseData);
+
+
+                    self.AddedOfficeAccountArray(self.GLArray().slice(0));
+
+                    count = 0;
+                    totalCount = 0;
+                    $("#tblDisplay tbody>tr").each(function () {
+
+                        if (self.GLArray()[count].Selected == "Y") {
+                            $(this).find("input[type=checkbox]").attr("checked", true);
+                            totalCount = totalCount + 1;
+                        }
+                        count = count + 1;
+
+                    });
+
+
+                    if (totalCount == self.GLArray().length) {
+                        $('#select_all').prop('checked', true);
+                    }
+                    else {
+                        $('#select_all').prop('checked', false);
+                    }
+                }
+                else {
+
+                    if (!result.IsToken)
+                        msg(result.Message, "WARNING", null, ClearSession);
+                    else
+                        msg(result.Message, "WARNING");
+                }
+
+
+            },
+            error: function (err) {
+                waitMsg.hide();
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+    }
+
+
+
+    self.ClearControls = function () {
+
+
+    }
+
+    self.Submit = function () {
+
+        if (self.validate()) {
+
+            Confirm('एकपटक Submit गरिसकेपछि अर्को पटक विवरण फेरि परिवर्तन गर्न पइने छैन। \n के तपाई Submit गर्न चाहनुहन्छ ?', 'Confirmation Dialog', function (r) {
+                if (r) {
+                    //self.AddedOfficeAccountArray([]);
+
+
+                    count = 0;
+
+                    $("#tblDisplay tbody>tr").each(function () {
+
+
+                        if (self.AddedOfficeAccountArray()[count].Selected == "N") {
+                            var x = $(this).find("input[type=checkbox]").prop('checked');
+                            if (x == true) {
+                                self.AddedOfficeAccountArray()[count].Action = "A";
+
+                            }
+
+                        }
+                        if (self.AddedOfficeAccountArray()[count].Selected == "N") {
+                            var x = $(this).find("input[type=checkbox]").prop('checked');
+                            if (x == false) {
+                                self.AddedOfficeAccountArray()[count].Action = "";
+
+                            }
+
+                        }
+                        if (self.AddedOfficeAccountArray()[count].Selected == "Y") {
+                            var x = $(this).find("input[type=checkbox]").prop('checked');
+                            if (x == true) {
+
+                                self.AddedOfficeAccountArray()[count].Action = "";
+                            }
+
+                        }
+
+                        if (self.AddedOfficeAccountArray()[count].Selected == "Y") {
+                            var x = $(this).find("input[type=checkbox]").prop('checked');
+                            if (x == false) {
+
+                                self.AddedOfficeAccountArray()[count].Action = "E";
+
+                            }
+
+                        }
+                        count = count + 1;
+
+                    });
+
+                    for (var i = 0; i < self.AddedOfficeAccountArray().length; i++) {
+                        self.AddedOfficeAccountArray()[i].Company.Office.OfficeCode = ko.toJS(self.SelectedOffice().OfficeCode);
+                        self.AddedOfficeAccountArray()[i].Company.CompanyID =  ko.toJS(self.SelectedCostCenter().CostCenterID);
+                       // self.AddedOfficeAccountArray()[i].Company.CompanyID = 0;
+                        self.AddedOfficeAccountArray()[i].EntryBy = $("#user").text();
+                        self.AddedOfficeAccountArray()[i].Rstatus = "F";
+
+                    }
+
+               console.log(ko.toJS(self.AddedOfficeAccountArray()));
+
+                    var url = "../../Handlers/ACCOUNT/OfficeCompanyAccChartHandler.ashx";
+                    var data = { 'method': "SaveOfficeComAcchart", 'args': JSON.stringify(ko.toJS(self.AddedOfficeAccountArray)) };
+                    async: false,
+                        $.post(url, data,
+                        function (result) {
+                            var obj = jQuery.parseJSON(result);
+                            msg(obj.Message);
+                            if (obj.IsSucess == true) {
+                                document.getElementById("btnSubmit").style.visibilty = "hidden";
+
+                            }
+                            if (obj.IsSucess == true) {
+
+                            }
+
+                        });
+
+
+                }
+            });
+        }
+    }
+
+
+    self.GetOffice();
+
+    self.validate = function () {
+
+        var errMsg = "";
+        var objFocus = null;
+        //var cval = ko.toJS(self.SelectedContact().TypeName);
+
+
+        if (ko.toJS(self.SelectedOffice) == undefined) {
+            errMsg += "Please Select Office !!!<br>";
+        }
+
+        //        if (ko.toJS(self.SelectedCostCenter) == undefined) {
+        //            errMsg += "Please Select Cost Center !!!<br>";
+        //        }
+        if (errMsg !== "") {
+             msg(errMsg,"WARNING");
+
+            return false;
+        }
+        else {
+            return true;
+        }
+
+
+    }
+
+
+}
+
+$(document).ready(function () {
+    ValidateSession();
+    ko.applyBindings(new OfficeAccountSetupViewModel());
+   
+});

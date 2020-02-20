@@ -1,0 +1,10 @@
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.COMMON\bin\Release\HRFA.COMMON.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.COMMON\bin\Release\HRFA.COMMON.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.COMMON\bin\Release\Newtonsoft.Json.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.COMMON\bin\Release\HRFA.ATT.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.COMMON\bin\Release\HRFA.ATT.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.COMMON\obj\Release\HRFA.COMMON.csprojAssemblyReference.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.COMMON\obj\Release\HRFA.COMMON.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.COMMON\obj\Release\HRFA.COMMON.csproj.CopyComplete
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.COMMON\obj\Release\HRFA.COMMON.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.COMMON\obj\Release\HRFA.COMMON.pdb

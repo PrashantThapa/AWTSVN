@@ -1,0 +1,127 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEmployeeInsurance
+    {
+        public List<ATTEmpInsurance> GetEmpInsurances(Int64? ID, OracleConnection conn, bool isDirty = false)
+        {
+            List<ATTEmpInsurance> lst = new List<ATTEmpInsurance>();
+
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                string sp = "CPR_GET_EMP_ISNURANCE";
+
+                if (isDirty)
+                {
+                    sp = "DCPR_GET_EMP_INSURANCE";
+                }
+
+
+
+                paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", ID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    foreach (DataRow dr in ((DataTable)ds.Tables[0]).Rows)
+                    {
+
+                        ATTEmpInsurance obj = new ATTEmpInsurance();
+
+
+                        obj.CompanyName = dr["COMPANY_NAME"].ToString();
+                        obj.InsuranceNo = dr["INSURANCE_NO"].ToString();
+                        obj.ExpiryDate = dr["MATURITY_DATE"].ToString();
+                        obj.FromDate = dr["FROM_DATE"].ToString();
+                        obj.PolicyType = dr["POLICY_TYPE"].ToString();
+                        obj.YearlyPremium = string.IsNullOrEmpty(dr["YEARLY_PREMIUM"].ToString()) ? (Double?)null : Double.Parse(dr["YEARLY_PREMIUM"].ToString());
+                        obj.MonthlyPremium = string.IsNullOrEmpty(dr["MONTHLY_PREMIUM"].ToString()) ? (Double?)null : Double.Parse(dr["MONTHLY_PREMIUM"].ToString());
+                        obj.Remarks = dr["REMARKS"].ToString();
+                        obj.EntryBy = dr["ENTRY_BY"].ToString();
+                        obj.EntryDate = dr["ENTRY_DATE"].ToString();
+                        obj.RStatus = dr["R_STATUS"].ToString();
+
+                        lst.Add(obj);
+
+                    }
+
+                }
+
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+        #region Dirty
+        public bool SaveDirtyEmployeeInsurance(List<ATTEmpInsurance> lst, Int64? submissionNo, Int32? seqNo, string entryBy, OracleTransaction tran)
+        {
+            try
+            {
+                string sp = "";
+
+                foreach (ATTEmpInsurance objEmpInsurance in lst)
+                {
+                    if (objEmpInsurance.Action == "E")
+                    {
+                        sp = "DCPR_EDIT_EMP_INSURANCE";
+
+                    }
+                    else if (objEmpInsurance.Action == "A")
+                    {
+                        sp = "DCPR_ADD_EMP_INSURANCE";
+
+                    }
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+
+                        paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", submissionNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_SEQ_NO", seqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_COMPANY_NAME", objEmpInsurance.CompanyName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_INSURANCE_NO", objEmpInsurance.InsuranceNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", objEmpInsurance.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.InputOutput));
+                        paramList.Add(SqlHelper.GetOraParam(":p_MATURITY_DATE", objEmpInsurance.ExpiryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objEmpInsurance.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", null, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objEmpInsurance.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_POLICY_TYPE", objEmpInsurance.PolicyType, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_YEARLY_PREMIUM", objEmpInsurance.YearlyPremium, OracleDbType.Double, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_MONTHLY_PREMIUM", objEmpInsurance.MonthlyPremium, OracleDbType.Double, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_REMARKS", objEmpInsurance.Remarks, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                        paramList.Clear();
+
+                    }
+                   
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in Saving Employee Insurance !!!" + ex.Message);
+                throw (ex);
+            }
+        }
+        #endregion
+    }
+}

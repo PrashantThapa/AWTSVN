@@ -1,0 +1,186 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEmploymentType
+    {
+        /// <summary>
+        /// This method Save/Update Employment Type
+        /// </summary>
+        /// <param name="objEmp"></param>
+        /// <returns>String as a Message about Save/Update Employment Type</returns>
+        /// 
+        public string SaveEmploymentType(List<ATTEmploymentType> objEmp)
+        {
+            string msg = "No Data To Save!!!";
+            string sp = "";
+            string status = "";
+
+            foreach (ATTEmploymentType item in objEmp)
+            {
+                if (item.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_EMPLOYMENT_TYPE";
+                    msg = "Successfully Saved.";
+                }
+                else
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_EMPLOYMENT_TYPE";
+                    msg = "Successfully Updated.";
+                }
+
+                if (item.Status == true)
+                {
+                    status = "A";
+                }
+                else
+                {
+                    status = "I";
+                }
+
+               // item.EntryBy = "SOSYS_MAIN";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":p_EMPLOYMENT_TYPE_ID", item.EmpID, OracleDbType.Int32, ParameterDirection.InputOutput));
+                paramList.Add(SqlHelper.GetOraParam(":p_EMPLOYMENT_TYPE_NAME", item.EmpTypeName, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_EMPLOYMENT_TYPE_NAME_ENG", item.EmpTypeNameEng, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_STATUS", status, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", item.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", item.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", item.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+
+                GetConnection conn = new GetConnection();
+                OracleConnection dbConn = conn.GetDbConn();
+                OracleTransaction tran = dbConn.BeginTransaction();
+
+                try {
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    tran.Commit();
+                    
+
+                }
+                catch(Exception ex)
+                {
+                    tran.Rollback();
+                    throw new Exception("Error" + ex.Message);
+                   
+                }
+                finally
+                {
+                   
+                    dbConn.Close();
+                }
+
+
+            }
+
+            return msg;
+        }
+
+
+        /// <summary>
+        /// Retrives a list of Employment Type(s)
+        /// </summary>
+        /// <param name="EmpTypeID"></param>
+        /// <returns>Employment Type or Null if Employment Type does not exist</returns>
+        ///
+        public List<ATTEmploymentType> GetEmploymentType(int? EmpTypeID)
+        {
+            string sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_EMPLOYMENT_TYPE";
+
+            List<OracleParameter> paramList = new List<OracleParameter>();
+
+            paramList.Add(SqlHelper.GetOraParam(":p_EMPLOYMENT_TYPE_ID", EmpTypeID, OracleDbType.Int32, ParameterDirection.Input));
+            paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, ParameterDirection.Output));
+           
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection dbconn = getConn.GetDbConn();
+
+            List<ATTEmploymentType> listEmpType = new List<ATTEmploymentType>();
+
+            try
+            {
+                DataSet ds = SqlHelper.ExecuteDataset(dbconn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTEmploymentType objEmpType = new ATTEmploymentType();
+
+                    objEmpType.EmpID = int.Parse(drow["EMPTYPE_ID"].ToString());
+                    objEmpType.EmpTypeName = drow["EMPTYPE_NAME"].ToString();
+                    objEmpType.EmpTypeNameEng = drow["EMPTYPE_NAME_ENG"].ToString();
+                    if (drow["STATUS"].ToString() == "A")
+                    {
+                        objEmpType.Status = true;
+                    }
+                    else
+                    {
+                        objEmpType.Status = false;
+                    }
+                    objEmpType.FromDate = drow["FROM_DATE"].ToString();
+                    objEmpType.ToDate = drow["TO_DATE"].ToString();
+                    objEmpType.EntryBy = drow["ENTRY_BY"].ToString();
+                    objEmpType.EntryDate = drow["ENTRY_DATE"].ToString();
+
+                    listEmpType.Add(objEmpType);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(" " + ex.Message);
+            }
+            finally
+            {
+                dbconn.Close();  
+            }
+            return listEmpType;
+        }
+
+        /// <summary>
+        /// This method Delete Employment Type
+        /// </summary>
+        /// <param name="EmpTypeID">EmpTypeID to be deleted</param>
+        /// <returns>String as a Message about Delete Employment Type</returns>
+        ///
+
+        public string DelEmploymentType(int EmpTypeID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+            
+            
+            try
+            {
+                string sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_DEL_EMPLOYMENT_TYPE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":p_EMPLOYMENT_TYPE_ID", EmpTypeID, OracleDbType.Int32, ParameterDirection.InputOutput));
+                paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", null, OracleDbType.Varchar2, ParameterDirection.Input));
+
+                SqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                return "Deleted Successfully.";
+            }
+            catch(Exception ex)
+            {
+
+                return ex.Message;
+            }
+            finally
+            {
+               
+                conn.Close();
+            }
+      
+        }
+    }
+}

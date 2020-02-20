@@ -1,0 +1,780 @@
+﻿
+
+var EmployeeGrade = function (data) {
+	var self = this;
+	if (data != undefined) {
+		self.OldSubmissionNo = ko.observable(data.OldSubmissionNo);
+		self.EmpID = ko.observable(data.EmpID);
+		self.EmployeeName = ko.observable(data.EmployeeName);
+		self.GradeType = ko.observable(data.GradeType);
+		self.GradeValue = ko.observable(data.GradeValue);
+		self.FromDate = ko.observable(data.FromDate);
+		self.ToDate = ko.observable(data.ToDate);
+		self.EntryBy = ko.observable(data.EntryBy);
+		self.RStatus = ko.observable(data.RStatus);
+		self.Action = ko.observable(data.Action);
+		self.GrandeNo = ko.observable(data.GrandeNo);
+		self.Transportation = ko.observable(data.Transportation);
+		self.Residence = ko.observable(data.Residence);
+		self.TaxDeduction = ko.observable(data.TaxDeduction);
+		self.Insurance = ko.observable(data.Insurance);
+		self.PremiumAmount = ko.observable(data.PremiumAmount);
+		self.Sawari = ko.observable(data.Sawari);
+		self.LoanType = ko.observable(data.LoanType);
+		self.Bank = ko.observable(data.Bank);
+		self.IndividualDetailsLoan = ko.observable(data.IndividualDetailsLoan);
+
+	}
+}
+
+    var IndividualDetailsLoan = function (data) {
+    var self = this;
+    if (data != undefined) {
+        self.SubmissionNo = ko.observable(data.SubmissionNo);
+        self.EmpID = ko.observable(data.EmpID);
+        self.FromDate = ko.observable(data.FromDate);
+        self.ToDate = ko.observable(data.ToDate);
+        self.LoanType = ko.observable(data.LoanType);
+        self.LoanAmt = ko.observable(data.LoanAmt);
+        self.AccountNo = ko.observable(data.AccountNo);
+        self.Bank = ko.observable(data.Bank);
+        self.BankName = ko.observable(ko.toJS(self.Bank()? self.Bank().BankName : null));
+        self.EntryBy = ko.observable(data.EntryBy);
+        self.EntryDate = ko.observable(data.EntryDate);
+        self.RStatus = ko.observable(data.RStatus);
+        self.Action = ko.observable(data.Action);
+    }
+}
+
+//by Niraj
+     var LoanType = function (data) {
+    var self = this;
+    if (data != undefined) {
+        self.LoanTypeID = ko.observable(data.LoanTypeID);
+        self.LoanTypeName = ko.observable(data.LoanTypeName);
+    }
+};
+
+     var TaxCat = function (data) {
+    var self = this;
+    self.TaxCatID = ko.observable(data.TaxCatID);
+    self.NCatID = ko.observable(data.NCatID);
+    self.DescNep = ko.observable(data.DescNep);
+    self.DescEng = ko.observable(data.DescEng);
+};
+
+     var Bank = function (data) {
+    var self = this;
+    if (data != undefined) {
+
+        self.BankID = ko.observable(data.BankID);
+        self.BankName = ko.observable(data.BankName);
+    }
+};
+
+     var GradeLimit = {
+	'११': 7,
+	'१०': 7,
+	'९': 8,
+	'८': 8,
+	'७': 8,
+	'६': 8,
+	'५': 10,
+	'४': 10,
+	'३': 7,
+	'२': 6,
+	'१ [प्रथम]': 2,
+	'१ [दितिय]': 2,
+	'१ [तृतिय]': 2,
+	'१ [चतुर्थ]': 2,
+	'१ [पन्चम]': 4
+};
+
+     var EmpGradeViewModel = function () {
+    var self = this;
+
+    self.EmpID = ko.observable();
+		 self.EmployeeName = ko.observable();
+		 self.Level = ko.observable();
+		 self.Sewa = ko.observable();
+		 self.Samuh = ko.observable();
+		 self.EmpID.subscribe(function (value) {
+			 if (value === null || value === undefined || value <=0) return;
+		
+		$.ajax({
+			dataType: "json",
+			url: '../../Handlers/PAYROLL/EmpGradeHandler.ashx',
+			data: { 'method': 'GetEmpGradeByEmpID', 'EmpID':value },
+			contentType: "application/json; charset=utf-8",
+			async: false,
+			success: function (data) {				
+				var EmpGradeList = data.ResponseData.EmpGrade;
+				var LoanList = data.ResponseData.Loans;
+				var getGradeVal = function (arr) { // to nullify the new gradetypes which were not in the previous version
+					if (arr.length == 1) {
+						return arr[0].GradeValue;
+					} else {
+						return null;
+					}
+				};
+				if (EmpGradeList != null && EmpGradeList != undefined && EmpGradeList.length>0) {
+					
+					self.EmpID(EmpGradeList[0].EmpID);
+					self.EmployeeName(EmpGradeList[0].EmployeeName);
+					var GradeAmt = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Grade Unit Amount"));
+					var Month = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Grade Upgrade Month"));
+					var NLKPercent = getGradeVal(EmpGradeList.filter(item => item.GradeType == "NLK Amount")) === null ? '' : getGradeVal(EmpGradeList.filter(item => item.GradeType == "NLK Amount")).toFixed(2);
+					//var PFPercent = getGradeVal(EmpGradeList.filter(item => item.GradeType == "PF Amount")).toFixed(2);
+					var GrandeNo = getGradeVal(EmpGradeList.filter(item => item.GradeType == "No. of Grade"));
+					var TaxDeduction = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Tax Deduction"));
+					var Transportation = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Transportation"))==null?'0': getGradeVal(EmpGradeList.filter(item => item.GradeType == "Transportation")).toString();
+					var Residence = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Residence")) == null ? '0' : getGradeVal(EmpGradeList.filter(item => item.GradeType == "Residence")).toString();
+					var Insurance = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Insurance")) == null ? '0':getGradeVal(EmpGradeList.filter(item => item.GradeType == "Insurance")).toString();
+					var PremiumAmount = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Premium Amount"));
+					var Sawari = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Sawari")) == null ? '0' : getGradeVal(EmpGradeList.filter(item => item.GradeType == "Sawari")).toString();
+
+					self.SelectedMonth(Month);
+					self.GrandeNo(GrandeNo);
+					self.NLKPercent(NLKPercent);
+					//self.PFPercent(PFPercent);
+					self.UnitGradeAmount(GradeAmt);
+					self.TaxDeduction(TaxDeduction);
+					self.Transportation(Transportation);
+					self.Residence(Residence);
+					self.Insurance(Insurance);
+					self.PremiumAmount(PremiumAmount);
+					self.Sawari(Sawari);
+					if (LoanList != null && LoanList != undefined && LoanList.length > 0) {
+						self.IndividualDetailsLoans(LoanList.map(item => new IndividualDetailsLoan(item)));
+					}
+                } else {
+					msg("There is no data of the selected employee! ","WARNING");
+				}
+		
+			},
+			error: function (err) {
+                 msg("Oops! Error occured while obtaining data...","WARNING");				
+			}
+
+		});
+		
+	});
+    self.CheckSource = ko.observable();
+    self.UnitGradeAmount = ko.observable();
+    self.SelectedMonth = ko.observable();
+    self.Action = ko.observable();
+    self.RStatus = ko.observable();
+	self.NLKPercent = ko.observable();
+    self.TaxDeduction = ko.observable();
+    self.EmployeePost = ko.observable();
+    self.MaxGrade = ko.observable();
+
+    self.Months = ko.observableArray([
+        { 'MonthID': 1, 'MonthName': 'Baisakh' },
+        { 'MonthID': 2, 'MonthName': 'Jestha' },
+        { 'MonthID': 3, 'MonthName': 'Ashad' },
+        { 'MonthID': 4, 'MonthName': 'Shrawan' },
+        { 'MonthID': 5, 'MonthName': 'Bhadra' },
+        { 'MonthID': 6, 'MonthName': 'Aswin' },
+        { 'MonthID': 7, 'MonthName': 'Kartik' },
+        { 'MonthID': 8, 'MonthName': 'Mangsir' },
+        { 'MonthID': 9, 'MonthName': 'Poush' },
+        { 'MonthID': 10, 'MonthName': 'Magh' },
+        { 'MonthID': 11, 'MonthName': 'Falgun' },
+        { 'MonthID': 12, 'MonthName': 'Chaitra' }
+    ]);
+    self.EmployeeGrades = ko.observableArray([]);
+    self.TaxCats = ko.observableArray([]);
+
+    var entryby = $("#user").text();
+    self.EntryBy = ko.observable(entryby);
+    self.EntryDate = ko.observable();
+    self.SubmissionNo = ko.observable();
+
+    self.GrandeNo = ko.observable();
+    self.Transportation = ko.observable();
+    self.Residence = ko.observable();
+    self.TaxDeduction = ko.observable();
+
+    self.Insurance = ko.observable();
+    self.Sawari = ko.observable();
+
+    self.hasInsurance = ko.computed( function () {
+        return self.Insurance() == '1';
+    });
+
+    self.PremiumAmount = ko.observable();
+    
+    self.LoanTypes = ko.observableArray([]);
+    self.SelectedLoanType = ko.observable();
+
+    self.LoanAmt = ko.observable();
+    self.AccountNo = ko.observable();
+
+    self.Banks = ko.observableArray([]);
+    self.SelectedBank = ko.observable();
+
+    self.FromDate = ko.observable();
+    self.ToDate = ko.observable();
+
+    self.IndividualDetailsLoans = ko.observableArray([]);
+
+    self.selectedItem = ko.observable();
+
+    self.ShowPost = ko.observable(true);
+
+    self.EditIndividualDetails = function (data) {
+        self.RStatus(data.RStatus);
+        if (data.Action() == "A") {
+            self.Action("A");
+        }
+        else {
+            self.Action("E");
+        }
+        self.selectedItem(data);
+        //console.log('loanType Edit', ko.toJS(data.LoanType()).);
+        self.SelectedLoanType(data.LoanType());
+        self.FromDate(data.FromDate());
+        self.ToDate(data.ToDate());
+        self.LoanAmt(data.LoanAmt());
+        self.AccountNo(data.AccountNo());
+        self.SelectedBank(data.Bank());
+        self.EntryBy(data.EntryBy());
+        self.EntryDate(data.EntryDate());
+        self.Action(data.Action() == 'A' ? 'A' : 'E');
+
+        var btnAdd = $("button.icon-add");
+        btnAdd.removeClass("icon-add").addClass("icon-ok");
+        btnAdd.text("Update");
+    };
+
+    self.DeleteIndividualDetail = function (data) {
+        if (ko.toJS(self.Status) === 'F') return;
+       //  msg("के तपाईं डेटा हटाउन निश्चित हुनुहुन्छ?","WARNING");
+        Confirm('Are you sure to remove data?', 'Confirmation Dialog', function (r) {
+            if (r) {
+                self.IndividualDetailsLoans.remove(data);
+            }
+        });
+    };
+
+    self.AddIndividualDetails = function () {
+        var errMsg = ""; ;
+
+        var add = self.selectedItem();
+        if (self.LoanValidation()) {
+            if (add) {
+                add.LoanType(self.SelectedLoanType());
+                add.FromDate(self.FromDate());
+                add.ToDate(self.ToDate());
+                add.LoanAmt(self.LoanAmt());
+                add.AccountNo(self.AccountNo());
+                add.Bank(self.SelectedBank());
+                add.EntryBy(self.EntryBy());
+                add.EntryDate(self.EntryDate());
+                add.RStatus('F');// add.RStatus(self.RStatus());
+                add.Action(self.Action() == 'A' ? 'A' : 'E');
+            } else {
+                add = {
+                    SubmissionNo: self.SubmissionNo(),
+                    EmpID: self.EmpID(),
+                    LoanType: self.SelectedLoanType(),
+                    FromDate: self.FromDate(),
+                    ToDate: self.ToDate(),
+                    LoanAmt: self.LoanAmt(),
+                    AccountNo: self.AccountNo(),
+                    Bank: self.SelectedBank(),
+                    BankName: self.SelectedBank()? self.SelectedBank().BankName : null,
+                    EntryBy: self.EntryBy(),
+                    RStatus: 'F',
+                    EntryDate: null,
+                    Action: 'A'
+                };
+
+                self.IndividualDetailsLoans.push(new IndividualDetailsLoan(add));
+            }
+            var btnAdd = $("button.icon-ok");
+            btnAdd.removeClass("icon-ok").addClass("icon-add");
+            btnAdd.text("Add");
+            self.selectedItem();
+            self.ClearGridControls();
+        }
+    };
+
+    self.LoanValidation = function () {
+        var errMsg = '';
+        if (!self.SelectedLoanType()) {
+            errMsg += "Please select loan type!!!<br>";
+        }
+        if (!self.FromDate()) {
+            errMsg += "Please fill from date!!!<br>";
+        }
+        if (!self.LoanAmt()) {
+            errMsg += "Please fill loan amount!!<br>";
+        }
+        /*
+        if (!self.AccountNo()) {
+            errMsg += "कृपया खाता नम्बर भर्नुहोस !!!<br>";
+        }
+        if (!self.SelectedBank()) {
+            errMsg += "कृपया बैंक छान्नुहोस् !!!<br>";
+        }
+        */
+        if (errMsg) {
+             msg(errMsg,"WARNING");
+            return false;
+        } else {
+            return true;
+        }
+    };
+
+    self.GetLoadType = function () {
+
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            url: '../../../Handlers/CENTRALLOOKUP/LoanTypeHandler.ashx',
+            data: { 'method': 'GetLoanType', 'LoanTypeID': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new LoanType(item);
+                });
+
+                self.LoanTypes(mappedTask);
+            },
+            error: function(err) {
+                 msg("Oops! Error occured while obtaining data...","WARNING");
+            }
+
+        });
+    }
+
+    self.GetTaxCat = function () {
+        $.ajax({
+            dataType: "json",
+            async: false,
+            cache: false,
+            url: '../../../Handlers/CENTRALLOOKUP/LoanTypeHandler.ashx',
+            data: { 'method': 'GetTaxCat' },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new TaxCat(item);
+                });
+                self.TaxCats(mappedTask);
+            },
+            error: function(err) {
+                msg("Oops! Error occured while obtaining data ...","WARNING");
+            }
+        });
+    };
+        
+    self.GetLoadType();
+    self.GetTaxCat();
+
+    self.LoadBanks = function () {
+
+        waitMsg("Loading");
+        waitMsg.show();
+
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            url: '../../../Handlers/CENTRALLOOKUP/BankHandler.ashx',
+            data: { 'method': 'GetAllBank', 'bankid': null, 'token': $("#token").text() },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                waitMsg.hide();
+                if (result.IsSucess) {
+                    var mappedTask = $.map(result.ResponseData, function (item) {
+                        return new Bank(item)
+                    });
+
+                    self.Banks(mappedTask);
+                }
+                else {
+
+                    if (!result.IsToken)
+                        msg("Oops! Error occured while obtaining data ...","WARNING");
+                    else
+                        msg("Oops! Error occured while obtaining data ...","WARNING");
+                }
+            },
+            error: function(err) {
+                msg("Oops! Error occured while obtaining data ...","WARNING");
+                waitMsg.hide();
+            }
+        });
+    }
+
+    self.LoadBanks();
+
+    self.SaveEmpGrade = function () {
+        if (self.Validation()) {
+            var empgrade = {};
+            empgrade = {
+                OldSubmissionNo: self.SubmissionNo(),
+                EmpID: self.EmpID(),
+                EmployeeName: self.EmployeeName(),
+                GradeType: "Grade Upgrade Month",
+                GradeValue: self.SelectedMonth(),
+                FromDate: "",
+                ToDate: "",
+                EntryBy: self.EntryBy(),
+                RStatus: "F",
+                Action: "A"
+            };
+            self.EmployeeGrades.push(new EmployeeGrade(empgrade));
+
+
+            empgrade = {
+                OldSubmissionNo: self.SubmissionNo(),
+                EmpID: self.EmpID(),
+                EmployeeName: self.EmployeeName(),
+                GradeType: "Grade Unit Amount",
+                GradeValue: self.UnitGradeAmount(),
+                FromDate: "",
+                ToDate: "",
+                EntryBy: self.EntryBy(),
+                RStatus: "F",
+                Action: "A"
+            };
+            self.EmployeeGrades.push(new EmployeeGrade(empgrade));
+
+            empgrade = {
+                OldSubmissionNo: self.SubmissionNo(),
+                EmpID: self.EmpID(),
+                EmployeeName: self.EmployeeName(),
+                GradeType: "NLK Amount",
+                GradeValue: self.NLKPercent(),
+                FromDate: "",
+                ToDate: "",
+                EntryBy: self.EntryBy(),
+                RStatus: "F",
+                Action: "A"
+            };
+			self.EmployeeGrades.push(new EmployeeGrade(empgrade));
+
+            empgrade = {
+                OldSubmissionNo: self.SubmissionNo(),
+                EmpID: self.EmpID(),
+                EmployeeName: self.EmployeeName(),
+                GradeType: "No. of Grade",
+                GradeValue: self.GrandeNo(),
+                FromDate: "",
+                ToDate: "",
+                EntryBy: self.EntryBy(),
+                RStatus: "F",
+                Action: "A"
+            };
+            self.EmployeeGrades.push(new EmployeeGrade(empgrade));
+
+            empgrade = {
+                OldSubmissionNo: self.SubmissionNo(),
+                EmpID: self.EmpID(),
+                EmployeeName: self.EmployeeName(),
+                GradeType: "Transportation",
+                GradeValue: self.Transportation(),
+                FromDate: "",
+                ToDate: "",
+                EntryBy: self.EntryBy(),
+                RStatus: "F",
+                Action: "A"
+            };
+            self.EmployeeGrades.push(new EmployeeGrade(empgrade));
+            
+            empgrade = {
+                OldSubmissionNo: self.SubmissionNo(),
+                EmpID: self.EmpID(),
+                EmployeeName: self.EmployeeName(),
+                GradeType: "Residence",
+                GradeValue: self.Residence(),
+                FromDate: "",
+                ToDate: "",
+                EntryBy: self.EntryBy(),
+                RStatus: "F",
+                Action: "A"
+            };
+            self.EmployeeGrades.push(new EmployeeGrade(empgrade));
+            empgrade = {
+                OldSubmissionNo: self.SubmissionNo(),
+                EmpID: self.EmpID(),
+                EmployeeName: self.EmployeeName(),
+                GradeType: "Insurance",
+                GradeValue: self.Insurance(),
+                FromDate: "",
+                ToDate: "",
+                EntryBy: self.EntryBy(),
+                RStatus: "F",
+                Action: "A"
+            };
+            self.EmployeeGrades.push(new EmployeeGrade(empgrade));
+
+            empgrade = {
+                OldSubmissionNo: self.SubmissionNo(),
+                EmpID: self.EmpID(),
+                EmployeeName: self.EmployeeName(),
+                GradeType: "Premium Amount",
+                GradeValue: self.PremiumAmount(),
+                FromDate: "",
+                ToDate: "",
+                EntryBy: self.EntryBy(),
+                RStatus: "F",
+                Action: "A"
+            };
+            self.EmployeeGrades.push(new EmployeeGrade(empgrade));
+
+            empgrade = {
+                OldSubmissionNo: self.SubmissionNo(),
+                EmpID: self.EmpID(),
+                EmployeeName: self.EmployeeName(),
+                GradeType: "Tax Deduction",
+                GradeValue: self.TaxDeduction(),
+                FromDate: "",
+                ToDate: "",
+                EntryBy: self.EntryBy(),
+                RStatus: "F",
+                Action: "A"
+            };
+            self.EmployeeGrades.push(new EmployeeGrade(empgrade));
+
+            empgrade = {
+                OldSubmissionNo: self.SubmissionNo(),
+                EmpID: self.EmpID(),
+                EmployeeName: self.EmployeeName(),
+                GradeType: "Sawari",
+                GradeValue: self.Sawari(),
+                FromDate: "",
+                ToDate: "",
+                EntryBy: self.EntryBy(),
+                RStatus: "F",
+                Action: "A"
+            };
+            self.EmployeeGrades.push(new EmployeeGrade(empgrade));
+
+            var EmpGradeLoan = {
+                EmpGrade: ko.toJS(self.EmployeeGrades()),
+                Loans: ko.toJS(self.IndividualDetailsLoans())
+            };
+            var url = "/Handlers/PAYROLL/EmpGradeHandler.ashx";
+            var method = "SaveEmpGrade";
+            var appID = "FAMS";
+            var modID = "EMPGRADE";
+
+			var data = { 'method': method, 'args': JSON.stringify(ko.toJS(EmpGradeLoan)), 'appID': appID, 'modID': modID };
+			
+            $.post(url, data, function (result) {
+                var obj = jQuery.parseJSON(result);
+                if (obj.IsSucess) {
+                    self.SubmissionNo(obj.Message.match(/\d+/g));
+					 msg(obj.Message,"WARNING");                  
+                    self.ClearControls();
+                }
+				else {
+                    msg("Oops! Error occured while saving data ...","WARNING");
+                }
+			});
+			
+        }
+    };
+
+    self.GetEmpGradeBySubmissionNo = function () {
+        self.SubmissionNo(getUrlParamVal('SubmissionNumber'));
+        var editable = getUrlParamVal('Editable');
+        if (self.SubmissionNo() == null || self.SubmissionNo() == "" || self.SubmissionNo() == undefined) {
+            return;
+        }
+
+        else {
+            self.ShowPost(false);
+            if (editable == 'Y') {
+
+            }
+            else {
+                $('button').hide();
+                $('form').find('input, select').attr('disabled', 'disabled');
+            }
+
+            $.ajax({
+                dataType: "json",
+                url: '../../Handlers/PAYROLL/EmpGradeHandler.ashx',
+                data: { 'method': 'GetEmpGrade', 'submissionNo': self.SubmissionNo() },
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                success: function (data) {
+                    var EmpGradeList = data.ResponseData.EmpGrade;
+                    var LoanList = data.ResponseData.Loans;
+                    var getGradeVal = function (arr) { // to nullify the new gradetypes which were not in the previous version
+                        if (arr.length == 1) {
+                            return arr[0].GradeValue;
+                        } else {
+                            return null;
+                        }
+                    };
+                    if (EmpGradeList) {
+                        self.EmpID(EmpGradeList[0].EmpID);
+                        self.EmployeeName(EmpGradeList[0].EmployeeName);
+                        var GradeAmt = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Grade Unit Amount"));
+                        var Month = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Grade Upgrade Month"));
+						var NLKPercent = getGradeVal(EmpGradeList.filter(item => item.GradeType == "NLK Amount")).toFixed(2);
+						//var PFPercent = getGradeVal(EmpGradeList.filter(item => item.GradeType == "PF Amount")).toFixed(2);
+                        var GrandeNo = getGradeVal(EmpGradeList.filter(item => item.GradeType == "No. of Grade"));
+                        var TaxDeduction = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Tax Deduction"));
+                        var Transportation = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Transportation")).toString();
+                        var Residence = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Residence")).toString();
+                        var Insurance = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Insurance")).toString();
+                        var PremiumAmount = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Premium Amount"));
+                        var Sawari = getGradeVal(EmpGradeList.filter(item => item.GradeType == "Sawari")).toString();
+                        
+                        self.SelectedMonth(Month);
+                        self.GrandeNo(GrandeNo);
+						self.NLKPercent(NLKPercent);
+						//self.PFPercent(PFPercent);
+                        self.UnitGradeAmount(GradeAmt);
+                        self.TaxDeduction(TaxDeduction);
+                        self.Transportation(Transportation);
+                        self.Residence(Residence);
+                        self.Insurance(Insurance);
+                        self.PremiumAmount(PremiumAmount);
+                        self.Sawari(Sawari);
+                        self.IndividualDetailsLoans(LoanList.map(item => new IndividualDetailsLoan(item)));
+					} else {
+						 msg("No data on submission number","WARNING");
+
+                    }
+                },
+				error: function (err) {
+                    msg("Oops! Error occured while obtaining data...","WARNING");
+                }
+            });
+
+        }
+    }
+
+    self.GetEmpGradeBySubmissionNo();
+
+    self.ClearControls = function () {
+        self.EmpID('');
+        self.EmployeeName('');
+        self.UnitGradeAmount('');
+        self.SelectedMonth('');
+		self.NLKPercent('');		
+        self.EmployeeGrades([]);
+        self.IndividualDetailsLoans([]);
+        self.GrandeNo('');
+        self.Transportation('');
+        self.Residence('');
+        self.TaxDeduction('');
+        self.Insurance('');
+        self.PremiumAmount('');
+        self.Sawari('');
+        self.ClearGridControls();
+        self.EmployeePost(null);
+        self.MaxGrade(null);
+        self.IndividualDetailsLoans([]);
+    };
+
+    self.ClearGridControls = function () {
+        self.SelectedLoanType(null);
+        self.selectedItem(null);
+        self.SelectedBank(null);
+        self.FromDate(null);
+        self.ToDate(null);
+        self.LoanAmt(null);
+        self.AccountNo(null);
+    };
+
+    self.Validation = function () {
+        var errMsg = "";		
+        if (Validate.empty(self.EmployeeName())) {
+            errMsg += "Please fill Employee name!!!<br>";
+        }
+        if (Validate.empty(self.GrandeNo())) {
+            errMsg += "Please fill no.of grade!!!<br>";
+        }
+        if (Validate.empty(self.UnitGradeAmount())) {
+            errMsg += "Please fill grade unit amount!!!<br>";
+        }
+        if (self.SelectedMonth() == undefined) {
+            errMsg += "Please fill grade upgrade month !!!<br>";
+        }
+        if (Validate.empty(self.NLKPercent())) {
+            errMsg += "Please fill NLK amount!!!<br>";
+		}
+		
+        if (Validate.empty(self.Transportation())) {
+            errMsg += "Please select Transportation !!!<br>";
+        }
+        if (Validate.empty(self.Residence())) {
+            errMsg += "Please select Residence!!!<br>";
+        }
+        if (Validate.empty(self.Insurance())) {
+            errMsg += "Please select insurance!!!<br>";
+        }
+        if (Validate.empty(self.Sawari())) {
+            errMsg += "Please select sawari!!!<br>";
+        }
+        if (self.hasInsurance()) {
+            if (!self.PremiumAmount()) {
+                errMsg += "Please fill Premium!!!<br>";
+            }
+        }
+        if (Validate.empty(self.TaxDeduction())) {
+            errMsg += "Please select Tax Deduction!!!<br>";
+        }
+        //if (self.GrandeNo() > self.MaxGrade()) {
+        //    errMsg += "Grade amount should be " + self.MaxGrade() + " or " + self.MaxGrade() + " less than !!!<br>";
+        //}
+        if (self.GrandeNo() > 8) {
+            errMsg += "Grade amount should be less than or equal to 8 !!!<br>";
+        }
+        if (errMsg !== "") {
+              msg(errMsg,"WARNING");
+
+            return false;
+        }
+        else {
+            return true;
+        }
+
+    }
+
+    $('#modalEmpSearch').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var value = button.data('thissource');
+        self.CheckSource(value);
+        if (self.CheckSource() === "employee") {
+            GEmpID = self.EmpID();
+            GEmpName = self.EmployeeName();
+            self.ClearControls();
+            self.ClearGridControls();
+        }
+    })
+
+
+
+    $('#modalEmpSearch').on('hidden.bs.modal', function (event) {
+        if (self.CheckSource() === "employee") {
+            self.EmpID(GEmpID);
+           
+            self.EmployeeName(GEmpName);
+            self.EmployeePost(GPostDesc);
+            self.SubmissionNo(null);
+            if (self.EmployeePost() !== null && self.EmployeePost() !== undefined && self.EmployeePost().length > 0) {
+                console.log(ko.toJS(self.EmployeePost));
+				//var Level = self.EmployeePost().split('/')[2].slice(0, -1);
+				//self.MaxGrade(GradeLimit[Level]);
+                
+			}
+        }
+
+    })
+};
+
+$(document).ready(function () {
+    ValidateSession();
+    var egvm = new EmpGradeViewModel();
+    ko.applyBindings(egvm, document.getElementById('EmpGradeForm'));
+
+});

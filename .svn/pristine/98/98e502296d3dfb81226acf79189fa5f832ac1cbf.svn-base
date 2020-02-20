@@ -1,0 +1,141 @@
+﻿
+function Office(data) {
+    var self = this;
+    if (data != undefined) {
+        self.OfficeCode = ko.observable(data.OfficeCode);
+        self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+    }
+}
+
+//function OfficeInfo(data) {
+//    if (data != undefined) {
+//        var self = this;
+//        self.P_ID = ko.observable(data.P_ID);
+//        self.COUNTRY_CD = ko.observable(data.COUNTRY_CD);
+//        self.EDUCATION_EQUIVALENCE = ko.observable(data.EDUCATION_EQUIVALENCE);
+//        self.FROM_DATE = ko.observable(data.FROM_DATE);
+//        self.GRADE = ko.observable(data.GRADE);
+//        self.INSTITUTE = ko.observable(data.INSTITUTE);
+//        self.MAJOR_SUBJECT = ko.observable(data.MAJOR_SUBJECT);
+//        self.OPTIONAL_SUBJECT = ko.observable(data.OPTIONAL_SUBJECT);
+//        self.PERCENTAGE = ko.observable(data.PERCENTAGE);
+//        self.REMARKS = ko.observable(data.REMARKS);
+//        self.TITLE = ko.observable(data.TITLE);
+//        self.TO_DATE = ko.observable(data.TO_DATE);
+//        self.QUAL_ID = ko.observable(data.QUAL_ID);
+//        self.QUAL_NAME = ko.observable(data.QUAL_NAME);
+//        self.COUNTRY_NAME = ko.observable(data.COUNTRY_NAME);
+//    }
+//}
+function GetEmployees() {
+
+    $.ajax({
+        //UseSubmitBehavior="false",
+
+        dataType: "json",
+        cache: false,
+        async: false,
+        //alert:false,
+        url: '../../../Handlers/CENTRALLOOKUP/OfficeHandler.aspx',
+        data: { 'method': 'GetEmployees' },
+        contentType: "application/json; charset=utf-8",
+        success: function (result) {
+
+        },
+        error: function (err) {
+            msg(err.status + " - " + err.statusText, "FAILURE", null, ClearSession);
+
+        }
+    });
+}
+
+
+function OfficeInfo(data) {
+    if (data != undefined) {
+        var self = this;
+
+        //self.OfficeCode = ko.observable(data.OfficeCode);
+        //self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+        self.EMP_NAME = ko.observable(data.EMP_NAME);
+        self.SYMBOL_NO = ko.observable(data.SYMBOL_NO);
+        self.EMP_ID = ko.observable(data.EMP_ID);
+        self.POST_ID = ko.observable(data.POST_ID);
+        self.JOINING_DATE = ko.observable(data.JOINING_DATE);
+        self.OFFICE_CD = ko.observable(data.OFFICE_CD);
+        self.OFFICE_NAME_NEPALI = ko.observable(data.OFFICE_NAME_NEPALI);
+        self.POST_DESC = ko.observable(data.POST_DESC);
+    }
+}
+
+
+var OfficeEmployeeInfoViewModel = function () {
+
+    var self = this;
+
+    //self.ReportID = ko.observable('E');
+    self.officecd = ko.observable();
+
+    self.SelectedOffice = ko.observable();
+
+    self.Offices = ko.observableArray([]);
+
+    self.OfficeInfos = ko.observableArray([]);
+
+    //Load Office
+    $.ajax({
+        async: true,   // this will solve the problem
+
+        dataType: "json",
+        url: '../../../Handlers/CENTRALLOOKUP/OfficeHandler.ashx',
+        data: { 'method': 'GetAllOffice', 'officeCode': null },
+        async: false,
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            var mappedTask = $.map(data.ResponseData, function (item) {
+
+                return new Office(item)
+
+            });
+            self.Offices(mappedTask);
+
+        },
+        error: function (err) {
+            msg(err.status + " - " + err.statusText);
+        }
+    });
+    self.Cancel = function () {
+        self.SelectedOffice("");
+
+    }
+    self.ViewEmployeeGradeReport = function () {
+        $.ajax({
+            dataType: "json",
+            url: '/Handlers/Reporting/PIS/ReportHandlers/OfficeEmployeeInfoHandler.ashx',
+            data: { 'method': 'GetEmployeeInfo', 'officecd': self.SelectedOffice() },
+            async: false,
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                var mappedTask = $.map(data.ResponseData, function (item) {
+
+                    return new OfficeInfo(item)
+
+                });
+                self.OfficeInfos(mappedTask);
+                //console.log('detail', ko.toJS(self.Infos()[0]).);
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText);
+            }
+        });
+    }
+
+  
+}
+    $(document).ready(function () {
+
+        ValidateSession();
+
+        var oeivm = new OfficeEmployeeInfoViewModel();
+        ko.applyBindings(oeivm);
+
+    });

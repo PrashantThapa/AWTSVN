@@ -1,0 +1,79 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AdminMaster.Master" AutoEventWireup="true" CodeBehind="OfficeAccountSetup.aspx.cs" Inherits="IDS.Modules.ACCOUNTS.OfficeAccountSetup" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <style>
+     .treegrid-indent {width:10% !important; height: 16px; display: inline-block; position: relative;background-repeat: no-repeat;}
+
+.treegrid-expander {width:10% !important; height: 16px; display: inline-block; position: relative; cursor: pointer;background-repeat: no-repeat;}
+
+.treegrid-expander-expanded{background-image: url("../../Images/collapse.png"); }
+     .treegrid-expander-collapsed {
+         background-image: url("../../Images/expand.png");
+     }
+ </style>
+<div class="wrapper">
+    <div class="col-md-8">
+    <h3 class=" margin-top-15 margin-left-25">Office GL Account Assignment Setup/ Function Unit Budget GL Account Assignment Setup</h3>
+        <form class="form-horizontal" role="form">
+            <div class="row">
+        <div class="col-md-2">Office</div>    
+        <div class="col-md-4">
+            <div class="dropdown margin-left-0" style="width:100%;">
+            <select id="ddlGLGroup" class="dropdown-select"
+                            data-bind='options: OfficeArray, 
+                            optionsText: "OfficeNameNep",
+                            optionsValue:$data,
+                            value:SelectedOffice, 
+                            optionsCaption:"------छान्नुहोस्-------", event:{ change: $data.GetCostCenter }'> <%--change: $data.GetACChart --%> 
+              </select> 
+                   </div>
+        </div>    
+        <div class="col-md-2" >Function Unit</div>   <%-- style=" display:none;"--%>
+        <div class="col-md-4"  > <%--style=" display:none;"--%>
+        <div class="dropdown margin-left-0" style="width:100%;">        
+
+                    <select id="Select2" class="dropdown-select" data-bind='options:CostCenters, 
+                            optionsText: "CostCenterName",
+                            optionsValue:$data,
+                            value:SelectedCostCenter, 
+                            optionsCaption:"------छान्नुहोस्-------", event:{ change: $data.GetACChart }'>
+                            <%--, event:{ change: $data.GetACChart }--%>
+                        </select>
+                </div>
+        </div>  
+    </div>
+            <div class="row">
+            <div class="col-md-12 os-270">
+         <table class="tree" id="tblTree"  width="100%" >
+            <thead>
+                <tr style="background:#006699; color:#ffffff;">
+                    <td width="20%" style="text-align:center;">GL Code</td>
+                    <td width="62%"   style="text-align:center;">GL Name</td>
+                    <td width="18%" style="text-align:center;">Check All &nbsp;<input type="checkbox" id="checkAll" /></td>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach:GLArray">
+                  <tr data-bind="attr: {class: $root.getTreegridClass($data)}">
+                    <td><span data-bind="text:AccountChart.AccCode"></span></td>
+                    <td><span data-bind="text:AccountChart.ACNameEng"></span></td>
+                    <td style="text-align:center;"> <input type="checkbox" id="checktd"/></td>
+                </tr>
+            </tbody>
+        </table>
+             </div>           
+    </div>
+            <div class="col-md-4 pull-right margin-top-15 padding-right-0">
+                        <button class="btn btn-primary pull-right margin-left-15" id="btnSubmit" data-bind="click:Submit">Submit</button>
+            <button class="btn btn-primary pull-right" data-bind="click:ClearControls">Cancel</button>
+                
+            </div>
+        <div class="clear"></div>
+        </form>
+
+    </div>
+</div>
+      <script src="../../Scripts/jquery.treegrid.js"></script>
+    <script src="../../Scripts/ACCOUNT/OfficeAccountSetup.js" type="text/javascript"></script>
+</asp:Content>

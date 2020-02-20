@@ -1,0 +1,151 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLOfficeVoucherTran
+    {
+        public JsonResponse GetVoucherGroup()
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTVoucherGroup> lstAccountChart = new List<ATTVoucherGroup>();
+            DLLOfficeVoucherTran objdll= new DLLOfficeVoucherTran();
+            try
+            {
+                lstAccountChart = objdll.GetVoucherGroup();
+
+                response.ResponseData = lstAccountChart;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+
+        public JsonResponse GetAccChartByVGroup(Int32 vGroupID)
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTOfficeCompanyAccChart> lstAccountChart = new List<ATTOfficeCompanyAccChart>();
+            DLLOfficeVoucherTran objdll = new DLLOfficeVoucherTran();
+            try
+            {
+                lstAccountChart = objdll.GetAccChartByVGroup(vGroupID);
+
+                response.ResponseData = lstAccountChart;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+
+
+        public JsonResponse GetContraAccount(Int32 vGroupID, Int32? OfficeID)
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTOfficeCompanyAccChart> lstAccountChart = new List<ATTOfficeCompanyAccChart>();
+            DLLOfficeVoucherTran objdll = new DLLOfficeVoucherTran();
+            try
+            {
+                lstAccountChart = objdll.GetContraAccount(vGroupID, OfficeID);
+
+                response.ResponseData = lstAccountChart;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+
+        public JsonResponse GetAccChartChild(Int32 accCode,Int32? OfficeID)
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTOfficeCompanyAccChart> lstAccountChart = new List<ATTOfficeCompanyAccChart>();
+            DLLOfficeVoucherTran objdll = new DLLOfficeVoucherTran();
+            try
+            {
+                lstAccountChart = objdll.GetAccChartChild(accCode, OfficeID);
+
+                response.ResponseData = lstAccountChart;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+
+        public JsonResponse GetOfficeTranBV(Int64? tranNo)
+        {
+            JsonResponse response = new JsonResponse();
+
+            try
+            {
+                ATTOfficeTran obj = new ATTOfficeTran();
+                DLLOfficeVoucherTran objdllOfficeTran = new DLLOfficeVoucherTran();
+                obj = objdllOfficeTran.GetOfficeTranBV(tranNo);
+                response.Message = "";
+                response.IsSucess = true;
+                response.ResponseData = obj;
+
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+
+
+        public JsonResponse SaveOfficeTranBV(ATTOfficeTran objOfficeTran)
+        {
+            JsonResponse response = new JsonResponse();
+            try
+            {
+                DLLOfficeVoucherTran objdllOfficeTran = new DLLOfficeVoucherTran();
+                response.Message = objdllOfficeTran.SaveOfficeTranBV(objOfficeTran);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+    }
+}

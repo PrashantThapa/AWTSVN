@@ -1,0 +1,12 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTJob
+    {
+        public ATTJob() { }
+
+        public Int32? JobID { get; set; }
+        public string JobDesc { get; set; }
+    }
+}

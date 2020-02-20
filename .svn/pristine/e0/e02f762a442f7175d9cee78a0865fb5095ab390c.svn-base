@@ -1,0 +1,41 @@
+﻿using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+namespace IDS.Handlers.ACCOUNT
+{
+
+    public class GLGroupHandler : BaseHandler
+    {
+
+        public object SaveGLGroup(string args, string token)
+        {
+
+            JsonResponse response = new JsonResponse();
+            BLLGLGroup ObjbllGLGroup = new BLLGLGroup();
+            List<ATTGLGroup> objGLGroup = JsonUtility.DeSerialize(args, typeof(List<ATTGLGroup>)) as List<ATTGLGroup>;
+            response = ObjbllGLGroup.SaveGLGroup(objGLGroup);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetGLGroup(int? groupID, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLGLGroup ObjbllGLGroup = new BLLGLGroup();
+            response = ObjbllGLGroup.GetGLGroup(groupID);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object DeleteGLGroup(int? groupID, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLGLGroup ObjbllGLGroup = new BLLGLGroup();
+            response = ObjbllGLGroup.DeleteGLGroup(groupID);
+            return JsonUtility.Serialize(response);
+        }
+      
+    }
+}

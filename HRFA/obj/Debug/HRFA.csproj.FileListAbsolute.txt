@@ -1,0 +1,228 @@
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\SqlServerTypes\x64\msvcr120.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\SqlServerTypes\x64\SqlServerSpatial140.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\SqlServerTypes\x86\msvcr120.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\SqlServerTypes\x86\SqlServerSpatial140.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\HRFA.dll.config
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\HRFA.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\HRFA.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\AjaxControlToolkit.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\HRFA.COMMON.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\HRFA.DataLayer.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\Microsoft.SqlServer.Types.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\Newtonsoft.Json.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\Interop.zkemkeeper.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\HRFA.COMMON.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\bin\HRFA.DataLayer.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\obj\Debug\HRFA.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\obj\Debug\HRFA.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\obj\Debug\HRFA.csproj.CopyComplete
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\obj\Debug\HRFA.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA\obj\Debug\HRFA.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\SqlServerTypes\x64\msvcr120.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\SqlServerTypes\x64\SqlServerSpatial140.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\SqlServerTypes\x86\msvcr120.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\SqlServerTypes\x86\SqlServerSpatial140.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\HRFA.dll.config
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\HRFA.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\HRFA.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\AjaxControlToolkit.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\HRFA.COMMON.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\HRFA.DataLayer.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\Microsoft.SqlServer.Types.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\Newtonsoft.Json.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\Interop.zkemkeeper.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\HRFA.COMMON.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\bin\HRFA.DataLayer.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\obj\Debug\HRFA.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\obj\Debug\HRFA.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\obj\Debug\HRFA.csproj.CopyComplete
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\obj\Debug\HRFA.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA\obj\Debug\HRFA.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\SqlServerTypes\x64\msvcr120.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\SqlServerTypes\x64\SqlServerSpatial140.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\SqlServerTypes\x86\msvcr120.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\SqlServerTypes\x86\SqlServerSpatial140.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.dll.config
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\AjaxControlToolkit.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.COMMON.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.DataLayer.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\Microsoft.SqlServer.Types.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\Newtonsoft.Json.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\Interop.zkemkeeper.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.COMMON.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.DataLayer.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\obj\Debug\HRFA.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\obj\Debug\HRFA.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\obj\Debug\HRFA.csproj.CopyComplete
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\obj\Debug\HRFA.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA\obj\Debug\HRFA.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\SqlServerTypes\x64\msvcr120.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\SqlServerTypes\x64\SqlServerSpatial140.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\SqlServerTypes\x86\msvcr120.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\SqlServerTypes\x86\SqlServerSpatial140.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.dll.config
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\AjaxControlToolkit.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.COMMON.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.DataLayer.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\Microsoft.SqlServer.Types.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\Newtonsoft.Json.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\Interop.zkemkeeper.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.COMMON.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\bin\HRFA.DataLayer.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\obj\Debug\HRFA.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\obj\Debug\HRFA.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\obj\Debug\HRFA.csproj.CopyComplete
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\obj\Debug\HRFA.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA\obj\Debug\HRFA.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\SqlServerTypes\x64\msvcr120.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\SqlServerTypes\x64\SqlServerSpatial140.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\SqlServerTypes\x86\msvcr120.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\SqlServerTypes\x86\SqlServerSpatial140.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\HRFA.dll.config
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\HRFA.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\HRFA.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\AjaxControlToolkit.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\HRFA.COMMON.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\HRFA.DataLayer.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\Microsoft.SqlServer.Types.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\Newtonsoft.Json.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\Interop.zkemkeeper.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\HRFA.COMMON.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\bin\HRFA.DataLayer.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\obj\Debug\HRFA.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\obj\Debug\HRFA.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\obj\Debug\HRFA.csproj.CopyComplete
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\obj\Debug\HRFA.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA\obj\Debug\HRFA.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\SqlServerTypes\x64\msvcr120.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\SqlServerTypes\x64\SqlServerSpatial140.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\SqlServerTypes\x86\msvcr120.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\SqlServerTypes\x86\SqlServerSpatial140.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\HRFA.dll.config
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\HRFA.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\HRFA.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\AjaxControlToolkit.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\HRFA.ATT.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\HRFA.BLL.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\HRFA.COMMON.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\HRFA.DataLayer.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\Microsoft.SqlServer.Types.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\Oracle.DataAccess.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\Newtonsoft.Json.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\Interop.zkemkeeper.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\HRFA.ATT.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\HRFA.BLL.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\HRFA.COMMON.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\bin\HRFA.DataLayer.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\obj\Debug\HRFA.csprojAssemblyReference.cache
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\obj\Debug\HRFA.csproj.CoreCompileInputs.cache
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\obj\Debug\HRFA.csproj.CopyComplete
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\obj\Debug\HRFA.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA\obj\Debug\HRFA.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\SqlServerTypes\x64\msvcr120.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\SqlServerTypes\x64\SqlServerSpatial140.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\SqlServerTypes\x86\msvcr120.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\SqlServerTypes\x86\SqlServerSpatial140.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\HRFA.dll.config
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\HRFA.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\HRFA.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\AjaxControlToolkit.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\HRFA.ATT.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\HRFA.BLL.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\HRFA.COMMON.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\HRFA.DataLayer.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\Microsoft.SqlServer.Types.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\Microsoft.Web.Infrastructure.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\Newtonsoft.Json.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\Interop.zkemkeeper.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\HRFA.ATT.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\HRFA.BLL.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\HRFA.COMMON.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA\bin\HRFA.DataLayer.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA\obj\Debug\HRFA.csprojAssemblyReference.cache
+D:\Projects\AccessWorldNet\HRFA\HRFA\obj\Debug\HRFA.csproj.CoreCompileInputs.cache
+D:\Projects\AccessWorldNet\HRFA\HRFA\obj\Debug\HRFA.csproj.CopyComplete
+D:\Projects\AccessWorldNet\HRFA\HRFA\obj\Debug\HRFA.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA\obj\Debug\HRFA.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\SqlServerTypes\x64\msvcr120.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\SqlServerTypes\x64\SqlServerSpatial140.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\SqlServerTypes\x86\msvcr120.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\SqlServerTypes\x86\SqlServerSpatial140.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\HRFA.dll.config
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\HRFA.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\HRFA.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\AjaxControlToolkit.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\HRFA.ATT.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\HRFA.BLL.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\HRFA.COMMON.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\HRFA.DataLayer.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\Microsoft.SqlServer.Types.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\Oracle.ManagedDataAccess.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\Newtonsoft.Json.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\Interop.zkemkeeper.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\HRFA.ATT.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\HRFA.BLL.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\HRFA.COMMON.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\bin\HRFA.DataLayer.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\obj\Debug\HRFA.csprojAssemblyReference.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\obj\Debug\HRFA.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\obj\Debug\HRFA.csproj.CopyComplete
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\obj\Debug\HRFA.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\obj\Debug\HRFA.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\SqlServerTypes\x64\msvcr120.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\SqlServerTypes\x64\SqlServerSpatial140.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\SqlServerTypes\x86\msvcr120.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\SqlServerTypes\x86\SqlServerSpatial140.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\HRFA.dll.config
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\HRFA.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\HRFA.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\AjaxControlToolkit.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\HRFA.ATT.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\HRFA.BLL.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\HRFA.COMMON.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\HRFA.DataLayer.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\Microsoft.SqlServer.Types.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\Oracle.ManagedDataAccess.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\Oracle.Web.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\Newtonsoft.Json.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\Interop.zkemkeeper.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\HRFA.ATT.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\HRFA.BLL.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\HRFA.COMMON.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\HRFA.DataLayer.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\bin\Newtonsoft.Json.xml
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\obj\Debug\HRFA.csprojResolveAssemblyReference.cache
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\obj\Debug\HRFA.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA\obj\Debug\HRFA.pdb

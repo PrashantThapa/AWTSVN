@@ -1,0 +1,51 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTBlanketPurchase
+    {
+        public Int64? SubmissionNo { get; set; }
+        public Int64? OldSubmissionNo { get; set; }
+
+        private ATTVendor _Vendor ;
+        public ATTVendor Vendor
+        {
+            get { return _Vendor; }
+            set { _Vendor = value; }
+        }
+
+        private ATTItem _Item;
+        public ATTItem Item
+        {
+            get { return _Item; }
+            set { _Item = value; }
+        }
+
+        private ATTUnit _Unit;
+        public ATTUnit Unit
+        {
+            get { return _Unit; }
+            set { _Unit = value; }
+        }
+
+        public string AgreementDate { get; set; }
+        public string AgreementYear { get; set; }
+        public Int32? Quantity { get; set; }
+        public Int32? QuantityRecieved { get; set; }
+        public Double? UnitPrice { get; set; }
+        public string FromDate { get; set; }
+        public string ToDate { get; set; }
+        public string EntryBy { get; set; }
+        public string EntryDate { get; set; }
+        public string RStatus { get; set; }
+        public string Action { get; set; }
+
+        public ATTBlanketPurchase()
+        {
+            _Vendor = new ATTVendor();
+            _Item = new ATTItem();
+            _Unit = new ATTUnit();
+
+        }
+    }
+}

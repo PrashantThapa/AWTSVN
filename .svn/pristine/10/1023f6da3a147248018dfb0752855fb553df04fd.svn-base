@@ -1,0 +1,199 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AdminMaster.Master" AutoEventWireup="true" CodeBehind="AllowanceSetting.aspx.cs" Inherits="HRFA.Modules.PAYROLL.AllowanceSetting" %>
+<%@ Register Src="~/Modules/PIS/EmployeeSearchControl.ascx" TagPrefix="uc1" TagName="EmployeeSearchControl" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <uc1:EmployeeSearchControl runat="server" ID="EmployeeSearchControl" />
+	<section class="content" id="FixedAllowanceSetupForm">
+		<div class="row pages">
+			<div class="col-md-12">
+				<!-- general form elements -->
+				<div class="box box-primary">
+					<div class="box-header with-border">
+						<h3 class="box-title">Allowance Setting</h3>
+					</div>
+					<!-- /.box-header -->
+					<!-- form start -->
+					<form role="form" runat="server" id="Form2">
+						<div class="box-body">
+						<%--	<div class="row">
+								<div class="col-md-6">
+										<div class="form-group">
+										<label>आर्थिक वर्ष *</label>
+                        <select id="txtFiscalYear" class="form-control" style="padding: 6px;" title="आर्थिक वर्ष.." data-bind="options:FiscalYears, optionsText:'FiscalYearName', optionsValue:$data,optionsCaption:'------छान्नुहोस्-------', value: SelectedFiscalYear, event:{ change: SelectedFiscalYearChanged(this)}" ></select>
+										</div>
+								</div>--%>
+<%--         <form id="form1" runat="server"  style="margin-top:4%;" role="form"> --%>
+               <div class="row">
+                    <div class="col-lg-4">  
+                 <div class="form-group mx-sm-3 mb-2 " >
+                        <label for="txtFiscalYear" >आर्थिक वर्ष *</label>                        
+
+                        <select id="txtFiscalYear" class="form-control" style="padding: 6px;" title="आर्थिक वर्ष.." data-bind="options:FiscalYears, optionsText:'FiscalYearName', optionsValue:$data,optionsCaption:'------छान्नुहोस्-------', value: SelectedFiscalYear, event:{ change: SelectedFiscalYearChanged(this)}" ></select>
+                      </div>
+                        </div>
+             </div>
+            
+             <div class="row" style="margin-top:1%;">
+               <div class="col-md-3">
+                         <input name="radio1" type="radio" data-bind="checkedValue: true, 
+                                           checked: isAnnualAllowance" />Annual Allowance
+                    </div>
+               <div class="col-md-3">
+                         <input name="radio2" type="radio" data-bind="checkedValue: false, 
+                                           checked: isAnnualAllowance" />Monthly Allowance
+                    </div>     
+                 
+             </div>
+           
+                
+             <div class="row " data-bind="if: isAnnualAllowance" style="margin-top:2%;">                 
+               <div class="col-lg-4">                      
+                      
+                      <div class="form-group mx-sm-3 mb-2" >
+                          <label for="txtDressAllowance">लुगा भता</label>
+                         <input  class="form-control" id="txtDressAllowance" placeholder="लुगा भता" data-bind="value:DressAllowance"/>
+                      </div> 
+                    <div class="form-group mx-sm-3 mb-2" >
+                          <label for="txtDressAllowance">औषधि उपचार भता (प्रतिशतमा) </label>
+                         <div class="input-group">
+                                  <input type="number" id="txtMedicalAllowance" class="form-control" title="औषधि उपचार भता (प्रतिशतमा)" aria-describedby="basic-addon1" data-bind="value:MedicalAllowance">
+                                  <span class="input-group-addon">%</span>
+                                </div>
+                        
+                      </div> 
+                    <div class="form-group mx-sm-3 mb-2" >
+                          <label for="txtAnnualFestAllowance">बार्षिक उत्सव भता (प्रतिशतमा) </label>
+                         <div class="input-group">
+                                  <input type="number" id="txtAnnualFestAllowance" class="form-control" title="बार्षिक उत्सव भता (प्रतिशतमा)" aria-describedby="basic-addon1" data-bind="value:FestivalAllowance">
+                                  <span class="input-group-addon">%</span>
+                                </div>
+                        
+                      </div> 
+                  
+               </div>
+                <div class="col-lg-4">                
+                
+                 <div class="form-group mx-sm-3 mb-2">
+                               <label for="txtImpDress">लुगा भता लागु हुने महिना</label>
+                       <select id="txtImpDress" class="form-control" style="padding: 6px;" data-bind='options: Months, optionsText: "MonthName",
+                                    optionsValue: "MonthID", value:SelDressMonth, 
+                                    optionsCaption:"---छान्नुहोस्---"'></select>
+                          </div>
+                 <div class="form-group mx-sm-3 mb-2">
+                               <label for="txtImpMedical">औषधि उपचार भता लागु हुने महिना</label>
+                       <select id="txtImpMedical" class="form-control" style="padding: 6px;" data-bind='options: Months, optionsText: "MonthName",
+                                    optionsValue: "MonthID", value:SelMedicalMonth, 
+                                    optionsCaption:"---छान्नुहोस्---"'></select>
+                          </div>
+                      <div class="form-group mx-sm-3 mb-2">
+                               <label for="txtImpAnnualFest">बार्षिक उत्सव भता लागु हुने महिना</label>
+                       <select id="txtImpAnnualFest" class="form-control" style="padding: 6px;" data-bind='options: Months, optionsText: "MonthName",
+                                    optionsValue: "MonthID", value:SelFestivalMonth, 
+                                    optionsCaption:"---छान्नुहोस्---"'></select>
+                          </div>   
+                </div>
+               <div class="col-lg-4">
+                   <div class="form-group mx-sm-3 mb-2">
+                        <label for="txtRemarks">कैफियत</label>
+                         <textarea class="form-control" id="txtRemarks" rows="3" data-bind="value:Remarks"></textarea>
+                      </div>
+                   <button type="button" class="btn btn-primary" data-bind="click:SaveAllowance,   enable: disableSave" >Submit</button>
+                   <button type="button" class="btn btn-danger">Cancel</button>
+               </div>
+              </div>
+             <div class="row" data-bind="ifnot: isAnnualAllowance" style="margin-left:1%;">
+                 <div class="row">
+                     <div class="col-lg-4">
+                         <div class="form-group mx-sm-3 mb-2" >
+                        <label for="txtKhajaKharch">प्रति महिना खाजा खर्च</label>
+                        <input  class="form-control" id="txtKhajaKharch" placeholder="खाजा खर्च"  data-bind="value:KhajaPerMonth"/>
+                          </div>
+                          <div class="form-group mx-sm-3 mb-2" >
+                          <label for="txtPFPercentage">कर्मचारी संचय कोष कट्टी (प्रतिशतमा)</label>
+                              <div class="input-group">
+                                  <input type="number" id="txtPFPercentage" class="form-control" placeholder="कर्मचारी संचय कोष कट्टी (प्रतिशतमा)" aria-describedby="basic-addon1" data-bind="value:PFPercentage">
+                                  <span class="input-group-addon" id="basic-addon1">%</span>
+                                </div>
+                        <%-- <input  class="form-control" id="txtPFPercentage" placeholder="कर्मचारी संचय कोष कट्टी (प्रतिशतमा)" data-bind="value:PFPercentage"/>--%>
+                      </div> 
+                         </div>                   
+                        
+                     <div class="col-lg-4">
+                      <div class="form-group mx-sm-3 mb-2" >
+                          <label for="txtYatayatKharch">प्रति महिना यातायात खर्च </label>
+                          <input  class="form-control" id="txtYatayatKharch" placeholder="यातायात खर्च" data-bind="value:YataYatPerMonth"/>
+                      </div>
+                          <div class="form-group mx-sm-3 mb-2" >
+                        <label for="txtDearnessAllowance">मंहगी भता</label>
+                        <input  class="form-control" id="txtDearnessAllowance" placeholder="मंहगी भता"  data-bind="value:DearnessAllowance"/>
+                          </div>
+                     </div>
+                      <div class="col-lg-4">
+                     <div class="form-group mx-sm-3 mb-2" >
+                          <label for="txtWaterDhalAllowance">पानि तथा ढल महशुल </label>
+                          <input  class="form-control" id="txtWaterDhalAllowance" placeholder="पानि तथा ढल महशुल" data-bind="value:WaterDhalAllowance"/>
+                      </div>
+                    </div>
+
+                 </div>
+                  <div class="row">   
+                      <div class="col-lg-4">
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label for="txtEmployeeID">कर्मचारीको नाम</label>
+                            <input type="text" id="txtEmployeeID" data-bind="value:EmployeeName" class='form-control'
+                                disabled />
+                             <input type="text" id="txtEmployeeIDID" data-bind="value:EmpID" class='required form-control hidden'
+                                disabled />                           
+                        </div>
+                     </div>
+                      <div class="col-lg-4">
+                           <div class="form-group mx-sm-3 mb-2">                               
+                                <button type="button" id="btnSearch" class="btn btn-primary search" data-toggle="modal"
+                            data-target="#modalEmpSearch" data-thissource="employee" style="margin-top:4%;">
+                            Search</button>
+                           </div>
+                      </div>
+                 </div>
+                 <div class="row">   
+                     <div class="col-lg-4">
+                      <div class="form-group mx-sm-3 mb-2" >
+                        <label for="txtDearnessAllowance">अतिथि सत्कार भता</label>
+                        <input  class="form-control" id="txtAtithitiSatkarAllowance" placeholder="अतिथि सत्कार भता"  data-bind="value:AtithitiSatkarAllowance, enable: disableThis" />
+                          </div>
+                             <div class="form-group mx-sm-3 mb-2" >
+                          <label for="txtWaterDhalAllowance">टेलिफोन खर्च </label>
+                        <input  class="form-control" id="txtTeliphone" placeholder="टेलिफोन खर्च" data-bind="value:TeliphoneAllowance , enable: disableThis"/>
+                                 </div>
+                           
+                     </div>
+                     <div class="col-lg-4">
+                           <div class="form-group mx-sm-3 mb-2" >
+                          <label for="txtDressAllowance">ओभर टाईम भता</label>
+                        <input  class="form-control" id="txtOvertime" placeholder="ओभर टाईम भता" data-bind="value:OverTimeAllowance , enable: disableThis"/>
+                                 </div>  
+                      <div class="form-group mx-sm-3 mb-2" >
+                          <label for="txtDressAllowance">मेडिकल रिबेट</label>
+                        <input  class="form-control" id="txtMedicalRebet" placeholder="मेडिकल रिबेट" data-bind="value:MedicalRebet , enable: disableThis"/>
+                                 </div>  
+                         </div>
+                     <div class="col-lg-3" >
+                        <div class="form-group mx-sm-3 mb-2" >
+                                <label for="txtRemarksMA">कैफियत</label>
+                                 <textarea class="form-control" id="txtRemarksMA" rows="3" data-bind="value:MARemarks, enable: disableThis"></textarea>
+                              </div>
+                           <button type="button" class="btn btn-primary" data-bind="click:SaveAllowance,  enable: disableSave">Submit</button>
+                           <button type="button" class="btn btn-danger">Cancel</button>
+                       </div>
+                  </div>
+              
+              </div>
+                </div>
+    </form> 
+         </div>
+				</div>
+			</div>
+		</section>
+      <script src="../../Scripts/PAYROLL/AllowanceSetting.js" type="text/javascript"></script>
+
+</asp:Content>

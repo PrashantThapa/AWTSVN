@@ -1,0 +1,44 @@
+﻿using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+using System.Collections.Generic;
+
+
+namespace IDS.Handlers.ACCOUNT
+{
+   
+    public class CompanyHandler  : BaseHandler
+    {
+
+        public object  SaveCompany(string args, string token)
+        {
+
+            JsonResponse response = new JsonResponse();
+            BLLCompany bllObjCompany = new BLLCompany();
+            List<ATTCompany> objCompany = JsonUtility.DeSerialize(args, typeof(List<ATTCompany>)) as List<ATTCompany>;
+            response = bllObjCompany.SaveCompany(objCompany);
+           return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetCompany(int? OfficeCode, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLCompany bllObjCompany = new BLLCompany();
+            response = bllObjCompany.GetCompany(OfficeCode);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object DeleteCompany(int? companyID, string token)
+        {
+
+            JsonResponse response = new JsonResponse();
+            BLLCompany bllObjCompany = new BLLCompany();
+            response = bllObjCompany.DeleteCompany(companyID);
+            return JsonUtility.Serialize(response);
+        }
+
+      
+    }
+}

@@ -1,0 +1,72 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\Dell\\Desktop\\pororororoject\\HRFA.COMMON\\HRFA.COMMON.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Dell\\Desktop\\pororororoject\\HRFA.ATT\\HRFA.ATT.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Dell\\Desktop\\pororororoject\\HRFA.ATT\\HRFA.ATT.csproj",
+        "projectName": "HRFA.ATT",
+        "projectPath": "C:\\Users\\Dell\\Desktop\\pororororoject\\HRFA.ATT\\HRFA.ATT.csproj"
+      },
+      "frameworks": {
+        "net40": {}
+      }
+    },
+    "C:\\Users\\Dell\\Desktop\\pororororoject\\HRFA.COMMON\\HRFA.COMMON.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Dell\\Desktop\\pororororoject\\HRFA.COMMON\\HRFA.COMMON.csproj",
+        "projectName": "HRFA.COMMON",
+        "projectPath": "C:\\Users\\Dell\\Desktop\\pororororoject\\HRFA.COMMON\\HRFA.COMMON.csproj",
+        "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Dell\\Desktop\\pororororoject\\HRFA.COMMON\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\Dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net40"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net40": {
+            "projectReferences": {
+              "C:\\Users\\Dell\\Desktop\\pororororoject\\HRFA.ATT\\HRFA.ATT.csproj": {
+                "projectPath": "C:\\Users\\Dell\\Desktop\\pororororoject\\HRFA.ATT\\HRFA.ATT.csproj"
+              }
+            }
+          }
+        }
+      },
+      "frameworks": {
+        "net40": {
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.2, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}

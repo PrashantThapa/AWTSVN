@@ -1,0 +1,83 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+namespace HRFA.Handlers.ACCOUNT
+{
+    /// <summary>
+    /// Summary description for OfficeVoucherTranHandler
+    /// </summary>
+    public class OfficeVoucherTranHandler : BaseHandler
+    {
+        public object SaveOfficeTranBV(string args)
+        {
+
+            JsonResponse response = new JsonResponse();
+            ATTOfficeTran objOfficeTran = (ATTOfficeTran)JsonUtility.DeSerialize(args, typeof(ATTOfficeTran));
+            BLLOfficeVoucherTran objbllOfficeTran = new BLLOfficeVoucherTran();
+            response = objbllOfficeTran.SaveOfficeTranBV(objOfficeTran);
+
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetOfficeTranBV(Int64? submissionNo, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLOfficeVoucherTran objbllOfficeTran = new BLLOfficeVoucherTran();
+
+            //if (token == CurrentToken())
+            //{
+            response = objbllOfficeTran.GetOfficeTranBV(submissionNo);
+            //}
+            //else
+            //{
+            //    response.Message = "Suspicious Activity !!!";
+            //    response.IsSucess = false;
+            //    response.IsToken = false;
+            //}
+
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetVoucherGroup()
+        {
+            JsonResponse response = new JsonResponse();
+            BLLOfficeVoucherTran bllObj = new BLLOfficeVoucherTran();
+            response = bllObj.GetVoucherGroup();
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetAccChartByVGroup(Int32 vGroupID)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLOfficeVoucherTran bllObj = new BLLOfficeVoucherTran();
+            response = bllObj.GetAccChartByVGroup(vGroupID);
+            return JsonUtility.Serialize(response);
+
+        }
+        
+        public object GetContraAccount(Int32 vGroupID, Int32 OfficeID)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLOfficeVoucherTran bllObj = new BLLOfficeVoucherTran();
+            response = bllObj.GetContraAccount(vGroupID, OfficeID);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetAccChartChild(Int32 accCode, Int32? OfficeID)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLOfficeVoucherTran bllObj = new BLLOfficeVoucherTran();
+            response = bllObj.GetAccChartChild(accCode, OfficeID);
+            return JsonUtility.Serialize(response);
+
+        }
+
+
+      
+    }
+}

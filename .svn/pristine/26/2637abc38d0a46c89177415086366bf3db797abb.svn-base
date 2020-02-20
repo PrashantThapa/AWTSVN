@@ -1,0 +1,37 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTSalaryItem
+    {
+        public Int32? SalaryItemID { get; set; }
+        public string SalaryItemDesc { get; set; }
+        public string ItemType { get; set; }
+
+        public string Status { get; set; }
+        public string FromDate { get; set; }
+        public string ToDate { get; set; }
+        public string EntryBy { get; set; }
+        public string EntryDate { get; set; }
+        
+        public string Action { get; set; }
+
+        public string Taxable { get; set; }
+
+
+        //private ATTSalaryItemGL _SalaryItemGL;
+        //public ATTSalaryItemGL SalaryItemGL
+        //{
+        //    get { return _SalaryItemGL; }
+        //    set { _SalaryItemGL = value; }
+        //}
+
+
+        //public ATTSalaryItem()
+        //{
+        //    _SalaryItemGL = new ATTSalaryItemGL();
+        //}
+        //// public ATTAccountChart ParentGL { get; set; }
+
+    }
+}

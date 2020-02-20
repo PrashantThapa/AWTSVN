@@ -1,0 +1,77 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLEmployeeSearch
+    {
+        public JsonResponse SearchEmployee(ATTPISEmployee objEmployee)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLEmployeeSearch objDll = new DLLEmployeeSearch();
+            try
+            {
+                response.ResponseData = objDll.SearchEmployee(objEmployee);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        public JsonResponse SearchOfficeEmployee(int officeCode,int? costCenterID, int? postID)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLEmployeeSearch objDll = new DLLEmployeeSearch();
+            try
+            {
+                response.ResponseData = objDll.SearchOfficeEmployee(officeCode,costCenterID,postID);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+		public JsonResponse SearchPortalEmployee(ATTPISEmployee objEmployee)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLEmployeeSearch objDll = new DLLEmployeeSearch();
+            try
+            {
+                response.ResponseData = objDll.SearchPortalEmployee(objEmployee);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+		public JsonResponse GetEmployeeRegistered(int officeCode, int pageNumber, int pageSize, Int64? submissionNo)
+        {
+			JsonResponse response = new JsonResponse();
+			DLLEmployeeSearch objDll = new DLLEmployeeSearch();
+			try
+			{
+				response.ResponseData = objDll.GetEmployeeRegistered(officeCode, pageNumber, pageSize, submissionNo);
+                response.IsSucess = true;
+			}
+			catch (Exception ex)
+			{
+				response.IsSucess = false;
+				response.Message = ex.Message;
+			}
+			return response;
+		}
+
+	}
+}

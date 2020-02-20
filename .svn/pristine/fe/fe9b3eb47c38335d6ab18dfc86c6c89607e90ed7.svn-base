@@ -1,0 +1,130 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLProduct
+    {
+        /// <summary>
+        /// This method Save/Update Product
+        /// </summary>
+        /// <param name="lst"></param>
+        /// <returns>String as a Message about Save/Update Product</returns>
+        /// 
+        public string SaveProduct(List<ATTProduct> lst)
+        {
+            string SP = "";
+            string msg = "No Data to Save!!!";
+           
+
+            foreach (ATTProduct obj in lst)
+            {
+               
+
+                if (obj.Action == "E")
+                {
+                    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_PRODUCT";
+                    msg = "Successfully Updated";
+                }
+                else
+                {
+                    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_PRODUCT";
+                    msg = "Successfully Added ";
+                }
+
+                 List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_PROD_ID", obj.ProductID, OracleDbType.Int32, ParameterDirection.InputOutput));
+                paramList.Add(SqlHelper.GetOraParam(":P_PROD_DESC", obj.ProductDescription, OracleDbType.Varchar2, ParameterDirection.Input));
+               
+                //paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", obj.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+               // paramList.Add(SqlHelper.GetOraParam(":P_TRAN_NO", obj.PTranNo, OracleDbType.Int32, ParameterDirection.InputOutput));
+
+                GetConnection conn = new GetConnection();
+                OracleConnection dbConn = conn.GetDbConn();
+                OracleTransaction tran = dbConn.BeginTransaction();
+
+
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+                   
+                    tran.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tran.Rollback();
+                    throw new Exception("Error" + ex.Message);
+                }
+
+                finally
+                {
+
+                    conn.CloseDbConn();
+                }
+
+            }
+            return msg;
+            }
+
+         /// <summary>
+        /// Retrives a list of Product(s)
+        /// </summary>
+        /// <param name="productid"></param>
+        /// <returns>Product or Null if Product does not exist</returns>
+        /// 
+
+        public List<ATTProduct> GetProduct(int? productid)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn();
+
+            List<ATTProduct> lst = new List<ATTProduct>();
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_PRODUCT";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_PROD_ID", productid, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTProduct obj = new ATTProduct();
+
+                    obj.ProductID = Int32.Parse(drow["PROD_ID"].ToString());
+                    obj.ProductDescription = drow["PROD_DESC"].ToString();
+                   // obj.PTranNo = Int32.Parse(drow["TRAN_NO"].ToString());
+                    obj.Action = "";
+
+                    lst.Add(obj);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+
+        }
+
+        }
+
+    }
+

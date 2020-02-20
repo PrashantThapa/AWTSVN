@@ -1,0 +1,350 @@
+﻿using System;
+using System.Data;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLPersonContPri
+    {
+
+        public bool SavePersonAddressPri(ATTPersonAddress obj, OracleTransaction tran)
+        {
+            try
+            {
+                string sp = "";
+
+                obj.AddressPriority.EntryBy = obj.EntryBy;
+
+                if (obj.Action == "E")
+                {
+                    sp = "CPR_EDIT_PERSON_CONT_PRI";
+
+                }
+                else if (obj.Action == "A")
+                {
+                    sp = "CPR_ADD_PERSON_CONT_PRI";
+                }
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_PERSON_ID", obj.Person.PID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_TYPE", "A", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PRIORITY", obj.AddressPriority.Priority, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", obj.AddressPriority.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_TYPE_ID", null, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_FROM_DATE", "", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_TYPE_ID", obj.AddrType.AddressTypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_ID", obj.Address.AddressID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.AddressPriority.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Date, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", obj.AddressPriority.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    paramList.Clear();
+                }
+                else
+                {
+                    throw new Exception("Error in Saving Person Address Priority !!!");
+                }
+
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+        public  bool SavePersonContactPri(ATTPersonContact obj, OracleTransaction tran)
+        {
+            try
+            {
+                obj.ContactPriority.EntryBy = obj.EntryBy;
+                string sp = "";
+
+                if (obj.Action == "E")
+                {
+                    sp = "CPR_EDIT_PERSON_CONT_PRI";
+
+                }
+                else if (obj.Action == "A")
+                {
+                    sp = "CPR_ADD_PERSON_CONT_PRI";
+                }
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_PERSON_ID", obj.Person.PID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_TYPE", "C", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PRIORITY", obj.ContactPriority.Priority, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", obj.ContactPriority.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_TYPE_ID", obj.ContactType.TypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_TYPE_ID", null, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_ID", null, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_FROM_DATE", "", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.ContactPriority.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Date, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", obj.ContactPriority.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    paramList.Clear();
+                }
+                else
+                {
+                    throw new Exception("Error in Saving Person Contact Priority !!!");
+                }
+
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+
+        public ATTPersonContPri GetPersonAddressPri(Int64? ID, Int32? seqNo, int? adTypeID, Int32? addressID, string fromDate, OracleConnection conn, bool isDirty = false)
+        {
+            ATTPersonContPri obj = new ATTPersonContPri();
+
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                string sp = "CPR_GET_PER_ADD_PRI";
+
+                if (isDirty)
+                {
+                    sp = "DCPR_GET_PER_ADDR_PRI";                    
+                }
+                
+                paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", ID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_SEQNO", seqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_ADTYPE_ID", adTypeID, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_ID", addressID, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_A_FROM_DATE",fromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                    if (ds.Tables[0].Rows.Count > 0)
+                    {
+                        DataRow dr = ((DataTable)ds.Tables[0]).Rows[0];
+
+
+                        if (isDirty)
+                        {
+                            obj.Person.SubmissionNo = Int64.Parse(dr["SUBMISSION_NO"].ToString());
+                            obj.Person.SeqNo = int.Parse(dr["SEQ_NO"].ToString());
+                        }
+                        else
+                        {
+                            obj.Person.PID = Int64.Parse(dr["P_ID"].ToString());
+                        }
+
+                        obj.ContactType = "A";
+                        obj.Priority = int.Parse(dr["PRIORITY"].ToString());
+                        obj.AddressID = int.Parse(dr["ADDRESS_ID"].ToString());
+                        obj.AddressTypeID = int.Parse(dr["ADTYPE_ID"].ToString());
+                        obj.FromDate = dr["FROM_DATE"].ToString();
+                        obj.Status = dr["R_STAUS"].ToString();
+                        obj.TranNo = string.IsNullOrEmpty(dr["TRAN_NO"].ToString()) ? (Int64?)null : Int64.Parse(dr["TRAN_NO"].ToString());
+
+
+                    }                
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+
+            return obj;
+        }
+
+        public ATTPersonContPri GetPersonContactPri(Int64? ID, Int32? seqNo, int? contactTypeID, string fromDate, OracleConnection conn, bool isDirty = false)
+        {
+            ATTPersonContPri obj = new ATTPersonContPri();
+
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                string sp = "CPR_GET_PERSON_CONT_PRI";
+
+                if (isDirty)
+                {
+                    sp = "DCPR_GET_PER_CONT_PRI";
+                    
+                }
+                
+                paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", ID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_SEQNO", seqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_TYPE_ID", contactTypeID, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_C_FROM_DATE",fromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow dr = ((DataTable)ds.Tables[0]).Rows[0];
+
+                    if (isDirty)
+                    {
+                        obj.Person.SubmissionNo = Int64.Parse(dr["SUBMISSION_NO"].ToString());
+                        obj.Person.SeqNo = int.Parse(dr["SEQ_NO"].ToString());
+                    }
+                    else
+                    {
+                        obj.Person.PID = Int64.Parse(dr["P_ID"].ToString());
+                    }
+
+                    
+                    obj.ContactType = "C";
+                    obj.Priority = int.Parse(dr["PRIORITY"].ToString());
+                    obj.FromDate = dr["FROM_DATE"].ToString();
+                    obj.CTypeID = int.Parse(dr["CTYPE_ID"].ToString());
+
+                    obj.FromDate = dr["FROM_DATE"].ToString();
+                    obj.Status = dr["R_STAUS"].ToString();
+                    obj.TranNo = string.IsNullOrEmpty(dr["TRAN_NO"].ToString()) ? (Int64?)null : Int64.Parse(dr["TRAN_NO"].ToString());
+                    
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+
+            return obj;
+        }
+
+        #region Dirty
+
+        public bool SaveDirtyPersonAddressPri(ATTPersonAddress obj, OracleTransaction tran)
+        {
+            try
+            {
+                string sp = "";
+
+                obj.AddressPriority.EntryBy = obj.EntryBy;
+
+                if (obj.Action == "E")
+                {
+                    //sp = "DCPR_EDIT_PERSON_CONT_PRI";
+                    sp = "";
+
+                }
+                else if (obj.Action == "A")
+                {
+                    sp = "DCPR_ADD_PERSON_CONT_PRI";
+                }
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+                    
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO",obj.Person.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_SEQ_NO",obj.Person.SeqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_TYPE", "A", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PRIORITY", obj.AddressPriority.Priority, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", obj.AddressPriority.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_TYPE_ID", null, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_FROM_DATE", "", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_TYPE_ID", obj.AddrType.AddressTypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_ID", obj.Address.AddressID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.AddressPriority.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Date, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", obj.AddressPriority.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    paramList.Clear();
+                }
+                else
+                {
+                    if (sp != "") throw new Exception("Error in Saving Person Address Priority !!!");
+                }
+
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+        public bool SaveDirtyPersonContactPri(ATTPersonContact obj, OracleTransaction tran)
+        {
+            try
+            {
+                obj.ContactPriority.EntryBy = obj.EntryBy;
+                string sp = "";
+
+                if (obj.Action == "E")
+                {
+                    //sp = "DCPR_EDIT_PERSON_CONT_PRI";
+                    sp = "";
+
+                }
+                else if (obj.Action == "A")
+                {
+                    sp = "DCPR_ADD_PERSON_CONT_PRI";
+                }
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", obj.Person.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_SEQ_NO", obj.Person.SeqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_TYPE", "C", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PRIORITY", obj.ContactPriority.Priority, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", obj.ContactPriority.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_TYPE_ID", obj.ContactType.TypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_TYPE_ID", null, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_ID", null, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_FROM_DATE", "", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.ContactPriority.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Date, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", obj.ContactPriority.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    paramList.Clear();
+                }
+                else
+                {
+                    if (sp != "") 
+                    throw new Exception("Error in Saving Person Contact Priority !!!");
+                }
+
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+        #endregion
+    }
+}
+

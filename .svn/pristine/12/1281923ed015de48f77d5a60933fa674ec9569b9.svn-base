@@ -1,0 +1,259 @@
+﻿function Office(data) {
+    var self = this;
+    if (data != undefined) {
+        self.OfficeCode = ko.observable(data.OfficeCode);
+        self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+    }
+}
+
+function Post(data) {
+    var self = this;
+    if (data != undefined) {
+        self.OfficeCode = ko.observable(data.OfficeCode);
+        self.PostID = ko.observable(data.PostID);
+        self.PostDesc = ko.observable(data.PostDesc);
+
+    }
+}
+
+var EmployeeGradeScaleSetupModel = function () {
+	var self = this;
+    self.EmpLevel = ko.observable();
+    self.OfficeCode = ko.observable();
+    self.PostID = ko.observable();
+    self.PostDesc = ko.observable();
+    self.SelectedPost = ko.observable();
+    self.Posts = ko.observableArray([]);
+    self.Offices = ko.observableArray([]);
+
+	self.EmpLevel.subscribe(function (value) {
+		waitMsg("Loading");
+		waitMsg.show();
+		$.ajax({
+			dataType: "json",
+			cache: false,
+			url: '../../../Handlers/PAYROLL/GradeScaleSetupHandler.ashx',
+			data: { 'method': 'GetGradeScaleSettingsByEmpLevel', 'EmpLevel': value, 'token': $("#token").text() },
+			contentType: "application/json; charset=utf-8",
+			success: function (result) {
+				waitMsg.hide();
+				if (result.IsSucess) {
+					var mappedTask = $.map(result.ResponseData, function (item) {
+						return new EmployeeGradeScaleInfo(item)
+					});
+					if (mappedTask !== undefined) {
+						self.SubmissionNo(mappedTask.SubmissionNo);						
+					}
+				}
+				
+			}//,
+			//error: function (err) {
+			//	msg("ओहो! डेटा प्राप्त गर्दा त्रुटिहरू पत्ता लगाइयो ...", "WARNING");
+			//	waitMsg.hide();
+			//}
+		});
+    });
+
+
+    self.GetPost = function () {
+        waitMsg("Loading");
+        waitMsg.show();
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/COMMON/PostHandler.ashx',
+            data: { 'method': 'GetPost', 'postID': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new Post(item);
+                });
+
+                self.Posts(mappedTask);
+                waitMsg.hide();
+            },
+            error: function (err) {
+                msg("Oops! Error occured while obtaining Posts!!!", "WARNING");
+
+            }
+        });
+    };
+
+
+    self.GetPost();
+
+    var selfSubmissionNum = 0;
+	self.StartingScaleSalary = ko.observable();
+	self.GradeAmount = ko.observable();
+	self.MaxGradeNo = ko.observable();
+	self.MaxScaleSalary = ko.observable();
+	self.Remarks = ko.observable();
+    self.RStatus = ko.observable();
+   
+	var entryby = $("#user").text();
+	self.EntryBy = ko.observable(entryby);
+	self.EntryDate = ko.observable();
+	self.SubmissionNo = ko.observable();
+	self.EmployeeGradeScaleInfoes = ko.observableArray([]);
+	self.LoadEmployeeGradeScaleInfo = function () {
+		waitMsg("Loading");
+		waitMsg.show();		
+		$.ajax({
+			dataType: "json",
+			cache: false,
+			url: '../../../Handlers/PAYROLL/GradeScaleSetupHandler.ashx',
+			data: { 'method': 'GetALLGradeScaleSettings', 'token': $("#token").text() },
+			contentType: "application/json; charset=utf-8",
+			success: function (result) {
+				waitMsg.hide();
+				if (result.IsSucess) {
+					var mappedTask = $.map(result.ResponseData, function (item) {
+						return new EmployeeGradeScaleInfo(item)
+					});
+					self.EmployeeGradeScaleInfoes([]);
+                    self.EmployeeGradeScaleInfoes(mappedTask);
+				}
+				else {
+
+					if (!result.IsToken)
+                        msg("Oops! Error occured while obtaining data...", "WARNING");
+					else
+                        msg("Oops! Error occured while obtaining data...", "WARNING");
+				}
+			},
+			error: function (err) {
+                msg("Oops! Error occured while obtaining data...", "WARNING");
+				waitMsg.hide();
+			}
+		});
+	}
+	self.EditEmployeeGradeScaleSetup = function (row) {
+		var data = ko.toJS(row);
+        console.log(data);
+		self.EmpLevel(data.EmpLevel);
+		self.StartingScaleSalary(data.StartingScaleSalary);
+		self.GradeAmount(data.GradeAmount);
+		self.MaxGradeNo(data.MaxGradeNo);
+		self.MaxScaleSalary(data.MaxScaleSalary);
+		self.Remarks(data.Remarks);
+		self.EntryBy(data.EntryBy);
+		self.EntryDate(data.EntryDate);
+		self.SubmissionNo(data.SubmissionNo);
+		self.RStatus(data.RStatus);
+		console.log('edit', self.SubmissionNo());
+		selfSubmissionNum = self.SubmissionNo();
+	}	
+	self.LoadEmployeeGradeScaleInfo();
+	self.SaveEmployeeGradeScaleInfo = function () {
+		if (self.ValidateEmpGradeScaleInfo()) {
+			
+            var EmpGradeScaleInfoToAddorUpdate = {
+
+                OldSubmissionNo: self.SubmissionNo(),
+                SubmissionNo: self.SubmissionNo(),
+                EmpLevel: self.EmpLevel(),
+                //PostID: self.PostID(),
+				StartingScaleSalary: self.StartingScaleSalary(),
+				GradeAmount: self.GradeAmount(),
+				MaxGradeNo: self.MaxGradeNo(),
+				MaxScaleSalary: self.MaxScaleSalary(),
+				Remarks: self.Remarks(),
+				EntryBy: self.EntryBy(),
+				EntryDate: self.EntryDate(),
+				RStatus: "F"
+			};
+			
+			var url = "/Handlers/PAYROLL/GradeScaleSetupHandler.ashx";
+			var method = "SaveGradeScaleSetup";
+			var appID = "FAMS";
+			var modID = "EMPGRADESCALE";
+			
+			var data = { 'method': method, 'args': JSON.stringify(ko.toJS(EmpGradeScaleInfoToAddorUpdate)), 'appID': appID, 'modID': modID };
+
+			$.post(url, data, function (result) {
+				var obj = jQuery.parseJSON(result);
+				if (obj.IsSucess) {
+					self.SubmissionNo(obj.Message.match(/\d+/g));
+					msg(obj.Message, "SUCCESS");
+					self.ClearControls();
+					self.LoadEmployeeGradeScaleInfo();
+				}
+				else {
+                    msg("Oops! Error occured while saving data ...", "WARNING");
+				}
+			});
+		}
+		else {
+            msg("Oops! Error occured while saving data ।", "WARNING");
+		}
+	}
+	self.ValidateEmpGradeScaleInfo = function () {
+		var errMsg = "";
+
+		if (Validate.empty(self.EmpLevel())) {
+			errMsg += "Please fill level!!!<br>";
+		}
+		if (Validate.empty(self.StartingScaleSalary())) {
+			errMsg += "Please fill start salary scale!!!<br>";
+		}
+
+		if (Validate.empty(self.GradeAmount())) {
+			errMsg += "Please fill Grade Amount!!!<br>";
+		}
+		if (Validate.empty(self.MaxGradeNo())) {
+			errMsg += "Please fill maximum maximum grade number!!!<br>";
+		}
+		if (Validate.empty(self.MaxScaleSalary())) {
+			errMsg += "Please  fill Maximum salary scale!!!<br>";
+		}
+		if (errMsg !== "") {
+			msg(errMsg, "WARNING");
+
+			return false;
+		}
+		else {
+			return true;
+		}
+
+	}
+	self.ClearControls = function () {		
+		self.EmpLevel('');
+		self.StartingScaleSalary('');
+		self.GradeAmount('');
+		self.MaxGradeNo('');
+		self.MaxScaleSalary('');
+		self.Remarks('');
+		self.EntryBy('');
+		self.EntryDate('');
+		self.RStatus('');
+		self.EmployeeGradeScaleInfoes([]);
+
+	}
+}
+	var EmployeeGradeScaleInfo = function (data) {
+		var self = this;
+		if (data !== undefined) {
+			self.SubmissionNo = ko.observable(data.SubmissionNo);
+			self.EmpLevel = ko.observable(data.EmpLevel);
+			self.StartingScaleSalary = ko.observable(data.StartingScaleSalary);
+			self.GradeAmount = ko.observable(data.GradeAmount);
+			self.MaxGradeNo = ko.observable(data.MaxGradeNo);
+			self.MaxScaleSalary = ko.observable(data.MaxScaleSalary);
+			self.Remarks = ko.observable(data.Remarks);
+			self.EntryBy = ko.observable(data.EntryBy);
+			self.EntryDate = ko.observable(data.EntryDate);
+			self.RStatus= ko.observable(data.RStatus);
+		}
+
+		
+}
+
+
+
+$(document).ready(function () {
+	ValidateSession();
+	var egsvm = new EmployeeGradeScaleSetupModel();
+	ko.applyBindings(egsvm, document.getElementById('EmpGradeScaleForm'));
+
+});

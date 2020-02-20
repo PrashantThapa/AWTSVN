@@ -1,0 +1,209 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+
+namespace HRFA.BLL
+{
+    public  class BLLOfficeCompanyAccChart
+    {
+      public JsonResponse GetGLCodewithSubsidary(int? OfficeID, int? AccCode)
+      {
+
+          JsonResponse response = new JsonResponse();
+          List<ATTOfficeCompanyAccChart> lstOfficeCompanyAccChart = new List<ATTOfficeCompanyAccChart>();
+          DLLOfficeCompanyAccChart objdllOfficeCompanyAccChart = new DLLOfficeCompanyAccChart();
+          try
+          {
+              lstOfficeCompanyAccChart = objdllOfficeCompanyAccChart.GetGLCodewithSubsidary(OfficeID, AccCode);
+
+              response.ResponseData = lstOfficeCompanyAccChart;
+              response.Message = "Success";
+              response.IsSucess = true;
+          }
+          catch (Exception ex)
+          {
+              response.Message = ex.Message;
+              response.IsSucess = false;
+          }
+
+
+          return response;
+      }
+
+      public JsonResponse SaveOfficeComAcchart(List<ATTOfficeCompanyAccChart> lstOfficeComAcchart)
+        {
+
+            JsonResponse response = new JsonResponse();
+
+            try
+            {
+
+                if (response.Message == "")
+                {
+                    DLLOfficeCompanyAccChart objdllOfficeCompanyAccChart = new DLLOfficeCompanyAccChart();
+                    response.Message = objdllOfficeCompanyAccChart.SaveOfficeComAcchart(lstOfficeComAcchart);
+                    response.IsSucess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+            return response;
+        }
+
+      public JsonResponse DeleteOfficeComAcchart(int? OfficeID)
+        {
+
+            JsonResponse response = new JsonResponse();
+
+            try
+            {
+                DLLOfficeCompanyAccChart objdllOfficeCompanyAccChart = new DLLOfficeCompanyAccChart();
+                response.Message = objdllOfficeCompanyAccChart.DeleteOfficeComAcchart(OfficeID);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+
+        }
+      
+      public JsonResponse GetOfficeComanyAcchart(int? OfficeID, int? companyID,string P_all,string VType)
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTOfficeCompanyAccChart> lstOfficeCompanyAccChart = new List<ATTOfficeCompanyAccChart>();
+            DLLOfficeCompanyAccChart objdllOfficeCompanyAccChart = new DLLOfficeCompanyAccChart();
+            try
+            {
+                lstOfficeCompanyAccChart = objdllOfficeCompanyAccChart.GetOfficeComanyAcchart(OfficeID, companyID, P_all,VType);
+
+                response.ResponseData = lstOfficeCompanyAccChart;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+
+
+      public JsonResponse GetOfficeComanyAcchartLedger(int? OfficeID, int? companyID, string P_all, string VType)
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTOfficeCompanyAccChart> lstOfficeCompanyAccChart = new List<ATTOfficeCompanyAccChart>();
+            DLLOfficeCompanyAccChart objdllOfficeCompanyAccChart = new DLLOfficeCompanyAccChart();
+            try
+            {
+                lstOfficeCompanyAccChart = objdllOfficeCompanyAccChart.GetOfficeComanyAcchartLedger(OfficeID, companyID, P_all, VType);
+
+                response.ResponseData = lstOfficeCompanyAccChart;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+
+      public JsonResponse GetOfficeComanyAcchartBorC(int? OfficeID, int? companyID, string btype)
+      {
+
+          JsonResponse response = new JsonResponse();
+          List<ATTOfficeCompanyAccChart> lstOfficeCompanyAccChart = new List<ATTOfficeCompanyAccChart>();
+          DLLOfficeCompanyAccChart objdllOfficeCompanyAccChart = new DLLOfficeCompanyAccChart();
+          try
+          {
+              lstOfficeCompanyAccChart = objdllOfficeCompanyAccChart.GetOfficeComanyAcchartBorC(OfficeID, companyID, btype);
+
+              response.ResponseData = lstOfficeCompanyAccChart;
+              response.Message = "Success";
+              response.IsSucess = true;
+          }
+          catch (Exception ex)
+          {
+              response.Message = ex.Message;
+              response.IsSucess = false;
+          }
+
+
+          return response;
+      }
+
+
+
+
+      public JsonResponse GetAccount(int? args)
+      {
+
+          JsonResponse response = new JsonResponse();
+          List<ATTGetAccounts> lstOfficeCompanyAccChart = new List<ATTGetAccounts>();
+          DLLOfficeCompanyAccChart objdllOfficeCompanyAccChart = new DLLOfficeCompanyAccChart();
+          try
+          {
+              lstOfficeCompanyAccChart = objdllOfficeCompanyAccChart.GetAccounts(args);
+
+              response.ResponseData = lstOfficeCompanyAccChart;
+              response.Message = "Success";
+              response.IsSucess = true;
+          }
+          catch (Exception ex)
+          {
+              response.Message = ex.Message;
+              response.IsSucess = false;
+          }
+
+
+          return response;
+      }        
+
+
+
+
+             public JsonResponse GetOfficeComAcchart(int? OfficeID)
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTOfficeCompanyAccChart> lstOfficeCompanyAccChart = new List<ATTOfficeCompanyAccChart>();
+            DLLOfficeCompanyAccChart objdllOfficeCompanyAccChart = new DLLOfficeCompanyAccChart();
+            try
+            {
+                lstOfficeCompanyAccChart = objdllOfficeCompanyAccChart.GetOfficeComAcchart(OfficeID);
+
+                response.ResponseData = lstOfficeCompanyAccChart;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }  
+
+    }
+}

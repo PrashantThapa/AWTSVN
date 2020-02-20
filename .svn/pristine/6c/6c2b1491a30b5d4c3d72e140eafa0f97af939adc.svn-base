@@ -1,0 +1,351 @@
+﻿
+function LeaveLst(data) {
+    var self = this;
+
+    self.EmpID = ko.observable(data.EmpID);
+    self.EmpName = ko.observable(data.EmpName);
+    self.ApplicationDate = ko.observable(data.ApplicationDate);
+    self.LeaveTypeID = ko.observable(data.LeaveTypeID);
+    self.NoOfDays = ko.observable(data.NoOfDays);
+    self.ApprovedType = ko.observable(data.ApprovedType);
+    self.ForwardedToID = ko.observable(data.ForwardedToID);
+    self.ForwardedToName = ko.observable(data.ForwardedToName);
+    self.Action = ko.observable(data.Action);
+    self.Status = ko.observable(data.Status);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.FromDate = ko.observable(data.FromDate);
+    self.ToDate = ko.observable(data.ToDate);
+    self.SeqNo = ko.observable(data.SeqNo);
+    
+};
+
+function LeaveApprovedRecommendViewModel() {
+    //var LeaveApprovedRecommendViewModel = function () {
+
+    var self = this;
+    self.EmpID = ko.observable();
+    self.FromDate = ko.observable();
+    self.ToDate = ko.observable();
+    self.NoOfDays = ko.observable();
+    self.makecheck = ko.observable();
+    self.ForwardedToID = ko.observable();
+    self.ForwardedToName = ko.observable();
+    self.LeaveLsts = ko.observable([]);
+    self.SelectedLeaveLsts = ko.observable([]);
+    self.Action = ko.observable("A");
+
+    self.EntryBy = ko.observable($("#user").text());
+    self.EntryDate = ko.observable();
+    self.FromDate = ko.observable();
+    self.ToDate = ko.observable();
+    self.Status = ko.observable("I");
+    self.FDate = ko.observable();
+    self.TDate = ko.observable();
+    self.NDays = ko.observable();
+    self.Days = ko.observable();
+    var Toggle;
+    //--------------------------------------------------------------
+    // Employee Lists
+    //--------------------------------------------------------------
+    self.Load = function () {
+
+        var empid = $("#EmployeeID").text();
+        //var empid = $("#EmployeeID").text();
+        if (empid == null || empid == "") {
+            msg("You are not allowed to approve or recommend Leave.");
+        }
+
+        //else {
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                url: '../../Handlers/PIS/LeaveApprovedRecommend.ashx',
+                data: { 'method': 'GetLeaveApprovedRecommend', 'empID': empid },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    var mappedTask = $.map(result.ResponseData, function (item) {
+
+                        return new LeaveLst(item)
+                    });
+
+                    self.LeaveLsts(mappedTask);
+
+                    $("#loader").hide();
+
+
+                },
+                error: function (err) {
+                    msg('Error while obtaining the Data !!', "FAILURE");
+
+                }
+            });
+        //}
+    }
+
+    self.Load();
+
+    self.GetDateDifference = function (date1, date2, type) {
+        if (date1 != undefined && date2 != undefined) {
+
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                async: false,
+                url: '../../../Handlers/COMMON/DateHandler.ashx',
+                data: { 'method': 'GetDaysDifference', 'date1': date2, 'date2': date1 },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    var days = result.ResponseData;
+                    if (type == "date") {
+                        self.Days(days);
+                    }
+                    else if (type == "changedate") {
+                        self.NoOfDays(days + 1);
+                        if (days < 0) {
+                            msg("End date should be greater or equals to Start date!!!", "FAILURE");
+                            self.ToDate('');
+                        }
+                    }
+                    else if (type == "changefdate") {
+                        self.NoOfDays(days + 1);
+                        if (days < 0) {
+                            msg("Start date should be smaller or euals to End date!!!", "FAILURE");
+                            self.FromDate('');
+                        }
+                    }
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+                }
+            });
+        }
+    }
+    self.ValidateFromDate = function () {
+
+        if (self.FromDate() == "" || self.FromDate() === undefined) {
+
+            msg("Please fill Cancel Start date!!!<br>", "FAILURE");
+
+        }
+
+        if (!Validate.empty(self.FromDate()) && !Validate.empty(self.FDate())) {
+
+            self.GetDateDifference(self.FDate(), self.FromDate(),"date");
+
+            console.log(self.Days());
+            if (self.Days() < 0) {
+                msg("New start date should be smaller than old start date !!!");
+                self.FromDate('');
+               // $('#txtfromdate').focus();
+                self.Days('');
+            }
+            self.GetDateDifference(self.FromDate(), self.TDate(), "changefdate");
+            self.GetDateDifference(self.FromDate(), self.ToDate(), "changedate");
+        }
+    }
+    self.ValidateToDate = function () {
+
+        if (Validate.empty(self.ToDate())) {
+
+            msg("Please fill the cancel end date !!!<br>", "FAILURE");
+
+        }
+
+        if (!Validate.empty(self.ToDate()) && !Validate.empty(self.TDate())) {
+            self.GetDateDifference(self.ToDate(), self.TDate(), "date");
+            console.log(self.Days());
+            if (self.Days() < 0) {
+                msg("New end date should be smaller than old end date !!!");
+                self.ToDate('');
+                self.Days('');
+            }
+            self.GetDateDifference(self.FromDate(), self.ToDate(), "changedate");
+        }
+
+    }
+    self.ValidateDays = function () {
+
+
+        if (!Validate.empty(self.FromDate()) && !Validate.empty(self.ToDate())) {
+            self.GetDateDifference(self.FromDate(), self.ToDate(),"date");
+           
+            var Cdate = parseInt(self.Days());
+            Cdate = Cdate + 1;
+
+            if (Cdate < self.NoOfDays()) {
+                msg("Cancel no. of days should be smaller !!!");
+                self.NoOfDays('');
+                self.Days('');
+            }
+        }
+    }
+
+    //--------------------------------------------------------------
+    // To Clear Controls
+    //--------------------------------------------------------------
+    self.ClearControls = function () {
+        self.FromDate("");
+        self.EmpID("");
+        self.ToDate("");
+        self.NoOfDays("");
+        self.ForwardedToID("");
+        self.ForwardedToName("");
+    };
+    var DaysDiff;
+    //--------------------------------------------------------------
+    //To Validate Controls
+    //--------------------------------------------------------------
+	self.Validation = function () {
+
+        var errMsg = "";
+        var objFocus = null;
+
+        if ( Validate.empty(self.EmpID())) {
+
+            errMsg += "Please select the Id !!!<br>";
+        }
+        if ( Validate.empty(self.FromDate())) {
+
+            errMsg += "Please fill the start date!!!<br>";
+        }
+        if ( Validate.empty(self.ToDate())) {
+
+            errMsg += "Please fill the end date !!!<br>";
+        }
+        if ( Validate.empty(self.NoOfDays())) {
+
+            errMsg += "Please fill the no. of days !!!<br>";
+        }
+        if (Validate.empty(self.makecheck())) {
+            errMsg += "Please Select Approve or recommendation!!!<br>";
+        }
+        if (self.makecheck() == "I") {
+
+            if (Validate.empty(self.ForwardedToName())) {
+
+                errMsg += "Please select the employee for approve or Recommend !!!<br>";
+            }
+           
+        }
+
+        if (parseInt(self.NoOfDays()) > 0) {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                cache: false,
+                url: '../../Handlers/COMMON/DateHandler.ashx',
+				data: { 'method': 'GetDaysDifferenceWithHoliday', 'date1': self.FromDate(), 'date2': self.ToDate() },
+                contentType: "applicaton/json; character=utf -8",
+
+                success: function (result) {
+
+                    if (result.IsSucess) {
+                        DaysDiff = result.ResponseData;
+                        if (parseInt(self.NoOfDays()) > parseInt(DaysDiff))
+							errMsg += "Max no. of days !!!<br>";
+						
+                    }
+					else {
+						errMsg = 'Error Occured।';
+                        msg('Error Occured ।', "WARNING");
+						
+                    }
+
+
+                },
+                error: function (err) {
+                    msg('Error Occured ।', "WARNING");
+                    errMsg = 'Error Occured ।';
+                }
+
+            });
+            
+		}
+		if (errMsg != '')
+			return false;
+		return true;
+
+    };
+
+    self.ClickRowToGetData = function (datas) {
+
+        self.EmpID(ko.toJS(datas).EmpID);
+        self.FromDate(ko.toJS(datas).FromDate);
+        self.ToDate(ko.toJS(datas).ToDate);
+        self.NoOfDays(ko.toJS(datas).NoOfDays);
+        self.FDate(ko.toJS(datas).FromDate);
+        self.TDate(ko.toJS(datas).ToDate);
+        self.NDays(ko.toJS(datas).NoOfDays);
+        self.SelectedLeaveLsts(ko.toJS(datas));
+        
+    }
+
+    self.SaveLeaveApprovedRecommend = function () {
+
+        if (self.Validation()) {
+
+            args = {
+                EmpID: self.EmpID(),
+                LeaveTypeID: ko.toJS(self.SelectedLeaveLsts).LeaveTypeID,
+                ApplicationDate: ko.toJS(self.SelectedLeaveLsts).ApplicationDate,
+                SeqNo: ko.toJS(self.SelectedLeaveLsts).SeqNo,
+                ApprovedType: null,
+                FromDate: self.FromDate(),
+                ToDate: self.ToDate(),
+                NoOfDays: self.NoOfDays(),
+                Status: self.makecheck(),
+                EntryBy: self.EntryBy(),
+                EntryDate: self.EntryDate(),
+                Action: self.Action(),
+                ForwardedToID: self.ForwardedToID()
+            };
+
+
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                cache: false,
+                url: '../../Handlers/PIS/LeaveApprovedRecommend.ashx',
+                data: { 'method': 'SaveLeaveApprovedRecommend', 'args': JSON.stringify(args) },
+                contentType: "applicaton/json; character=utf -8",
+
+                success: function (result) {
+
+                    if (result.IsSucess) {
+                        msg('Data Stored Sucessfully', "SUCCESS");
+
+                        self.ClearControls();
+                        self.Load();
+                    }
+                    else {
+						msg('Error While storing Data', "WARNING");
+                    }
+
+
+                },
+                error: function (err) {
+                    msg('Error While storing Data', "WARNING");
+                }
+
+            });
+
+        }
+
+    };
+    $('#modalEmpSearch').on('hidden.bs.modal', function (event) {
+        self.ForwardedToID(GEmpID);
+        self.ForwardedToName(GEmpName);
+    });
+};
+
+$(document).ready(function () {
+    ValidateSession();
+    var empid = $("#empID").text();
+    ko.applyBindings(new LeaveApprovedRecommendViewModel(), document.getElementById("LeaveApprovedRecommend"));
+
+    //ValidateSession();
+
+    //var epvm = new LeaveApprovedRecommendViewModel();
+    //ko.applyBindings(epvm);
+});

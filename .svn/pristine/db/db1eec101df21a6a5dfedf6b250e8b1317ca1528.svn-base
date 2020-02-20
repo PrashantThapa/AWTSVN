@@ -1,0 +1,154 @@
+﻿using System;
+using System.Collections.Generic;
+using Oracle.DataAccess.Client;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+
+
+namespace HRFA.DataLayer
+{
+    public class DLLModuleFunction
+    {
+        public  List<ATTModuleFunction> GetModuleFunctions(string applicationID)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_get_SEC_MODULE_FUNCTIONS";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_APPLICATION_ID", applicationID, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTModuleFunction> lst = new List<ATTModuleFunction>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTModuleFunction obj = new ATTModuleFunction();
+
+                    obj.ApplicationID = applicationID;
+                    obj.ModuleID = drow["MODULE_ID"].ToString();
+                    obj.ModuleDesc = drow["MODULE_DESCRIPTION"].ToString();
+                    obj.ModuleType = drow["MODULE_TYPE"].ToString();
+                    obj.MenuName = drow["MENU_NAME"].ToString();
+                    obj.McRestricted = drow["MC_RESTRICTED"].ToString();
+                    obj.FunCD = drow["FUN_CD"].ToString();
+                    obj.FunDesc = drow["FUN_DESC"].ToString();
+
+                    lst.Add(obj);
+                }
+                return lst;
+            }
+            catch (Exception )
+            {
+                return new List<ATTModuleFunction>();
+
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+        }
+
+
+        public  List<ATTModuleFunction> GetModuleFunctionsBYUserId(string userid)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_get_user_module_func";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_USER_ID", userid, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTModuleFunction> lst = new List<ATTModuleFunction>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTModuleFunction obj = new ATTModuleFunction();
+
+
+                    obj.ModuleID = drow["MODULE_ID"].ToString();
+                    obj.FunCD = drow["FUN_CD"].ToString();
+                    obj.ApplicationID = drow["APPLICATION_ID"].ToString();
+                    obj.FunDesc = drow["FUN_DESC"].ToString();
+                    obj.FromDate = drow["FROM_DATE"].ToString();
+                    obj.Action = "E";
+
+                    lst.Add(obj);
+                }
+                return lst;
+            }
+            catch (Exception )
+            {
+                return new List<ATTModuleFunction>();
+
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+        }
+
+
+
+        public bool SaveUserModuleFunctions(List<ATTModuleFunction> lst, OracleTransaction tran)
+        {
+
+            string SP = "";
+            try
+            {
+                ATTModuleFunction obja = new ATTModuleFunction();
+
+                foreach (ATTModuleFunction obj in lst)
+                {
+                    
+                    if(obj.Action == "A")
+                    {
+                        SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_USER_MODULE_FUNCS";
+
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+
+                        paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_USER_ID", obj.UserID, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_MODULE_ID", obj.ModuleID, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_APPLICATION_ID", obj.ApplicationID, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_FUN_CD", obj.FunCD, OracleDbType.Varchar2, ParameterDirection.Input));
+
+                        paramList.Add(SqlHelper.GetOraParam(":P_AUTH_NO", obj.AuthNO, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_AUTH_BY", obj.AuthBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_AUTH_DATE", obj.AuthDate, OracleDbType.Varchar2, ParameterDirection.Input));
+
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", obj.EntryDate, OracleDbType.Varchar2, ParameterDirection.Input));
+
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+                       
+                        paramList.Clear();
+                    }
+
+                }
+                
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+
+
+        }
+
+    }
+}

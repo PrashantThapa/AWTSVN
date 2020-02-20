@@ -1,0 +1,153 @@
+﻿using System;
+using System.Collections.Generic;
+using Oracle.DataAccess.Client;
+using System.Data;
+using HRFA.COMMON;
+using HRFA.ATT;
+using System.Configuration;
+using zkemkeeper;
+
+namespace HRFA.DataLayer
+{
+    public class DLLAttendence
+    {
+        public CZKEMClass axCZKEM1 = new CZKEMClass();
+        private bool bIsConnected = false;
+        private int iMachineNumber = 1;
+        int idwErrorCode = 0;
+
+        public string SaveAttendenceInfo(ATTAttendenceDownload objAttDownload)
+        {
+            bIsConnected = axCZKEM1.Connect_Net(objAttDownload.IPAddress, 4370);
+            string msg ="";
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                if (bIsConnected == true)
+                {
+                    iMachineNumber = 1;
+                    axCZKEM1.RegEvent(iMachineNumber, 65535);
+
+                    string sdwEnrollNumber = "";
+                    int idwVerifyMode = 0;
+                    int idwInOutMode = 0;
+                    int idwYear = 0;
+                    int idwMonth = 0;
+                    int idwDay = 0;
+                    int idwHour = 0;
+                    int idwMinute = 0;
+                    int idwSecond = 0;
+                    int idwWorkcode = 0;
+
+
+                    try
+                    {
+
+                        string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_ATTENDANCE_INFO";
+
+                        axCZKEM1.EnableDevice(iMachineNumber, false);
+                        if (axCZKEM1.ReadGeneralLogData(iMachineNumber))
+                        {
+                            while (axCZKEM1.SSR_GetGeneralLogData(iMachineNumber, out sdwEnrollNumber, out idwVerifyMode,
+                                        out idwInOutMode, out idwYear, out idwMonth, out idwDay, out idwHour, out idwMinute, out idwSecond, ref idwWorkcode))
+                            {
+                                string date = idwYear + "." + idwMonth + "." + idwDay;
+                                string time = idwHour + ":" + idwMinute + ":" + idwSecond;
+                                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                                paramList.Add(SqlHelper.GetOraParam(":P_ENROLL_NO", sdwEnrollNumber, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+                                paramList.Add(SqlHelper.GetOraParam(":P_ATT_DATE", date, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                                paramList.Add(SqlHelper.GetOraParam(":P_ATT_TIME", time, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                                paramList.Add(SqlHelper.GetOraParam(":P_INOUT_MODE", idwInOutMode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+
+                                SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+                                paramList.Clear();
+
+                            }
+
+                            msg = "Successfully Downloaded.";
+                            SaveAttendenceDownload(objAttDownload, tran, msg);
+
+                            tran.Commit();
+                            
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        msg = ex.Message;
+                        SaveAttendenceDownload(objAttDownload, tran, msg);
+                    }
+
+                }
+                else
+                {
+                    if (idwErrorCode != 0)
+                    {
+                        msg = "Reading data from terminal failed.";
+                    }
+                    else
+                    {
+                        msg = "No data from terminal returns.";
+                    }
+
+                    SaveAttendenceDownload(objAttDownload, tran, msg);
+                    tran.Commit();
+                }
+            }
+
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                msg = ex.Message;
+                throw ex;
+            }
+
+            finally
+            {
+                getConn.CloseDbConn();
+                axCZKEM1.EnableDevice(iMachineNumber, true);
+            }
+
+            return msg;
+        }
+
+        private void SaveAttendenceDownload(ATTAttendenceDownload objAttDownload,OracleTransaction tran, string status) {
+
+            string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_ATTENDANCE_DOWNLOAD";
+
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", objAttDownload.Office.OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_IP_ADDRESS", objAttDownload.IPAddress, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_DOWNLOAD_DATE", objAttDownload.DownloadDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_STATUS", status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", objAttDownload.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", objAttDownload.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+                paramList.Clear();
+            }
+            
+            catch (Exception ex) 
+            {
+                throw ex;
+            }
+        }
+
+        public void ClearLog()
+        {
+            if (axCZKEM1.ClearGLog(iMachineNumber))
+            {
+                axCZKEM1.RefreshData(iMachineNumber);
+            }
+        }
+         
+    }
+}

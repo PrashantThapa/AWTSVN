@@ -1,0 +1,10 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTSchedule
+    {
+       public Int32? ScheduleID { get; set; }
+       public string ScheduleName { get; set; }
+    }
+}

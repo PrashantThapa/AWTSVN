@@ -1,0 +1,40 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.DataLayer;
+
+namespace HRFA.BLL
+{
+    public class BLLBudgetItem
+    {
+       public string SaveBudgetItem(ATTBudgetItem objBudgetItemAtt)
+       {
+           try
+           {
+               DLLBudgetItem objBudgetItem = new DLLBudgetItem();
+               return objBudgetItem.SaveBudgetItem(objBudgetItemAtt);
+           }
+           catch (Exception ex)
+           {
+               throw (ex);
+           }
+
+       }
+
+       public List<ATTBudgetItem> GetBudgetItem(Int64? BudgetItems)
+       {
+           try
+           {
+               DLLBudgetItem obj = new DLLBudgetItem();
+               return obj.GetBudgetItem(BudgetItems);
+           }
+           catch (Exception ex)
+           {
+               throw (ex);
+           }
+
+       }
+
+
+    }
+}

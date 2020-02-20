@@ -1,0 +1,125 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DllAppraisal
+    {
+        public string SaveAppraisal(ATTAppraisal objAppraisal, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                if (objAppraisal.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_EMP_AWARD";
+                    msg = "Successfully Saved.";
+
+                }
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", null, OracleDbType.Int64, ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CD", objAppraisal.Office.OfficeCode, OracleDbType.Int32, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_POST_ID", objAppraisal.Post.PostID, OracleDbType.Int32, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_POST_SEQ", objAppraisal.OfficePostDarbandi.PostSeq, OracleDbType.Int32, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", objAppraisal.EmpID, OracleDbType.Int64, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_SEQ_NO", null, OracleDbType.Int16, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CAT_ID", null, OracleDbType.Int16, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_REMARKS", objAppraisal.Remarks, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objAppraisal.RStatus, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objAppraisal.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objAppraisal.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+                    paramList[0].Size = 20;
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    objAppraisal.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+
+                    if (objAppraisal.OldSubmissionNo != null)
+                    {
+                        DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                        dllUTV.SaveVerifyLog(tran, objAppraisal.EntryBy, objAppraisal.OldSubmissionNo, objAppraisal.SubmissionNo, appID, modID);
+
+                    }
+
+                    paramList.Clear();
+                    tran.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            //return msg;
+            return msg + "</br> Please Note Your Submission No.</br><b>" + objAppraisal.SubmissionNo + "</b>";
+        }
+
+        public string SaveAppraisalCategory(ATTAppraisalCategory objAppraisalCategory, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_INS_APPRAISAL_CATEGORY";
+                msg = "Successfully Saved.";
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":P_CATEGORY_ID", objAppraisalCategory.Id, OracleDbType.Int32, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_CATEGORY_NAME", objAppraisalCategory.Name, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_POINTS", objAppraisalCategory.Name, OracleDbType.Int16, ParameterDirection.Input));
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    paramList.Clear();
+                    tran.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+
+            //return msg;
+            return msg + "</br> Successfully completed.</br>" ;
+        }
+
+        public void GetAppraisalAll()
+        {
+        }
+
+        public void GetAppraisalById()
+        {
+        }
+        public void GetAppraisalCategories()
+        {
+        }
+    }
+}

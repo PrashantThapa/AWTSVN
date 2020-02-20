@@ -1,0 +1,48 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTBudgetTransfer
+    {
+       public ATTOffice FromOffice { get; set; }
+
+       public ATTCostCenter FromCostCenter { get; set; }
+
+       public ATTJob FromJob { get; set; }
+
+       public ATTBudgetItem FromBudgetItem { get; set; }
+       
+       public ATTOffice ToOffice { get; set; }
+
+       public ATTCostCenter ToCostCenter { get; set; }
+
+       public ATTJob ToJob { get; set; }
+
+       public ATTBudgetItem ToBudgetItem { get; set; }
+
+       public Int64? SubmissionNo { get; set; }
+
+       public Int64? OldSubmissionNo { get; set; }
+
+       public Int64? TransferNo { get; set; }
+       public Int16? TransferSeq { get; set; }
+       public string TransferDate { get; set; }
+       public string FromRequestDate { get; set; }
+       public Int64? FromBudgetID { get; set; }
+       public Int16? FromJobID { get; set; }
+       public string ToRequestDate { get; set; }
+       public Int64? ToBudgetID { get; set; }
+       public Int64? ToJobID { get; set; }
+       public Int64? TransferAmount { get; set; }
+       public Int64? ApproveAmount { get; set; }
+       public string Remarks { get; set; }
+       public string EntryBy { get; set; }
+       public string EntryDate { get; set; }
+       public string RStatus { get; set; }
+
+       public string Action { get; set; }
+       public string FiscalYear { get; set; }
+
+
+    }
+}

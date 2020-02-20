@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+
+namespace HRFA.BLL
+{
+    public class BLLUnit
+    {
+        public JsonResponse GetUnit(Int16? unitID)
+        {
+            JsonResponse response = new JsonResponse();
+            List<ATTUnit> lst = new List<ATTUnit>();
+            DLLUnit dllUnit = new DLLUnit();
+            try
+            {
+                lst = dllUnit.GetUnit(unitID);
+
+                response.ResponseData = lst;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+            return response;
+
+        }
+    }
+}

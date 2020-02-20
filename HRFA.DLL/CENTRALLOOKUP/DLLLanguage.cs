@@ -1,0 +1,206 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLLanguage
+    {
+        public string SaveAddressType(List<ATTLanguage> lst)
+        {
+            string SP = "";
+            string msg = "No Data to Save!!!";
+            
+
+            foreach (ATTLanguage obj in lst)
+            {
+
+               
+                if (obj.Action == "E")
+                {
+                    SP = "CPR_EDIT_LANGUAGE";
+                    msg = "Successfully Updated";
+                }
+                else
+                {
+                    SP = "CPR_ADD_LANGUAGE";
+                    msg = "Successfully Added ";
+                }
+
+                // obj.EntryBy = "SOSYS_MAIN";
+
+                List<OracleParameter> paramList = new List<OracleParameter>
+                {
+                    SqlHelper.GetOraParam(":p_LANG_ID", obj.LanguageID, OracleDbType.Int32, ParameterDirection.InputOutput),
+                    SqlHelper.GetOraParam(":p_LANG_NAME", obj.LanguageName, OracleDbType.Varchar2, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_LANG_ENG", obj.LanguageNameEng, OracleDbType.Varchar2, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_TO_DATE", null, OracleDbType.Varchar2, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_ENTRY_DATE", obj.EntryDate, OracleDbType.Date, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_STATUS", obj.Status, OracleDbType.Varchar2, ParameterDirection.Input)
+                };
+
+                GetConnection conn = new GetConnection();
+                OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+                OracleTransaction tran = dbConn.BeginTransaction();
+
+
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                    tran.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tran.Rollback();
+                    throw new Exception("Error" + ex.Message);
+                }
+
+                finally
+                {
+
+                    conn.CloseDbConn();
+                }
+
+            }
+            return msg;
+        }
+
+		public string DeleteLanguage(int? languageid)
+		{
+			GetConnection conn = new GetConnection();
+			OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+
+			try
+			{
+				string SP = "CPR_DEL_LANGUAGE"; 
+				List<OracleParameter> ParamList = new List<OracleParameter>();
+				ParamList.Add(SqlHelper.GetOraParam(":p_LANG_ID", languageid, OracleDbType.Int32, ParameterDirection.InputOutput));
+				SqlHelper.ExecuteNonQuery(dbConn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+				return "Deleted Successfully!!!";
+
+
+			}
+			catch (Exception ex)
+			{
+
+				return ex.Message;
+
+			}
+			finally
+			{
+
+				conn.CloseDbConn();
+			}
+
+		}
+
+		public List<ATTLanguage> GetLanguageType(int? langtypeID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            List<ATTLanguage> lst = new List<ATTLanguage>();
+
+            try
+            {
+                string SP = "CPR_GET_LANGUAGE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>
+                {
+                    SqlHelper.GetOraParam(":p_LANG_ID", langtypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output)
+                };
+
+
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTLanguage obj = new ATTLanguage();
+
+                    obj.LanguageID = string.IsNullOrEmpty(drow["LANG_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["LANG_ID"].ToString());
+                    obj.LanguageName = drow["LANG_NAME"].ToString();
+                    obj.LanguageNameEng = drow["LANG_ENG"].ToString();
+                    
+
+                    lst.Add(obj);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+        public List<ATTLanguage> GetLanguageTypes(int? langtypeID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            List<ATTLanguage> lst = new List<ATTLanguage>();
+
+            try
+            {
+                string SP = "CPR_GET_LANGUAGE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>
+                {
+                    SqlHelper.GetOraParam(":p_LANG_ID", langtypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output)
+                };
+
+
+
+                DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTLanguage obj = new ATTLanguage();
+
+                    obj.LanguageID = string.IsNullOrEmpty(drow["LANG_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["LANG_ID"].ToString());
+                    obj.LanguageName = drow["LANG_NAME"].ToString();
+                    obj.LanguageNameEng = drow["LANG_ENG"].ToString();
+                    obj.FromDate = drow["FROM_DATE"].ToString();
+                    //obj.ToDate = drow["TO_DATE"].ToString();
+                    //obj.EntryBy = drow["ENTRY_BY"].ToString();
+                    //obj.EntryDate = drow["ENTRY_DATE"].ToString();
+
+                    obj.Status = drow["STATUS"].ToString();
+                    obj.Action = "";
+                    //obj.TranNo = drow["TRAN_NO"].ToString();
+
+                    lst.Add(obj);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+    }
+}

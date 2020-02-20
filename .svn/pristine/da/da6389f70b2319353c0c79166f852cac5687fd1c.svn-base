@@ -1,0 +1,265 @@
+﻿
+var accountStatementModel = function (data) {
+    var self = this;
+    data = data || {}
+    self.OfficeCode = ko.observable(data.OfficeCode || '0');
+    self.OfficeName = ko.observable(data.OfficeName || '');
+    self.Type = ko.observable(data.Type || '');
+    self.GLGroupCode = ko.observable(data.GLGroupCode || '0');
+    self.GLGroupName = ko.observable(data.GLGroupName || '');
+    self.SchID = ko.observable(data.SchID || '0');
+    self.AccountNumber = ko.observable(data.AccountNumber || '');
+    self.DateType = ko.observable(data.DateType || '');
+    self.FromDate = ko.observable(data.FromDate || nepaliDate);
+    self.ToDate = ko.observable(data.ToDate || nepaliDate);
+    self.PrintDate = ko.observable(data.PrintDate || nepaliDate);
+};
+
+
+var accountStatementViewModel = function () {
+    var self = this;
+    SOSYS.init(self);
+    self.isSchemeVisible_Acc = ko.observable(false);
+    self.isInvestVisible_Acc = ko.observable(false);
+    self.isDefaultVisible = ko.observable(true);
+    self.isSchemeVisible = ko.observable(false);
+    self.isInvestVisible = ko.observable(false);
+    self.isDefaultEnable = ko.observable(false);
+    self.isAccEnable = ko.observable(false);
+    // self.isToDateVisible = ko.observable(false);
+    self.SchID = ko.observable('0');
+    self.accountStatement = ko.observable(new accountStatementModel());
+    self.pageSize = ko.observable(5);
+    self.GLGroup_Scheme_SearchInputTerm = ko.observable('');
+    self.GLGroup_Invest_SearchInputTerm = ko.observable('');
+    self.AccountNumberSearchInputTerm = ko.observable('');
+    self.AccountNumberSearchInputTerm_Invst = ko.observable('');
+    var path = '/Handlers/ACCOUNT/Report/AccountStatementHandler.ashx';
+    self.trackElement = function (i, item) {
+        //self.currentEditingItem(item);
+        switch (i) {
+            case 1: $("#searchGLGroup_Default").modal("show");
+
+                break;
+            case 2: $('#searchGLGroup_Scheme').modal('show');
+
+                break;
+            case 3: $('#searchGLGroup_Invest').modal('show');
+
+                break;
+            default:
+                break;
+        }
+    }
+
+    self.trackElement_Account = function (i, item) {
+        //self.currentEditingItem(item);
+        switch (i) {
+            case 1: $("#searchAccountNumber").modal("show");
+
+                break;
+            case 2: $('#searchAccountNumber_Invst').modal('show');
+
+                break;
+            default:
+                break;
+        }
+    }
+
+    //    self.chngDateType = function () {
+
+    //        var dateType = ko.toJS(self.accountStatement().DateType);
+
+    //        if (dateType == 'DATE') {
+    //            self.isToDateVisible(false);
+    //            self.accountStatement().ToDate('');
+    //        }
+    //        else if (dateType == 'DATE RANGE') {
+    //            self.isToDateVisible(true);
+    //            self.accountStatement().ToDate(nepaliDate);
+    //          
+    //        }
+    //        else if (dateType == '') {
+    //            self.isToDateVisible(false);
+    //            self.accountStatement().ToDate('');
+    //        }
+    //    };
+
+
+    self.chngType = function () {
+
+        var type = ko.toJS(self.accountStatement().Type);
+
+        if (type === 'SCHEME') {
+
+            self.isSchemeVisible(true);
+            self.isDefaultVisible(false);
+            self.isInvestVisible(false);
+            self.isSchemeVisible_Acc(true);
+            self.isInvestVisible_Acc(false);
+            self.isAccEnable(true);
+             type = ko.toJS(self.accountStatement().Type);
+            self.gridViewSearchModelGLGroup_Scheme.searchField({ Type: type, inputSearchText: self.GLGroup_Invest_SearchInputTerm() });
+
+        }
+        else if (type === 'INVESTMENT') {
+
+            self.isInvestVisible(true);
+            self.isDefaultVisible(false);
+            self.isSchemeVisible(false);
+            self.isAccEnable(true);
+            self.isSchemeVisible_Acc(false);
+            self.isInvestVisible_Acc(true);
+            type = ko.toJS(self.accountStatement().Type);
+            self.gridViewSearchModelGLGroup_Invest.searchField({ Type: type, inputSearchText: self.GLGroup_Invest_SearchInputTerm() });
+        }
+        else if (type === '') {
+            self.isDefaultEnable(false);
+            self.isInvestVisible(false);
+            self.isDefaultVisible(true);
+            self.isSchemeVisible(false);
+            self.isAccEnable(false);
+            self.isSchemeVisible_Acc(false);
+            self.isInvestVisible_Acc(false);
+
+        }
+    };
+    //For Office
+    self.gridViewSearchModelOffice = new ko.simpleGrid.viewModel({
+        url: '/Handlers/FixedAssest/Report/FAStatusReportHandler.ashx',
+        method: 'ListOffices',
+        pageSize: self.pageSize(),
+        columns: [
+                    { headerText: "Office Code", rowText: "OfficeCode" },
+                    { headerText: "Office Name", rowText: "OfficeName" }
+                ]//,
+        //pageSize: 5
+    });
+
+    /* call back to get selected item from search*/
+    self.gridViewSearchModelOffice.selectData = function (item) {
+        self.accountStatement().OfficeCode(item.OfficeCode);
+        self.accountStatement().OfficeName(item.OfficeName);
+        self.gridViewSearchModelOffice.searchField("");
+    };
+    //End oF Office
+
+    //For Default GL Group Code
+    self.gridViewSearchModelDefault = new ko.simpleGrid.viewModel({
+    //        url: path,
+    //        method: 'ListGLGroup_Scheme',
+    //        pageSize: self.pageSize(),
+    //        columns: [
+    //                                { headerText: "GL Group Code", rowText: "GLGroupCode" }
+    //                            ],
+    //        pageSize: 5
+});
+
+
+//End of Default GL Group Code
+//For GL GroupCode_Scheme
+self.gridViewSearchModelGLGroup_Scheme = new ko.simpleGrid.viewModel({
+    url: path,
+    method: 'ListGLGroup',
+    pageSize: self.pageSize(),
+    columns: [
+                                { headerText: "GL Group Code", rowText: "GLGroupCode" }
+                            ]//,
+    //pageSize: 5
+});
+
+self.GLGroup_Scheme_SearchInputTerm.subscribe(function () {
+    var a = ko.toJS(self.accountStatement().Type);
+    self.gridViewSearchModelGLGroup_Scheme.searchField({ Type: a, inputSearchText: self.GLGroup_Scheme_SearchInputTerm() });
+});
+
+self.gridViewSearchModelGLGroup_Scheme.selectGLGroup_Scheme = function (item) {
+    self.accountStatement().GLGroupCode(item.GLGroupCode);
+    self.accountStatement().GLGroupName(item.GLGroupName);
+    self.accountStatement().SchID(item.SchID);
+    var schID = parseInt(item.SchID);
+    self.gridViewSearchModelAccountNumber.searchField({ SchID: schID, inputSearchText: self.AccountNumberSearchInputTerm() });
+    $('#searchGLGroup_Scheme').modal('hide');
+};
+
+//End GL GroupCode_Scheme
+
+
+//    //For GL GroupCode_Invest
+self.gridViewSearchModelGLGroup_Invest = new ko.simpleGrid.viewModel({
+    url: path,
+    method: 'ListGLGroup_Invest',
+    pageSize: self.pageSize(),
+    columns: [
+                                    { headerText: "GL Group Code", rowText: "GLGroupCode" }
+                                ]//,
+   // pageSize: 5
+});
+
+self.gridViewSearchModelGLGroup_Invest.selectGLGroup_Invest = function (item) {
+    self.accountStatement().GLGroupCode(item.GLGroupCode);
+    self.accountStatement().GLGroupName(item.GLGroupName);
+    $('#searchGLGroup_Invest').modal('hide');
+    var GroupCode = parseInt(ko.toJS(item.GLGroupCode));
+    self.gridViewSearchModelAccountNumber_Invst.searchField({ GroupCode: GroupCode, inputSearchText: self.AccountNumberSearchInputTerm() });
+};
+
+self.GLGroup_Invest_SearchInputTerm.subscribe(function () {
+    var a = ko.toJS(self.accountStatement().Type);
+    self.gridViewSearchModelGLGroup_Invest.searchField({ Type: a, inputSearchText: self.GLGroup_Invest_SearchInputTerm() });
+});
+
+//End GL GroupCode_Scheme
+
+//For Account Number of Scheme
+self.gridViewSearchModelAccountNumber = new ko.simpleGrid.viewModel({
+    url: path,
+    method: 'ListAccountNumber',
+    pageSize: self.pageSize(),
+    columns: [
+                                    { headerText: "Account  Number", rowText: "AccountNumber" }
+                                ]//,
+    //pageSize: 5
+});
+
+self.gridViewSearchModelAccountNumber.select_AccountNumber = function (item) {
+    self.accountStatement().AccountNumber(item.AccountNumber);
+    $('#searchAccountNumber').modal('hide');
+};
+
+self.AccountNumberSearchInputTerm.subscribe(function () {
+    var schID = parseInt(ko.toJS(self.accountStatement().SchID));
+    self.gridViewSearchModelAccountNumber.searchField({ SchID: schID, inputSearchText: self.AccountNumberSearchInputTerm() });
+});
+
+//End of Account Number of Scheme
+//For Account Number of Invest
+self.gridViewSearchModelAccountNumber_Invst = new ko.simpleGrid.viewModel({
+    url: path,
+    method: 'ListAccountNumberForInvst',
+    pageSize: self.pageSize(),
+    columns: [
+                                    { headerText: "Account  Number", rowText: "AccountNumber" }
+                                ]//,
+    //pageSize: 5
+});
+
+self.gridViewSearchModelAccountNumber_Invst.select_AccountNumber_Invst = function (item) {
+    self.accountStatement().AccountNumber(item.AccountNumber);
+    $('#searchAccountNumber_Invst').modal('hide');
+};
+
+self.AccountNumberSearchInputTerm_Invst.subscribe(function () {
+   /// alert('fff');
+    var GroupCode = parseInt(ko.toJS(self.accountStatement().GLGroupCode));
+    self.gridViewSearchModelAccountNumber.searchField({ GroupCode: GroupCode, inputSearchText: self.AccountNumberSearchInputTerm_Invst() });
+});
+
+//End of Account Number of Invest
+
+};
+
+$(function () {
+    ko.applyBindings(new accountStatementViewModel());
+    ValidateSession();
+});

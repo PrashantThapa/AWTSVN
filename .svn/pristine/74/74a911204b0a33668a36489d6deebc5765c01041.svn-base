@@ -1,0 +1,180 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+
+namespace HRFA.DataLayer
+{
+    public class DLLBFICapital
+    {
+        /// <summary>
+        /// Retrives a list of Capital(s)
+        /// </summary>
+        /// <param name="bficapid"></param>
+        /// <returns>Bank or Null if Capital does not exist</returns>
+        public List<ATTBFICapital> GetBFICapital(int? bficapid)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+
+            List<ATTBFICapital> lst = new List<ATTBFICapital>();
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_BFI_CAPITAL";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_BFI_CAP_ID", bficapid, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                
+                    foreach (DataRow drow in ds.Tables[0].Rows)
+                    {
+                        ATTBFICapital objBFICapital = new ATTBFICapital();
+
+                        objBFICapital.BFICapID = Int32.Parse(drow["BFI_CAP_ID"].ToString());
+                        objBFICapital.BFICapNameNepali = drow["BFI_CAP_NAME"].ToString();
+                        objBFICapital.BFICapNameEnglish = drow["BFI_CAP_NAME_ENG"].ToString();
+
+                        if (drow["STATUS"].ToString() == "A")
+                        {
+                            objBFICapital.Status = true;
+                        }
+                        else
+                        {
+                            objBFICapital.Status = false;
+                        }
+                        objBFICapital.FromDate = drow["FROM_DATE"].ToString();
+                        objBFICapital.Action = "";
+                        lst.Add(objBFICapital);
+                         }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+        
+
+        /// <summary>
+        /// This method Save/Update Capital
+        /// </summary>
+        /// <param name="lst"></param>
+        /// <returns>String as a Message about Save/Update Capital</returns>
+        /// 
+        public string SaveBFICapital(List<ATTBFICapital> lst)
+        {
+            string sp = "";
+            string msg = "No Data To Save !!!";
+            string status = "";
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection dbConn = getConn.GetDbConn();
+            OracleTransaction tran = dbConn.BeginTransaction();
+
+            foreach (ATTBFICapital objBFICaptial in lst)
+            {
+
+                if (objBFICaptial.Status == true)
+                {
+                    status = "A";
+                }
+                else
+                {
+                    status = "I";
+                }
+
+
+                if (objBFICaptial.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_BFI_CAPITAL";
+                    msg = "Successfully Saved.";
+                }
+                else if (objBFICaptial.Action == "E")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_BFI_CAPITAL";
+                    msg = "Successfully Updated.";
+                }
+
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_BFICAP_ID", objBFICaptial.BFICapID, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+                paramList.Add(SqlHelper.GetOraParam(":P_BFICAP_NAME", objBFICaptial.BFICapNameNepali, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_BFICAP_NAME_ENG", objBFICaptial.BFICapNameEnglish, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_STATUS", status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", objBFICaptial.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                //paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", objBFICaptial.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", objBFICaptial.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", objBFICaptial.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                    tran.Commit();
+
+                }
+
+
+                catch (Exception ex)
+                {
+                    throw new Exception("Error" + ex.Message);
+                }
+                finally
+                {
+                    dbConn.Close();
+                }
+            }
+                     return msg;
+        }
+
+        /// <summary>
+        /// This method Delete Capital
+        /// </summary>
+        /// <param name="bficapid">bficapid to be deleted</param>
+        /// <returns>String as a Message about Delete Capital</returns>
+        ///
+        public string DeleteBFICapital(int? bficapid)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn();
+           // OracleConnection conn = GetConn.GetDbConn("DCGC_MAIN", "DCGC_MAIN");
+            string msg = "";
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_DEL_BFI_CAPITAL";
+                msg = "Record Deleted Successfully";
+
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":P_BFICAP_ID", bficapid, OracleDbType.Int32, ParameterDirection.InputOutput));
+                ParamList.Add(SqlHelper.GetOraParam(":P_TO_DATE", null, OracleDbType.Varchar2, ParameterDirection.Input));
+
+                SqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+    }
+}

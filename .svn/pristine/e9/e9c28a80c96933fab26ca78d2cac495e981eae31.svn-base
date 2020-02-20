@@ -1,0 +1,38 @@
+﻿using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+using System.Collections.Generic;
+
+namespace HRFA.Handlers.ACCOUNT
+{
+    /// <summary>
+    /// Summary description for SubsidaryACHandler
+    /// </summary>
+    public class SubsidaryACHandler : BaseHandler
+    {
+
+        public object SaveSubsidaryAC(string args)
+        {
+            JsonResponse response = new JsonResponse();
+            //if (token == CurrentToken())
+            //{
+            BLLSubsidaryAC bllsub = new BLLSubsidaryAC();
+            List<ATTSubsidaryAC> lstsub = JsonUtility.DeSerialize(args, typeof(List<ATTSubsidaryAC>)) as List<ATTSubsidaryAC>;
+            response = bllsub.SaveSubsidaryAC(lstsub);
+            return JsonUtility.Serialize(response);
+        }
+
+        public object GetSubsidaryLst(int? officeCode,int? accode)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLSubsidaryAC bllDeviceReg = new BLLSubsidaryAC();
+
+            response = bllDeviceReg.GetSubsidaryLst(officeCode,accode);
+
+
+            return JsonUtility.Serialize(response);
+
+
+        }
+    }
+}

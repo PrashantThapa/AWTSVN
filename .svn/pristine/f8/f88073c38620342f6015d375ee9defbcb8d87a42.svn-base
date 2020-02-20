@@ -1,0 +1,230 @@
+﻿using System;
+using System.Collections.Generic;
+using Oracle.DataAccess.Client;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEmployeeAttendance
+    {
+        public List<ATTEmpAttendance> GetEmployeeDetBySubmissionNo(Int64? SubmissionNo)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_EMP_ATT_BY_SUB_NO";
+                List<OracleParameter> paramList = new List<OracleParameter>
+                {
+                    SqlHelper.GetOraParam(":P_SUBMISSION_NO", SubmissionNo, OracleDbType.Int64, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output)
+                };
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+                List<ATTEmpAttendance> lst = new List<ATTEmpAttendance>();
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTEmpAttendance Employee = new ATTEmpAttendance
+                    {
+                        SN = drow["SYMBOL_NO"].ToString(),
+                        EmployeeName = drow["EMP_NAME"].ToString(),
+                        PostDesc = drow["POST_DESC"].ToString(),
+                        WorkingDays = string.IsNullOrEmpty(drow["WORKING_DAYS"].ToString()) ? (Int16?)null : Int16.Parse(drow["WORKING_DAYS"].ToString()),
+                        AttDays = string.IsNullOrEmpty(drow["ATT_DAYS"].ToString()) ? (Int16?)null : Int16.Parse(drow["ATT_DAYS"].ToString()),
+                        Year = string.IsNullOrEmpty(drow["YEAR"].ToString()) ? (Int16?)null : Int16.Parse(drow["YEAR"].ToString()),
+                        Month = string.IsNullOrEmpty(drow["MONTH"].ToString()) ? (Int16?)null : Int16.Parse(drow["MONTH"].ToString()),
+                        EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["EMP_ID"].ToString()),
+                        SubmissionNo = string.IsNullOrEmpty(drow["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString()),
+                        CostCenterID = string.IsNullOrEmpty(drow["COSTCENTER_ID"].ToString()) ? (int?)null : int.Parse(drow["COSTCENTER_ID"].ToString()),
+                        OfficeCD = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (int?)null : int.Parse(drow["OFFICE_CD"].ToString()),
+                        RStatus = Convert.ToChar(drow["R_STATUS"].ToString()),
+                        EntryBy = drow["ENTRY_BY"].ToString(),
+                        EntryDate = drow["ENTRY_DATE"].ToString(),
+                        RejRemarks = drow["REJECT_REMARKS"].ToString()
+                    };
+                    lst.Add(Employee);
+                }
+                return lst;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+        public object GetWorkingDays(int? year, int? monthID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_EMP_WORKING_DAYS";
+                string month = monthID.ToString().Length==1? 0+monthID.ToString(): monthID.ToString();
+                List<OracleParameter> paramList = new List<OracleParameter>
+                {                    
+                    SqlHelper.GetOraParam(":P_YEAR", year, OracleDbType.Int16, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_MONTH",month, OracleDbType.Varchar2, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_TOTAL_WORKING_DAYS", null, OracleDbType.Int16, ParameterDirection.Output)
+                };
+
+                var ds = SqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                return paramList[2].Value;
+
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            return 0;
+        }
+
+        public List<ATTEmpAttendance> GetEmpAttendance(int? officeCD, int? CostCenterID, int? Year, int? MonthID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_EMP_ATTENDANCE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>
+                {
+                    SqlHelper.GetOraParam(":P_OFFICE_CD", officeCD, OracleDbType.Int16, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_COSTCENTER_ID", CostCenterID, OracleDbType.Int16, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_YEAR", Year, OracleDbType.Int16, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_MONTH", MonthID, OracleDbType.Int16, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output)
+                };
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+                List<ATTEmpAttendance> lst = new List<ATTEmpAttendance>();
+                if (ds.Tables != null)
+                {
+                    foreach (DataRow drow in ds.Tables[0].Rows)
+                    {
+                        ATTEmpAttendance Employee = new ATTEmpAttendance
+                        {
+                            SN = (!DBNull.Value.Equals(drow["SYMBOL_NO"]))?drow["SYMBOL_NO"].ToString():string.Empty,
+                            EmployeeName = drow["EMP_NAME"]!=null? drow["EMP_NAME"].ToString():string.Empty,
+                            PostDesc = (!DBNull.Value.Equals(drow["POST_DESC"])) ? drow["POST_DESC"].ToString():string.Empty,
+                            WorkingDays = DBNull.Value.Equals(drow["WORKING_DAYS"]) ? (Int16?)null : Int16.Parse(drow["WORKING_DAYS"].ToString()),
+                            AttDays = DBNull.Value.Equals(drow["ATT_DAYS"]) ? (Int16?)null : Convert.ToInt16(Math.Round(Convert.ToDouble(drow["ATT_DAYS"].ToString()))),
+                            Year = Year,
+                            Month = MonthID,
+                            EmpID = DBNull.Value.Equals(drow["EMP_ID"])? (Int16?)null : Int16.Parse(drow["EMP_ID"].ToString()),
+                            SubmissionNo = null,//string.IsNullOrEmpty(drow["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                            RStatus = DBNull.Value.Equals(drow["R_STATUS"]) ? 'F' : Convert.ToChar(drow["R_STATUS"].ToString()),
+                            EntryBy = DBNull.Value.Equals(drow["ENTRY_BY"]) ?string.Empty: drow["ENTRY_BY"].ToString(),
+                            EntryDate = DBNull.Value.Equals(drow["ENTRY_DATE"])?string.Empty:  drow["ENTRY_DATE"].ToString(),
+                            RejRemarks = string.Empty,//drow["REJECT_REMARKS"].ToString();
+                            Action=DBNull.Value.Equals(drow["ACTION"])?'N': Convert.ToChar(drow["ACTION"])
+                        };
+                        lst.Add(Employee);
+                    }
+                }
+                return lst;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+        public string SaveEmpAttendance(List<ATTEmpAttendance> EmpAttList)
+        {
+            string sp = "";
+            string msg = "";
+            Int64? SubmissionNo = null;
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GEN_EMP_ATT_SUB_NO";
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                SubmissionNo = EmpAttList[0].SubmissionNo;
+                if (SubmissionNo == null)
+                {
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", null, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+                    paramList.Clear();
+                }
+
+                foreach (ATTEmpAttendance EmpAtt in EmpAttList)
+                {
+                    if (EmpAtt.Action == 'A')
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_EMP_ATTENDANCE";
+                        List<OracleParameter> paramList1 = new List<OracleParameter>
+                        {
+                            SqlHelper.GetOraParam(":p_SUBMISSION_NO", SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_EMP_ID", EmpAtt.EmpID, OracleDbType.Int64, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_OFFICE_CD", EmpAtt.OfficeCD, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_COSTCENTER_ID", EmpAtt.CostCenterID, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_YEAR", EmpAtt.Year, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_MONTH", EmpAtt.Month, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_WORKING_DAYS", EmpAtt.WorkingDays, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_ATT_DAYS", EmpAtt.AttDays, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_ENTRY_BY", EmpAtt.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_ENTRY_DATE", EmpAtt.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_R_STATUS", 'F', OracleDbType.Varchar2, System.Data.ParameterDirection.Input)
+                        };
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList1.ToArray());
+                    }
+                    else if (EmpAtt.Action == 'E')
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_EDIT_EMP_ATTENDANCE";
+                        List<OracleParameter> paramList1 = new List<OracleParameter>
+                        {
+                            SqlHelper.GetOraParam(":p_SUBMISSION_NO", SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_EMP_ID", EmpAtt.EmpID, OracleDbType.Int64, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_OFFICE_CD", EmpAtt.OfficeCD, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_COSTCENTER_ID", EmpAtt.CostCenterID, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_YEAR", EmpAtt.Year, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_MONTH", EmpAtt.Month, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_WORKING_DAYS", EmpAtt.WorkingDays, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_ATT_DAYS", EmpAtt.AttDays, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_ENTRY_BY", EmpAtt.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_R_STATUS", 'F', OracleDbType.Varchar2, System.Data.ParameterDirection.Input)
+                        };
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList1.ToArray());
+                       
+                    }
+                }
+                msg = "Successfully Saved.";
+                tran.Commit();
+            }
+            catch (Exception ex)
+            {
+
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            //return msg;
+            return msg + "</ br > Data Saved !!!</ br > Please Save The Submission Number </ br >< b > "  + SubmissionNo + " </b>";
+        }
+    }
+}

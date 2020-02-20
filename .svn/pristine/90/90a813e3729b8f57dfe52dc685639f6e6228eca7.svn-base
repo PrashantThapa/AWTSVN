@@ -1,0 +1,70 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLVendor
+    {
+        public JsonResponse SaveVendor(ATTVendor objVendor, string appID, string modID)
+        {
+            JsonResponse response = new JsonResponse();
+
+            try
+            {
+                if (response.Message == "")
+                {
+
+                    DLLVendor dllVendor = new DLLVendor();
+                    response.Message = dllVendor.SaveVendor(objVendor,appID,modID);
+                    response.IsSucess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+
+        }
+
+        public JsonResponse GetVendor(Int16? vendorID)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLVendor objDll = new DLLVendor();
+            try
+            {
+                response.ResponseData = objDll.GetVendor(vendorID);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+
+        public JsonResponse GetVendorBySubmissionNo(Int64? submissionNo)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLVendor objDll = new DLLVendor();
+            try
+            {
+                response.ResponseData = objDll.GetVendorBySubmissionNo(submissionNo);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+    }
+}

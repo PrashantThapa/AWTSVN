@@ -1,0 +1,121 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEmployeeRawana
+    {
+        public string SaveEmployeeRawana(ATTEmployeeRawana objEmployeeRawana, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                if (objEmployeeRawana.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_EMP_RAWANA";
+                    msg = "Successfully Saved !!!";
+                }
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", null, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", objEmployeeRawana.EmpID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_DECISION_DATE", objEmployeeRawana.DecisionDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_RAWANA_TYPE", objEmployeeRawana.RawanaType, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", objEmployeeRawana.RawanaDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_TO_DATE", objEmployeeRawana.ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_REMARKS", objEmployeeRawana.Reason, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objEmployeeRawana.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objEmployeeRawana.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objEmployeeRawana.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList[0].Size = 50;
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    objEmployeeRawana.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+                    if (objEmployeeRawana.OldSubmissionNo != null)
+                    {
+                        DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                        dllUTV.SaveVerifyLog(tran, objEmployeeRawana.EntryBy, objEmployeeRawana.OldSubmissionNo, objEmployeeRawana.SubmissionNo, appID, modID);
+                    }
+                    paramList.Clear();
+                    tran.Commit();
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            return msg + "Data saved!</br> Please Note your submission number!!</br><b>" + objEmployeeRawana.SubmissionNo + "</b>";
+
+        }
+        public List<ATTEmployeeRawana> GetRawanaBySubNo(Int64? SubNo)
+        {
+            string SP = "";
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            try
+            {
+                SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_EMP_RAWANA";
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", SubNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                paramList[0].Size = 20;
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+                List<ATTEmployeeRawana> lstEmployeeRawana = new List<ATTEmployeeRawana>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTEmployeeRawana objEmployeeRawana = new ATTEmployeeRawana();
+                    objEmployeeRawana.SubmissionNo = string.IsNullOrEmpty(drow["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                    objEmployeeRawana.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString()); 
+                    objEmployeeRawana.EmployeeName = drow["EMP_NAME"].ToString();
+                    objEmployeeRawana.RawanaDate = drow["FROM_DATE"].ToString();
+                    objEmployeeRawana.ToDate = drow["TO_DATE"].ToString();
+                    objEmployeeRawana.Status = drow["R_STATUS"].ToString();
+                    objEmployeeRawana.EntryBy = drow["ENTRY_BY"].ToString();
+                    objEmployeeRawana.EntryDate = drow["ENTRY_DATE"].ToString();
+                    objEmployeeRawana.RawanaType = drow["RAWANA_TYPE"].ToString();
+                    objEmployeeRawana.DecisionDate = drow["DECISION_DATE"].ToString();
+                    objEmployeeRawana.Reason = drow["REMARKS"].ToString();
+                  
+                    lstEmployeeRawana.Add(objEmployeeRawana);
+                }
+                paramList.Clear();
+                return lstEmployeeRawana;
+
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+
+
+
+        }
+    }
+}

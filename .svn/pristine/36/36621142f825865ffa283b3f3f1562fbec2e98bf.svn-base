@@ -1,0 +1,63 @@
+﻿var CashFlowGroupRptViewModel = function () {
+    self.OfficeCode = ko.observable('');
+    self.OfficeName = ko.observable('');
+    self.FromDate = ko.observable('');
+    self.ToDate = ko.observable('');
+
+    self.officeCodeListGridView = new ko.simpleGrid.viewModel({
+        url: '/Handlers/FixedAssest/Setup/OrganizationSetupMain.ashx',
+        method: 'GetOfficeList',
+        columns: [
+                    { headerText: "Office Code", rowText: "OfficeCode" },
+                    { headerText: "Office Name", rowText: "OfficeName" }
+                ],
+        pageSize: 5
+    });
+
+    self.officeCodeListGridView.selectData = function (item) {
+        self.OfficeCode(item.OfficeCode);
+        self.OfficeName(item.OfficeName);
+    };
+
+    self.print = function () {
+        if (self.FromDate() == '') {
+            return SOSYS.message(self, "Please Enter From Date", "WARNING");
+        }
+        if (self.ToDate() != "") {
+            if (self.FromDate() > self.ToDate()) {
+                return SOSYS.message(self, "From Date should be Higher Than To Date", "WARNING");
+            }
+        }
+
+        SOSYS.confirmMessage(self, "Confirm to Print?", self.printCallBack);
+    };
+
+    self.printCallBack = function () {
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            method: 'get',
+            url: '/Handlers/ACCOUNT/Report/CashFlowGroupHandler.ashx',
+            data: { 'method': 'PrintReport', OfficeCode: self.OfficeCode(), OfficeName: self.OfficeName(), FromDate: self.FromDate, ToDate: self.ToDate(), 'token': SOSYS.getToken() },
+            contentType: "application/json;charset=utf-8",
+            success: function (result) {
+                if (result.IsSucess)
+                    window.open('/Modules/ACCOUNT/REPORT/ReportViewer.aspx', '_blank');
+            },
+            error: function (err) {
+                alert(err.status + " - " + err.statusText, "ERROR");
+            }
+        });
+    };
+
+    self.reset = function () {
+        self.OfficeCode('');
+        self.OfficeName('');
+        self.FromDate('');
+        self.ToDate('');
+    }
+}
+
+$(document).ready(function () {
+    ko.applyBindings(new CashFlowGroupRptViewModel());
+});

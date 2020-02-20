@@ -1,0 +1,207 @@
+﻿using System;
+using System.Collections.Generic;
+using Oracle.DataAccess.Client;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using HRFA.ATT.PIS;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEmployeeSearch
+	{
+		public List<ATTPISEmployee> SearchEmployee(ATTPISEmployee objEmployee)
+		{
+			GetConnection getConn = new GetConnection();
+			OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+			try
+			{
+				string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_SEARCH_EMP_DET";
+
+				{
+					List<OracleParameter> paramList = new List<OracleParameter>();
+					paramList.Add(SqlHelper.GetOraParam(":P_SYMBOL_NO", objEmployee.SymbolNo, OracleDbType.Varchar2, ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_FNAME_NEP", objEmployee.Person.FirstName, OracleDbType.Varchar2, ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_MNAME_NEP", objEmployee.Person.MiddleName, OracleDbType.Varchar2, ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_LNAME_NEP", objEmployee.Person.LastName, OracleDbType.Varchar2, ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_FNAME_ENG", objEmployee.Person.FirstNameEn, OracleDbType.Varchar2, ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_MNAME_ENG", objEmployee.Person.MiddleNameEn, OracleDbType.Varchar2, ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_LNAME_ENG", objEmployee.Person.LastNameEn, OracleDbType.Varchar2, ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", objEmployee.Office != null ? objEmployee.Office.OfficeCode : null, OracleDbType.Varchar2, ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_FORM_ID", objEmployee.FormID, OracleDbType.Varchar2, ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+					DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+					List<ATTPISEmployee> lstEmployee = new List<ATTPISEmployee>();
+					foreach (DataRow drow in ds.Tables[0].Rows)
+					{
+						ATTPISEmployee objEmp = new ATTPISEmployee();
+						objEmp.Person = new ATTPerson();
+						objEmp.Office = new ATTOffice();
+						objEmp.Post = new ATTPost();
+						objEmp.OfficeDarabandi = new ATTOfficePostDarbandi();
+						objEmp.EmpID = int.Parse(drow["EMP_ID"].ToString());
+						objEmp.SymbolNo = drow["SYMBOL_NO"].ToString();
+						objEmp.EmployeeName = drow["EMP_NAME"].ToString();
+						objEmp.Office.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+						objEmp.Office.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_CD"].ToString());
+						objEmp.Post.PostID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_ID"].ToString());
+						objEmp.Post.PostDesc = drow["POST_DESC"].ToString();
+						objEmp.OfficeDarabandi.PostSeq = string.IsNullOrEmpty(drow["POST_SEQ"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_SEQ"].ToString());
+						lstEmployee.Add(objEmp);
+					}
+
+					return lstEmployee;
+				}
+			}
+			catch (Exception ex)
+			{
+				throw (ex);
+			}
+			finally
+			{
+				getConn.CloseDbConn();
+			}
+		}
+
+		public List<ATTPISEmployee> SearchPortalEmployee(ATTPISEmployee objEmployee)
+		{
+			GetConnection getConn = new GetConnection();
+			OracleConnection conn = getConn.GetDbConn();
+			try
+			{
+				string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_SEARCH_EMP_DET";
+
+				List<OracleParameter> paramList = new List<OracleParameter>();
+				paramList.Add(SqlHelper.GetOraParam(":P_SYMBOL_NO", objEmployee.SymbolNo, OracleDbType.Varchar2, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_FNAME_NEP", objEmployee.Person.FirstName, OracleDbType.Varchar2, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_MNAME_NEP", objEmployee.Person.MiddleName, OracleDbType.Varchar2, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_LNAME_NEP", objEmployee.Person.LastName, OracleDbType.Varchar2, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_FNAME_ENG", objEmployee.Person.FirstNameEn, OracleDbType.Varchar2, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_MNAME_ENG", objEmployee.Person.MiddleNameEn, OracleDbType.Varchar2, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_LNAME_ENG", objEmployee.Person.LastNameEn, OracleDbType.Varchar2, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", objEmployee.Office.OfficeCode, OracleDbType.Varchar2, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_FORM_ID", objEmployee.FormID, OracleDbType.Varchar2, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+				DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+				List<ATTPISEmployee> lstEmployee = new List<ATTPISEmployee>();
+				foreach (DataRow drow in ds.Tables[0].Rows)
+				{
+					ATTPISEmployee objEmp = new ATTPISEmployee();
+					objEmp.Person = new ATTPerson();
+					objEmp.Office = new ATTOffice();
+					objEmp.Post = new ATTPost();
+					objEmp.OfficeDarabandi = new ATTOfficePostDarbandi();
+					objEmp.EmpID = int.Parse(drow["EMP_ID"].ToString());
+					objEmp.SymbolNo = drow["SYMBOL_NO"].ToString();
+					objEmp.EmployeeName = drow["EMP_NAME"].ToString();
+					objEmp.Office.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+					objEmp.Office.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_CD"].ToString());
+					objEmp.Post.PostID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_ID"].ToString());
+					objEmp.Post.PostDesc = drow["POST_DESC"].ToString();
+					objEmp.OfficeDarabandi.PostSeq = string.IsNullOrEmpty(drow["POST_SEQ"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_SEQ"].ToString());
+					lstEmployee.Add(objEmp);
+				}
+				return lstEmployee;
+			}
+			catch (Exception ex)
+			{
+				throw (ex);
+			}
+			finally
+			{
+				getConn.CloseDbConn();
+			}
+		}
+		public List<ATTPISEmployee> SearchOfficeEmployee(int officeCode, int? costCenterID, int? postID)
+		{
+			GetConnection getConn = new GetConnection();
+			OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+			try
+			{
+				string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_EMP_SEARCH";
+				List<OracleParameter> paramList = new List<OracleParameter>();
+				paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", officeCode, OracleDbType.Int32, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_COST_CENTER", costCenterID, OracleDbType.Int32, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_POST_ID", postID, OracleDbType.Int32, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+				DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+				List<ATTPISEmployee> lst = new List<ATTPISEmployee>();
+				foreach (DataRow drow in ds.Tables[0].Rows)
+				{
+					ATTPISEmployee objEmp = new ATTPISEmployee();
+					objEmp.Office = new ATTOffice();
+					objEmp.Post = new ATTPost();
+					objEmp.EmpID = int.Parse(drow["EMP_ID"].ToString());
+					objEmp.EmployeeName = drow["EMP_NAME"].ToString();
+					objEmp.Office.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_CD"].ToString());
+					objEmp.Post.PostID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_ID"].ToString());
+					objEmp.Post.PostDesc = drow["POST_DESC"].ToString();
+
+					lst.Add(objEmp);
+
+				}
+				return lst;
+			}
+			catch (Exception ex)
+			{
+
+				throw ex;
+			}
+			finally
+			{
+				getConn.CloseDbConn();
+			}
+
+
+		}
+
+		public List<ATTEmployeeAll> GetEmployeelist(int? PageNumber, int? PageSize)
+		{
+			{
+				GetConnection getConn = new GetConnection();
+				OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+				try
+				{
+					string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".GET_EMPLOYEE_ALL";
+					List<OracleParameter> paramList = new List<OracleParameter>();
+					paramList.Add(SqlHelper.GetOraParam(":P_PAGE_NUMBER", PageNumber, OracleDbType.Int32, ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_PAGE_SIZE", PageSize, OracleDbType.Int32, ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+					DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+					List<ATTEmployeeAll> lst = new List<ATTEmployeeAll>();
+					foreach (DataRow drow in ds.Tables[0].Rows)
+					{
+						ATTEmployeeAll objEmp = new ATTEmployeeAll();
+
+						objEmp.OfficeCode = int.Parse(drow["OFFICE_CD"].ToString());
+						objEmp.OfficeNameEng = drow["OFF_NAME_ENGLISH"].ToString();
+						objEmp.FnameNep = drow["FULL_NAME_ENGLISH"].ToString();
+						//objEmp.LnameNep = drow["LNAME_NEP"].ToString();
+
+						lst.Add(objEmp);
+
+					}
+					return lst;
+				}
+				catch (Exception ex)
+				{
+
+					throw ex;
+				}
+				finally
+				{
+					getConn.CloseDbConn();
+				}
+
+
+			}
+
+
+		}
+	}
+}

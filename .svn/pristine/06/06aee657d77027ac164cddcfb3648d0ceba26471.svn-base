@@ -1,0 +1,143 @@
+﻿using System;
+using System.Collections.Generic;
+using Oracle.DataAccess.Client;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+
+namespace HRFA.DataLayer
+{
+    public class DLLPersonQualification
+    {
+        public List<ATTPersonQualification> GetPersonQualifications(Int64? ID, Int32? seqNo, OracleConnection conn, bool isDirty = false)
+        {
+            List<ATTPersonQualification> lst = new List<ATTPersonQualification>();
+
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                string sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_PERSON_QUALIFICATION";
+
+                if (isDirty)
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_PERSON_QUALIFICATION";
+                }
+
+
+
+                paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", ID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_SEQNO", seqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    foreach (DataRow dr in ((DataTable)ds.Tables[0]).Rows)
+                    {
+
+                        ATTPersonQualification obj = new ATTPersonQualification();
+
+                        if (isDirty)
+                        {
+                            obj.Person.SubmissionNo = string.IsNullOrEmpty(dr["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(dr["SUBMISSION_NO"].ToString());
+                            obj.Person.SeqNo = string.IsNullOrEmpty(dr["SEQ_NO"].ToString()) ? (Int32?)null : Int32.Parse(dr["SEQ_NO"].ToString());
+                        }
+                        else
+                        {
+                            obj.Person.PID = string.IsNullOrEmpty(dr["SEQ_NO"].ToString()) ? (Int64?)null : Int64.Parse(dr["SEQ_NO"].ToString());
+                        }
+
+                        obj.Qualification.QualID =  string.IsNullOrEmpty(dr["QUAL_ID"].ToString()) ? (Int32?)null : Int32.Parse(dr["QUAL_ID"].ToString());
+                        obj.Qualification.QualName = dr["QUAL_NAME"].ToString();
+                        obj.Country.CountryCode = dr["COUNTRY_CD"].ToString();
+                        obj.Country.CountryName = dr["COUNTRY_NAME"].ToString();
+                        obj.Title = dr["TITLE"].ToString();
+                        obj.Institute = dr["INSTITUTE"].ToString();
+                        obj.Grade = dr["GRADE"].ToString();
+                        obj.Percentage =string.IsNullOrEmpty(dr["PERCENTAGE"].ToString()) ? (Double?)null : Double.Parse(dr["PERCENTAGE"].ToString());
+                        obj.MajorSubject = dr["MAJOR_SUBJECT"].ToString();
+                        obj.OptSubject = dr["OPTIONAL_SUBJECT"].ToString();
+                        obj.Remarks = dr["REMARKS"].ToString();
+                        obj.EduEquivalence = dr["EDUCATION_EQUIVALENCE"].ToString();
+                        obj.FromDate = dr["FROM_DATE"].ToString();
+                        obj.ToDate = dr["TO_DATE"].ToString();
+                        obj.EntryBy = dr["ENTRY_BY"].ToString();
+
+                        lst.Add(obj);
+
+                    }
+
+                }
+
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+        #region Dirty
+        public bool SaveDirtyPersonQualification(List<ATTPersonQualification> lst, Int64? submissionNo, Int32? seqNo, string entryBy, OracleTransaction tran)
+        {
+            try
+            {
+                string sp = "";
+
+                foreach (ATTPersonQualification objPersonQualification in lst)
+                {
+                    if (objPersonQualification.Action == "E")
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_EDIT_PER_QUALIFICATION";
+
+                    }
+                    else if (objPersonQualification.Action == "A")
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_PER_QUALIFICATION";
+
+                    }
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+
+                        paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", submissionNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_SEQ_NO", seqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_QUAL_ID", objPersonQualification.Qualification.QualID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_COUNTRY_CD", objPersonQualification.Country.CountryCode, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_INSTITUTE", objPersonQualification.Institute, OracleDbType.Varchar2, System.Data.ParameterDirection.InputOutput));
+                        paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", objPersonQualification.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_TO_DATE", objPersonQualification.ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_GRADE", objPersonQualification.Grade, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_PERCENTAGE", objPersonQualification.Percentage, OracleDbType.Double, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_MAJOR_SUBJECT", objPersonQualification.MajorSubject, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_OPTIONAL_SUBJECT", objPersonQualification.OptSubject, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_REMARKS", objPersonQualification.Remarks, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_EDUCATION_EQUIVALENCE", objPersonQualification.EduEquivalence, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objPersonQualification.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", null, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objPersonQualification.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_TITLE", objPersonQualification.Title, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                        paramList.Clear();
+
+                    }
+                   
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in Saving Person Qualification !!!" + ex.Message);
+            }
+        }
+        #endregion
+    }
+}

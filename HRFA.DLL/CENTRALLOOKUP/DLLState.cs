@@ -1,0 +1,177 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLState
+    {
+        public string SaveState(List<ATTState> lst)
+        {
+            string msg = "No Data To Save!!! ";
+            string SP = "";
+            string status = "";
+
+            foreach (ATTState obj in lst)
+            {
+
+                if (obj.Status == true)
+                {
+                    status = "A";
+                }
+                else
+                {
+                    status = "I";
+                }
+
+                if (obj.Action == "A")
+                {
+                    SP = "CPR_ADD_STATE";
+                    msg = "Successfully Saved.";
+                }
+                else
+                {
+                    SP = "CPR_EDIT_STATE";
+                    msg = "Successfully Updated.";
+                }
+
+
+                List<OracleParameter> paramlist = new List<OracleParameter>();
+
+                paramlist.Add(SqlHelper.GetOraParam(":P_STATE_CD ", obj.StateCD, OracleDbType.Int32, ParameterDirection.InputOutput));
+                paramlist.Add(SqlHelper.GetOraParam(":P_STATE_NAME_ENG", obj.StateNameEnglish, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_STATE_NAME_NEP", obj.StateNameNepali, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_STATUS", status, OracleDbType.Char, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_TO_DATE", null, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", obj.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+
+                GetConnection conn = new GetConnection();
+                OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+                OracleTransaction tran = dbConn.BeginTransaction();
+
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, SP, paramlist.ToArray());
+
+                    tran.Commit();
+
+                }
+
+
+                catch (Exception ex)
+                {
+                    tran.Rollback();
+                    throw new Exception("Error" + ex.Message);
+                }
+
+                finally
+                {
+
+                    conn.CloseDbConn();
+                }
+
+            }
+            return msg;
+        }
+        /// <summary>
+        /// This method Delete State
+        /// </summary>
+        /// <param name="statecd">Statecd to be deleted</param>
+        /// <returns>String as a Message about Delete State</returns>
+        /// 
+
+        public string DeleteState(int? statecd)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+
+            try
+            {
+                string SP = "CPR_DEL_STATE";
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":P_STATE_CD", statecd, OracleDbType.Int32, ParameterDirection.InputOutput));
+                ParamList.Add(SqlHelper.GetOraParam(":P_TO_DATE", null, OracleDbType.Date, ParameterDirection.Input));
+                SqlHelper.ExecuteNonQuery(dbConn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+                return "Deleted Successfully!!!";
+
+
+            }
+            catch (Exception ex)
+            {
+
+                return ex.Message;
+
+            }
+            finally
+            {
+
+                conn.CloseDbConn();
+            }
+
+        }
+        /// <summary>
+        /// Retrives a list of Occupation(s)
+        /// </summary>
+        /// <param name="statecd"></param>
+        /// <returns>State or Null if State does not exist</returns>
+
+        public List<ATTState> GetState(int? statecd)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+            List<ATTState> lst = new List<ATTState>();
+
+            try
+            {
+                string SP = "CPR_GET_STATE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":p_STATE_CD", statecd, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTState obj = new ATTState();
+                    obj.StateCD = Int32.Parse(drow["STATE_CD"].ToString());
+                    obj.StateNameNepali = drow["STATE_NAME_NEP"].ToString();
+                    obj.StateNameEnglish = drow["STATE_NAME_ENG"].ToString();
+
+                    if (drow["STATUS"].ToString() == "A")
+                    {
+                        obj.Status = true;
+                    }
+                    else
+                    {
+                        obj.Status = false;
+                    }
+                    obj.FromDate = drow["FROM_DATE"].ToString();
+                    obj.Action = "";
+                    lst.Add(obj);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+
+            return lst;
+        }
+    }
+}

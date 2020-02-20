@@ -1,0 +1,54 @@
+# pack-refs with: peeled fully-peeled sorted 
+60db0f31e129cfde0917386bc7e705770d53653b refs/remotes/origin/experimental-blob-support
+f0c26eee7f11a1f253477ff59c240563fbaa6364 refs/remotes/origin/feature-flow
+b015656a631c39dbf888930ea90f04dec9db1902 refs/remotes/origin/feature/builder
+ab75e17f4c1e0038fc024deb590fb5a4c99aee50 refs/remotes/origin/feature/icc_profiles
+d8c3d4258e94a800b4f0cfd0a36b1e4db00e02b6 refs/remotes/origin/feature/logo-test
+a1671405c098dc9393efba26fc6bb9759d1b99b1 refs/remotes/origin/feature/securityhandlers
+44f2534d7115b2b0945fb3b76e25cc9d4a2ebd2b refs/remotes/origin/feature/standard-js
+0eca25f0bc074b8ae8efcb23c6de8119b965ffbc refs/remotes/origin/feature/svg-html
+48d272f05f2a5b3608dbf2e775a60b686bd62338 refs/remotes/origin/greenkeeper/karma-jasmine-2.0.1
+7a6c82114c6bc809a43a5aeee094c4493ce77fab refs/remotes/origin/greenkeeper/rollup-0.67.3
+e7b8098182602a4bb1619f14f46663f5979b188e refs/remotes/origin/hotfix_ie_blur
+077c557972e46f271245e302451ccea3af1826b9 refs/remotes/origin/ie-shim
+f2cf12cd23108eb6cf03c334a10e9c37beba31f4 refs/remotes/origin/master
+99a4fde6d5dbce7fe88f7c534daa7efecde5dccc refs/remotes/origin/plugin/saveDialog
+49c934d564f004598a3a8147a9bb047abbeee9f2 refs/remotes/origin/plugin/templateEngine
+76ccc7a7812c4d57a2068ad5c449ed10777b25ad refs/remotes/origin/polyfill-test
+653f94aa5188b5eed26c355da21c78b7c048c877 refs/tags/1.1.135
+aac406f626e0af075f3024cd8738f3c2182e450b refs/tags/1.3.4
+16887f832521767aa662d512298126bb2d600cf4 refs/tags/v.1.4.0
+f3a34f8bf55ccdf40a1ca9918a9db428fde258a6 refs/tags/v0.9.0
+^4fc26f526b08ab3df79ea80ae1dd5cef74c773dc
+22e8b4c99f168e4738ba72d1b951cf981a002f6d refs/tags/v1.0.106
+aec0c91d0872f899f9f1851991324bcb008bc6ed refs/tags/v1.0.115
+460f63e792436b463bc03d7a1f2317c2113c23b5 refs/tags/v1.0.116
+^b24434864dc733386e02e7862d0eacc361edcf15
+6739c1ff3a765f6b0ee40b2974a7aa3ae5d2adc6 refs/tags/v1.0.119
+^4c6949394c1ffaf86d448e5e962f315559deb000
+abad6240034d5f9efed85e14161666eb3b7ab51d refs/tags/v1.0.138
+^aed93c35eff51a0c032627af3241b5f2c4311fc7
+af288bfd1bd795d3dbc0415cc07ce74bc9e92e51 refs/tags/v1.0.150
+^75d18af849972d8826b7b0c5e6b65c7d868803a1
+28df44b7538076299a7e82d7a6c60658e2326ebd refs/tags/v1.0.178
+^da257c28e70df11e68e9887ddf0dab7bb19902f5
+1e722ff71d569b8e56a02f6223569f7c195ebd4e refs/tags/v1.0.272
+^43eb0811568aae12c5258326921d7cda06424d59
+04343b54b04a573512abe948cd80ef9a86c271a8 refs/tags/v1.2.60
+5e8bd00e640653048554e9474f157ba4479dd669 refs/tags/v1.2.61
+13474e23a863131b4e928857aaf8bbfb2f1de28d refs/tags/v1.3.0
+^32d2675cf566feaece7747e429880495baba6bdf
+3d79799e6f56fd32f40a02c3af8623d0d3dfc69c refs/tags/v1.3.1
+^7d854cc77ddf6006d2928d57c2788f4bebaf9ddf
+5cccca5adda1da5a18171bbb7c31bf1413e543c6 refs/tags/v1.3.2
+^5a5f4b6fb4221edb6da147de3fb9500fe886805b
+e73770a88d751848624c2cc6bdbcdd91e8467e20 refs/tags/v1.3.3
+^ac12a246456496d509be585d0fa504da55aef96e
+407e72dbcabe7486e64cbc6d69f57e0ce40b88d4 refs/tags/v1.3.4
+^938a6bcfc8468ff383c2a02e50e6e3022ff253bd
+ff30727c294bc1e91f4eeac97bf73108f4794c84 refs/tags/v1.3.5
+^626d79aab76d85ae987f88081f7aabb7c1f2e61c
+3506e5bfd0ff5723d5b7517954673eb4ec1b4267 refs/tags/v1.4.0
+^16887f832521767aa662d512298126bb2d600cf4
+24f150827e0c77b2c84f70310a7d580142e6f188 refs/tags/v1.4.1
+^eb6f0424855fc5cf790178572a19f277e1ca5107

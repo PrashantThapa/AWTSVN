@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLItem
+    {
+        public JsonResponse GetItem(Int16? itemID)
+        {
+            JsonResponse response = new JsonResponse();
+            List<ATTItem> lst = new List<ATTItem>();
+            DLLItem dllItem = new DLLItem();
+            try
+            {
+                lst = dllItem.GetItem(itemID);
+
+                response.ResponseData = lst;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+            return response;
+
+        }
+    }
+}

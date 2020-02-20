@@ -1,0 +1,18 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTBudgetItem
+    {
+       public Int64? BudgetItemID { get; set; }
+       public string BudgetItemName { get; set; }
+       public string BudgetItemEng { get; set; }
+       public string Status { get; set; }
+       public string FromDate { get; set; }
+       public string ToDate { get; set; }
+       public string EntryBy { get; set; }
+       public string EntryDate { get; set; }
+
+       public string Action { get; set; }
+    }
+}

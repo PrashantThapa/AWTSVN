@@ -1,0 +1,116 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.BLL.REPORTING;
+using HRFA.COMMON;
+
+namespace HRFA.Handlers.CENTRALLOOKUP
+{
+    /// <summary>
+    /// Summary description for OfficeHandler
+    /// </summary>
+    public class OfficeHandler : BaseHandler
+    {
+
+        public object GetAllOffice(Int32? officeCode)
+        {
+
+            BLLOffice obj = new BLLOffice();
+            //ATTOffice offcode = JsonUtility.DeSerialize(args, typeof(ATTOffice)) as ATTOffice;
+
+            //List<ATTOffice> lst = obj.GetAllOffice();
+            List<ATTOffice> lst = new List<ATTOffice>();
+
+            JsonResponse response = new JsonResponse
+            {
+                ResponseData = lst
+            };
+            try
+            {
+                response.Message = "Success";
+                response.ResponseData = obj.GetAllOffice(officeCode);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+
+		public object DeleteOffice(Int32? officeCode)
+		{
+			JsonResponse response = new JsonResponse();
+
+			BLLOffice bLLOffice = new BLLOffice();
+
+			//if (token == CurrentToken())
+			//{
+			response = bLLOffice.DeleteOffice(officeCode);
+			//}
+			//else
+			//{
+			//    response.Message = "Suspicious Activity !!!";
+			//    response.IsSucess = false;
+			//    response.IsToken = false;
+			//}
+
+			return JsonUtility.Serialize(response);
+
+		}
+
+
+		public object SaveOffice(string args)
+        {
+            BLLOffice objOfficeBLL = new BLLOffice();
+            ATTOffice objOffice = (ATTOffice)JsonUtility.DeSerialize(args, typeof(ATTOffice));
+            JsonResponse response = new JsonResponse();
+            try
+            {
+                
+                response.Message = objOfficeBLL.SaveOffice(objOffice);
+                //response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            
+            }
+            return JsonUtility.Serialize(response);
+        }
+
+
+        public object GetPortalOffice(Int32? officeCode)
+        {
+
+            BLLOffice obj = new BLLOffice();
+            //ATTOffice offcode = JsonUtility.DeSerialize(args, typeof(ATTOffice)) as ATTOffice;
+
+            //List<ATTOffice> lst = obj.GetAllOffice();
+            List<ATTOffice> lst = new List<ATTOffice>();
+
+            JsonResponse response = new JsonResponse
+            {
+                ResponseData = lst
+            };
+            try
+            {
+                response.Message = "Success";
+                response.ResponseData = obj.GetPortalOffice(officeCode);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+    }
+
+        
+    }

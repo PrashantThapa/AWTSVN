@@ -1,0 +1,104 @@
+﻿function Office(data) {
+    var self = this;
+    self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+    self.OfficeCode = ko.observable(data.OfficeCode);
+}
+
+function VoucherGroup(data) {
+    var self = this;
+    self.VoucherGroupID = ko.observable(data.VoucherGroupID);
+    self.VoucherGroupDesc = ko.observable(data.VoucherGroupDesc);
+}
+
+function OfficeTransactionViewModel() {
+    var self = this;
+
+    self.OfficeArray = ko.observable([]);
+    self.VoucherGroups = ko.observableArray([]);
+
+    self.SelectedOffice = ko.observable();
+    self.SelectedVGroup = ko.observable();
+
+    self.GetOffice = function () {
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/CENTRALLOOKUP/OfficeHandler.ashx',
+            data: { 'method': 'GetAllOffice', 'args': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new Office(item)
+
+                });
+                self.OfficeArray(mappedTask);
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+
+    };
+
+    self.GetVoucherGroup = function () {
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/ACCOUNT/OfficeVoucherTranHandler.ashx',
+            data: { 'method': 'GetVoucherGroup'},
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new VoucherGroup(item)
+
+                });
+                self.VoucherGroups(mappedTask);
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+
+    };
+
+    self.GetOffice();
+    self.GetVoucherGroup();
+
+    self.Go = function () {
+        var errMsg = "";
+        if (self.SelectedOffice() == undefined) {
+            errMsg += "Please Select Office !!!<br>";
+        }
+        else {
+            if (self.SelectedVGroup() == undefined) {
+                errMsg += "Please Select Voucher Group !!!<br>";
+            }
+
+        }
+
+
+        if (errMsg == "") {
+
+            window.location = window.location.origin + "/Modules/ACCOUNTS/OfficeVoucherTransaction.aspx?CompanyName=" + ko.toJS(self.SelectedOffice).OfficeCode + "." + ko.toJS(self.SelectedOffice).OfficeNameNep + "." + ko.toJS(self.SelectedVGroup()).VoucherGroupID + "." + ko.toJS(self.SelectedVGroup()).VoucherGroupDesc;
+
+        }
+        else {
+            msg(errMsg, "Warning", "Warning");
+        }
+
+
+    }
+}
+
+$(document).ready(function () {
+    ValidateSession();
+    ko.applyBindings(new OfficeTransactionViewModel());
+});

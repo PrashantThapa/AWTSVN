@@ -1,0 +1,190 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEthinicity
+    {
+        /// <summary>
+        /// This method Save/Update Ethinicity Type
+        /// </summary>
+        /// <param name="lst"></param>
+        /// <returns>String as a Message about Save/Update Ethinicity Type</returns>
+        /// 
+        public string SaveEthinicity(List<ATTEthinicity> lst)
+        {
+            string msg = "No Data To Save!!! ";
+            string SP = "";
+
+
+            string status = "";
+
+            foreach (ATTEthinicity obj in lst)
+            {
+
+                if (obj.EthStatus == true)
+                {
+                    status = "A";
+                }
+                else
+                {
+                    status = "I";
+                }
+
+                if (obj.Action == "A")
+                {
+                    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_ETHNICITY";
+                    msg = "Successfully Saved.";
+                }
+                else
+                {
+                    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_ETHNICITY";
+                    msg = "Successfully Updated.";
+                }
+
+
+
+                //if (SP != "")
+                //{
+                //obj.EntryBy = "SOSYS_MAIN";
+
+                List<OracleParameter> paramlist = new List<OracleParameter>();
+
+                paramlist.Add(SqlHelper.GetOraParam(":p_ETHNICITY_ID ", obj.EthTypeID, OracleDbType.Int32, ParameterDirection.InputOutput));
+                paramlist.Add(SqlHelper.GetOraParam(":p_ETHNICITY_NAME", obj.EthTypeName, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_ETHNICITY_NAME_ENG", obj.EthTypeNameEng, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_STATUS", status, OracleDbType.Char, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_FROM_DATE", obj.EthFromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", obj.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+
+                // }
+                GetConnection conn = new GetConnection();
+                OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+                OracleTransaction tran = dbConn.BeginTransaction();
+
+
+                try
+                {
+
+                    SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, SP, paramlist.ToArray());
+                    tran.Commit();
+
+                }
+             catch (Exception ex)
+                {
+                    tran.Rollback();
+                    throw new Exception("Error" + ex.Message);
+                }
+
+                finally
+                {
+
+                    conn.CloseDbConn();
+                }
+            }
+                return msg;
+
+           
+        }
+
+        /// <summary>
+        /// This method Delete Ethinicity Type
+        /// </summary>
+        /// <param name="ethtypeid">ethtypeid to be deleted</param>
+        /// <returns>String as a Message about Delete Ethinicity Type</returns>
+        ///
+        public string DeleteEthinicity(int? ethtypeid)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_DEL_ETHNICITY";
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":p_ETHNICITY_ID", ethtypeid, OracleDbType.Int32, ParameterDirection.InputOutput));
+                ParamList.Add(SqlHelper.GetOraParam(":P_TO_DATE", null, OracleDbType.Date, ParameterDirection.Input));
+                SqlHelper.ExecuteNonQuery(dbConn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+                return "Deleted Successfully!!!";
+
+
+            }
+            catch (Exception ex)
+            {
+
+                return ex.Message;
+
+            }
+            finally
+            {
+
+                conn.CloseDbConn();
+            }
+
+        }
+
+        /// <summary>
+        /// Retrives a list of Ethinicity Type(s)
+        /// </summary>
+        /// <param name="ethtypeid"></param>
+        /// <returns>Ethinicity Type or Null if Ethinicity Type does not exist</returns>
+        /// 
+        public List<ATTEthinicity> GetEthinicity(int? ethtypeid)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+            List<ATTEthinicity> lst = new List<ATTEthinicity>();
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_ETHNICITY";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":p_ETHNICITY_ID", ethtypeid, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTEthinicity obj = new ATTEthinicity();
+                    obj.EthTypeID = Int32.Parse(drow["ETH_ID"].ToString());
+                    obj.EthTypeName = drow["ETH_NAME"].ToString();
+                    obj.EthTypeNameEng = drow["ETH_NAME_ENG"].ToString();
+
+                    if (drow["STATUS"].ToString() == "A")
+                    {
+                        obj.EthStatus = true;
+                    }
+                    else
+                    {
+                        obj.EthStatus = false;
+                    }
+                    obj.EthFromDate = drow["FROM_DATE"].ToString();
+                    obj.Action = "";
+                    lst.Add(obj);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+
+            return lst;
+        }
+
+    }
+}

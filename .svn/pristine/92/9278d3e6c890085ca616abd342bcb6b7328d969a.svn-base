@@ -1,0 +1,239 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A1C8A236-8A67-4315-A9C9-548F3223DA7B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HRFA.BLL</RootNamespace>
+    <AssemblyName>HRFA.BLL</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ACCOUNT\BLLACCEmployee.cs" />
+    <Compile Include="ACCOUNT\BLLAccountChart.cs" />
+    <Compile Include="ACCOUNT\BLLCompany.cs" />
+    <Compile Include="ACCOUNT\BLLGLGroup.cs" />
+    <Compile Include="ACCOUNT\BLLOfficeCompanyAccChart.cs" />
+    <Compile Include="ACCOUNT\BLLOfficeTran.cs" />
+    <Compile Include="ACCOUNT\BLLOfficeVoucherTran.cs" />
+    <Compile Include="ACCOUNT\BLLSchedule.cs" />
+    <Compile Include="ACCOUNT\BLLSubsidaryAC.cs" />
+    <Compile Include="ALMS\BLLAttendence.cs" />
+    <Compile Include="ALMS\BLLBalanceLeaveType.cs" />
+    <Compile Include="ALMS\BLLDeviceRegistration.cs" />
+    <Compile Include="ALMS\BLLHolidays.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLAddressType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLAppointmentType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLBank.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLBankAccount.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLBFICapital.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLCategory.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLContactType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLCountry.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLDesignation.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLDistrict.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLDocumentType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLEmployerType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLEmploymentType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLEthinicity.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLFiscalYear.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLLanguage.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLLiteracyType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLLoanType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLMaritalStatus.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLMarkingType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLMedicalAtt.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLOffice.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLOTSetting.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLPosition.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLProvince.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLProduct.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLQualification.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLRelationType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLReligionType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLServiceType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLSkillType.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLState.cs" />
+    <Compile Include="CENTRALLOOKUP\BLLVDC.cs" />
+    <Compile Include="COMMON\BLLDate.cs" />
+    <Compile Include="COMMON\BLLDepartment.cs" />
+    <Compile Include="COMMON\BLLLeaveType.cs" />
+    <Compile Include="COMMON\BLLLevel.cs" />
+    <Compile Include="COMMON\BLLOfficePost.cs" />
+    <Compile Include="COMMON\BLLOfficePostDarbandi.cs" />
+    <Compile Include="COMMON\BLLPortalLogin.cs" />
+    <Compile Include="COMMON\BLLPost.cs" />
+    <Compile Include="COMMON\BLLPostWiseLeaveType.cs" />
+    <Compile Include="COMMON\BLLSamuha.cs" />
+    <Compile Include="COMMON\BLLSewa.cs" />
+    <Compile Include="COMMON\BLLShift.cs" />
+    <Compile Include="COMMON\BLLSubmission.cs" />
+    <Compile Include="COMMON\BLLUpaSamuha.cs" />
+    <Compile Include="FAMS\BLLBlanketPurchase.cs" />
+    <Compile Include="FAMS\BLLBudgetApprove.cs" />
+    <Compile Include="FAMS\BLLBudgetItem.cs" />
+    <Compile Include="FAMS\BLLBudgetRelease.cs" />
+    <Compile Include="FAMS\BLLBudgetRequest.cs" />
+    <Compile Include="FAMS\BLLBudgetTransfer.cs" />
+    <Compile Include="FAMS\BLLCostCenter.cs" />
+    <Compile Include="FAMS\BLLFAMCategory.cs" />
+    <Compile Include="FAMS\BLLItem.cs" />
+    <Compile Include="FAMS\BLLPurchaseOrder.cs" />
+    <Compile Include="FAMS\BLLSalarySheet.cs" />
+    <Compile Include="FAMS\BLLType.cs" />
+    <Compile Include="FAMS\BLLUnit.cs" />
+    <Compile Include="FAMS\BLLVendor.cs" />
+    <Compile Include="PAYROLL\BLLAllowance.cs" />
+    <Compile Include="PAYROLL\BLLEmpGrade.cs" />
+    <Compile Include="PAYROLL\BLLEmpSalaryItem.cs" />
+    <Compile Include="PAYROLL\BLLEmpSalaryItemRate.cs" />
+    <Compile Include="PAYROLL\BLLEmpSalaryPayment.cs" />
+    <Compile Include="PAYROLL\BLLEmpSalarySheet.cs" />
+    <Compile Include="PAYROLL\BLLExtraAllowance.cs" />
+    <Compile Include="PAYROLL\BLLGrades.cs" />
+    <Compile Include="PAYROLL\BLLGradeScaleSetup.cs" />
+    <Compile Include="PAYROLL\BLLPayrollEmployeeSalaryRep.cs" />
+    <Compile Include="PAYROLL\BLLPayrollEmpSalaryPayment.cs" />
+    <Compile Include="PAYROLL\BLLPayrollEmpSalaryReport.cs" />
+    <Compile Include="PAYROLL\BLLPayrollSalarySheetAdjustment.cs" />
+    <Compile Include="PAYROLL\BLLSalaryParameter.cs" />
+    <Compile Include="PAYROLL\BLLShowAttendance.cs" />
+    <Compile Include="PAYROLL\BLLTiming.cs" />
+    <Compile Include="PIS\BLLAppraisal.cs" />
+    <Compile Include="PIS\BLLGetDepartmentList.cs" />
+    <Compile Include="REPORTING\BLLPayslip.cs" />
+    <Compile Include="PAYROLL\BLLPostWiseSalaryItem.cs" />
+    <Compile Include="PAYROLL\BLLSalaryItem.cs" />
+    <Compile Include="PIS\BLLAppointment.cs" />
+    <Compile Include="PIS\BLLAward.cs" />
+    <Compile Include="PIS\BLLDeputation.cs" />
+    <Compile Include="PIS\BLLDeputationReturn.cs" />
+    <Compile Include="PIS\BLLEmpConfirmation.cs" />
+    <Compile Include="PIS\BLLEmpDeptCostAssign.cs" />
+    <Compile Include="PIS\BLLEmpLeaveApplication.cs" />
+    <Compile Include="PIS\BLLEmployee.cs" />
+    <Compile Include="PIS\BLLEmployeeAttendance.cs" />
+    <Compile Include="PIS\BLLEmployeeDevice.cs" />
+    <Compile Include="PIS\BLLEmployeeRawana.cs" />
+    <Compile Include="PIS\BLLEmployeeSearch.cs" />
+    <Compile Include="PIS\BLLEmployeeTransfer.cs" />
+    <Compile Include="PIS\BLLEmpPosting.cs" />
+    <Compile Include="PIS\BLLLeaveApprovedRecommend.cs" />
+    <Compile Include="PIS\BLLLeaveCancellation.cs" />
+    <Compile Include="PIS\BLLPromotion.cs" />
+    <Compile Include="PIS\BLLPunishment.cs" />
+    <Compile Include="PIS\BLLResignation.cs" />
+    <Compile Include="PIS\BLLRetirement.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="REPORTING\BLLRepAttendence.cs" />
+    <Compile Include="REPORTING\BLLRepEmployee.cs" />
+    <Compile Include="REPORTING\BLLRepEmployeeHist.cs" />
+    <Compile Include="REPORTING\BLLRepEmployeeQualification.cs" />
+    <Compile Include="REPORTING\BLLRepHoliday.cs" />
+    <Compile Include="REPORTING\BLLRepLeave.cs" />
+    <Compile Include="REPORTING\BLLRepLeaveDetail.cs" />
+    <Compile Include="REPORTING\BLLRepOfficeInfo.cs" />
+    <Compile Include="REPORTING\BLLRepOfficePost.cs" />
+    <Compile Include="REPORTING\BLLRepPayRoll.cs" />
+    <Compile Include="REPORTING\BLLRepShiftSchedule.cs" />
+    <Compile Include="REPORTING\BLLRepShiftWiseInfo.cs" />
+    <Compile Include="REPORTING\BLLRepOfficePostReport.cs" />
+    <Compile Include="SECURITY\BLLApplicationRole.cs" />
+    <Compile Include="SECURITY\BLLModuleFunction.cs" />
+    <Compile Include="SECURITY\BLLRole.cs" />
+    <Compile Include="SECURITY\BLLRoleModuleFunction.cs" />
+    <Compile Include="SECURITY\BLLSECApplication.cs" />
+    <Compile Include="SECURITY\BLLUser.cs" />
+    <Compile Include="SECURITY\BLLUserDesignation.cs" />
+    <Compile Include="VERIFICATION\BLLApplication.cs" />
+    <Compile Include="VERIFICATION\BLLModule.cs" />
+    <Compile Include="VERIFICATION\BLLModuleVerification.cs" />
+    <Compile Include="VERIFICATION\BLLUserTranVerification.cs" />
+    <Compile Include="VERIFICATION\BLLUserVerification.cs" />
+    <Compile Include="VERIFICATION\BLLVerificationModule.cs" />
+    <Compile Include="VERIFICATION\OracleException.cs" />
+    <Compile Include="WFMS\BLLDeptWiseShift.cs" />
+    <Compile Include="WFMS\BLLEmployeeShiftAssignment.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HRFA.ATT\HRFA.ATT.csproj">
+      <Project>{b4e4872e-4169-40fc-85c6-b94fadce8bf4}</Project>
+      <Name>HRFA.ATT</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HRFA.COMMON\HRFA.COMMON.csproj">
+      <Project>{80c785e4-3e93-42c2-94d8-c10acaeb56f9}</Project>
+      <Name>HRFA.COMMON</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HRFA.DLL\HRFA.DataLayer.csproj">
+      <Project>{5186634f-7a0e-4093-a5a4-1dc382182974}</Project>
+      <Name>HRFA.DataLayer</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

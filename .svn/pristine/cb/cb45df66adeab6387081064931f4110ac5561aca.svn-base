@@ -1,0 +1,1 @@
+﻿<%@ WebHandler Language="C#" CodeBehind="BudgetReleaseHandler.ashx.cs" Class="HRFA.Handlers.FAMS.BudgetReleaseHandler" %>

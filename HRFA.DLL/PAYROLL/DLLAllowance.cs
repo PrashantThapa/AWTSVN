@@ -1,0 +1,186 @@
+﻿using HRFA.ATT;
+using HRFA.COMMON;
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLAllowance
+    {
+        public string SaveAllowance(List<ATTAllowance> allowances, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";            
+            Int64? submissionNo = null;
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {         
+                foreach (ATTAllowance objAll in allowances)
+                {
+                    sp = "DCPR_ADD_AllOWANCE";
+                    msg = "Successfully Saved.";
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>
+                        {
+                            SqlHelper.GetOraParam(":P_SUBMISSION_NO", submissionNo, OracleDbType.Int64, ParameterDirection.InputOutput),
+                            SqlHelper.GetOraParam(":P_FISCAL_YEAR", objAll.SelectedFiscalYear, OracleDbType.Varchar2, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_SALARY_ITEM_ID", objAll.Salary_ItemId, OracleDbType.Int32, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_ITEM_AMOUNT", objAll.Item_Amount, OracleDbType.Decimal, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_EMP_ID", objAll.EmpId, OracleDbType.Int32, ParameterDirection.InputOutput),
+                            SqlHelper.GetOraParam(":P_A_STATUS", objAll.AStatus, OracleDbType.Varchar2, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_REMARKS", objAll.Remarks, OracleDbType.Varchar2, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":p_ENTRY_BY", objAll.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":p_ENTRY_DATE", null, OracleDbType.Date, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_R_STATUS", objAll.RStatus, OracleDbType.Varchar2, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":P_Month", objAll.AllowanceMonth, OracleDbType.Int32, ParameterDirection.Input)
+                        };
+                        paramList[0].Size = 20;
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());                       
+                        submissionNo = Int64.Parse(paramList[0].Value.ToString());
+                       
+                        paramList.Clear();
+                    }
+                }                
+                tran.Commit();
+
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            //return msg;
+            return msg + "Data saved! Please Note your submission number!!" + submissionNo + "</b>";
+        }
+
+        public object LoadMonthlyAllowance(string empID, string fiscalYear)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+
+            try
+            {
+                string SP = "CPR_GET_MONTHLYALLOWANCE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_FISCAL_YEAR", fiscalYear, OracleDbType.Varchar2, ParameterDirection.Input));
+                if (empID != null && empID != "")
+                {
+                    paramList.Add(SqlHelper.GetOraParam(":P_EMP_ID", empID, OracleDbType.Int32, ParameterDirection.Input));
+                }
+                else
+                {
+                    paramList.Add(SqlHelper.GetOraParam(":P_EMP_ID", null, OracleDbType.Int32, ParameterDirection.Input));
+                }
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTAllowance> lst = new List<ATTAllowance>();
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTAllowance objAllowance = new ATTAllowance();
+                    objAllowance.SubmissionNo = DBNull.Value.Equals(drow["SUBMISSION_NO"]) ? (long?)null : Convert.ToInt64(drow["SUBMISSION_NO"]);
+                    objAllowance.EmpId = DBNull.Value.Equals(drow["EMP_ID"]) ? (Int32?)null :Convert.ToInt32(drow["EMP_ID"]);
+                    objAllowance.OldSubmissionNo = DBNull.Value.Equals(drow["SUBMISSION_NO"]) ? (long?)null : Convert.ToInt64(drow["SUBMISSION_NO"]);
+                    objAllowance.Salary_ItemId =  Convert.ToInt32(drow["SALARY_ITEM_ID"]);
+                    objAllowance.Item_Amount = Convert.ToDecimal(drow["ITEM_AMOUNT"]);
+                    objAllowance.AStatus = DBNull.Value.Equals(drow["A_STATUS"]) ? string.Empty : drow["A_STATUS"].ToString();
+                    objAllowance.Remarks = DBNull.Value.Equals(drow["REMARKS"]) ? string.Empty : drow["REMARKS"].ToString();
+                    objAllowance.EntryBy = DBNull.Value.Equals(drow["ENTRY_BY"]) ? string.Empty : drow["ENTRY_BY"].ToString();
+                    objAllowance.EntryDate = Convert.ToDateTime(drow["ENTRY_DATE"]);
+                    objAllowance.RStatus = DBNull.Value.Equals(drow["R_STATUS"]) ? string.Empty : drow["R_STATUS"].ToString();
+                    objAllowance.AllowanceMonth = DBNull.Value.Equals(drow["ALLOWANCE_MONTH"]) ? (Int32?)null :Convert.ToInt32(drow["ALLOWANCE_MONTH"]);
+                    
+                    lst.Add(objAllowance);
+                }
+              
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+        public object LoadYealyAllowance(string fiscalYear)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+
+            try
+            {
+                string SP = "CPR_GET_YEARLYALLOWANCE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_FISCAL_YEAR", fiscalYear, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTAllowance> lst = new List<ATTAllowance>();
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTAllowance objAllowance = new ATTAllowance();
+                    objAllowance.SubmissionNo = DBNull.Value.Equals(drow["SUBMISSION_NO"]) ? (long?)null : Convert.ToInt64(drow["SUBMISSION_NO"]);
+                    objAllowance.EmpId = DBNull.Value.Equals(drow["EMP_ID"]) ? (Int32?)null : Convert.ToInt32(drow["EMP_ID"]);
+                    objAllowance.OldSubmissionNo = DBNull.Value.Equals(drow["SUBMISSION_NO"]) ? (long?)null : Convert.ToInt64(drow["SUBMISSION_NO"]);
+                    objAllowance.Salary_ItemId = Convert.ToInt32(drow["SALARY_ITEM_ID"]);
+                    objAllowance.Item_Amount = Convert.ToDecimal(drow["ITEM_AMOUNT"]);
+                    objAllowance.AStatus = DBNull.Value.Equals(drow["A_STATUS"]) ? string.Empty : drow["A_STATUS"].ToString();
+                    objAllowance.Remarks = DBNull.Value.Equals(drow["REMARKS"]) ? string.Empty : drow["REMARKS"].ToString();
+                    objAllowance.EntryBy = DBNull.Value.Equals(drow["ENTRY_BY"]) ? string.Empty : drow["ENTRY_BY"].ToString();
+                    objAllowance.EntryDate = Convert.ToDateTime(drow["ENTRY_DATE"]);
+                    objAllowance.RStatus = DBNull.Value.Equals(drow["R_STATUS"]) ? string.Empty : drow["R_STATUS"].ToString();
+                    objAllowance.AllowanceMonth = DBNull.Value.Equals(drow["ALLOWANCE_MONTH"]) ? (Int32?)null : Convert.ToInt32(drow["ALLOWANCE_MONTH"]);
+                    lst.Add(objAllowance);
+                }
+
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+    }
+    
+}

@@ -1,0 +1,313 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEmployee
+    {
+        public string SaveEmployee(ATTPISEmployee objEmployee,string appID, string modID)
+        {
+            string sp = "";
+            string msg="";
+            bool isDirty = false;
+
+            if (objEmployee.Source == "DIRTY")
+            {
+                isDirty = true;
+            }
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+			DLLPerson dllPerson = new DLLPerson();
+            dllPerson.SavePerson(objEmployee.Person, tran);
+
+            objEmployee.SubmissionNo = objEmployee.Person.SubmissionNo;
+            objEmployee.SequenceNo = objEmployee.Person.SeqNo;
+
+            try
+            {
+                if (objEmployee.Action == "E")
+                {
+                    sp = "DCPR_EDIT_EMPLOYEE";
+                    msg = "Successfully Updated.";
+                }
+                else if (objEmployee.Action == "A")
+                {
+                    sp = "DCPR_ADD_EMPLOYEE";
+                    msg = "Successfully Submitted.";
+
+                }
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>
+                    {
+                        SqlHelper.GetOraParam(":p_SUBMISSION_NO", objEmployee.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_SEQ_NO", objEmployee.SequenceNo, OracleDbType.Int64, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_SYMBOL_NO", objEmployee.SymbolNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_ORG_EMP_NO", objEmployee.OrgEmpNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_IDENTITY_MARK", objEmployee.IdentityMark, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_ENTRY_BY", objEmployee.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_ENTRY_DATE", null, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_PROVIDENT_FUND_NO", objEmployee.PFNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_CIT_NO", objEmployee.NLKNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_PAN_NO", objEmployee.PanNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_R_STATUS", objEmployee.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input)
+                    };
+
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                    if (objEmployee.OldSubmissionNo != null && objEmployee.Action != "E")
+                    {
+                        DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                        dllUTV.SaveVerifyLog(tran, objEmployee.EntryBy, objEmployee.OldSubmissionNo, objEmployee.SubmissionNo, appID, modID);
+                    }
+
+                    paramList.Clear();
+
+
+                    #region Employee Training
+
+                    if (objEmployee.EmployeeTraining != null && objEmployee.EmployeeTraining.Count > 0)
+                    {
+                        DLLEmployeeTraining dllTraining = new DLLEmployeeTraining();
+                        for (int i = 0; i < objEmployee.EmployeeTraining.Count; i++)
+                        {
+                            objEmployee.EmployeeTraining[i].Status = objEmployee.Status;
+                        }
+                        if (isDirty)
+                        {
+                            dllTraining.SaveDirtyEmployeeTraining(objEmployee.EmployeeTraining, objEmployee.SubmissionNo, objEmployee.SequenceNo, objEmployee.EntryBy, tran);
+                        }
+                        else
+                        {
+                        }
+                    }
+
+                    #endregion
+
+                    #region Employee Experience
+
+                    if (objEmployee.EmployeeExperience != null && objEmployee.EmployeeExperience.Count > 0)
+                    {
+                        DLLEmployeeExperience dllExperience = new DLLEmployeeExperience();
+                        for (int i = 0; i < objEmployee.EmployeeExperience.Count; i++)
+                        {
+                            objEmployee.EmployeeExperience[i].RStatus = objEmployee.Status;
+                        }
+                        if (isDirty)
+                        {
+                            dllExperience.SaveDirtyEmployeeExperience(objEmployee.EmployeeExperience, objEmployee.SubmissionNo, objEmployee.SequenceNo, objEmployee.EntryBy, tran);
+                        }
+                        else
+                        {
+                        }
+                    }
+
+                    #endregion
+
+                    #region Employee Insurance
+
+                    if (objEmployee.EmployeeInsurance != null && objEmployee.EmployeeInsurance.Count > 0)
+                    {
+                        DLLEmployeeInsurance dllInsurance = new DLLEmployeeInsurance();
+                        for (int i = 0; i < objEmployee.EmployeeInsurance.Count; i++)
+                        {
+                            objEmployee.EmployeeInsurance[i].RStatus = objEmployee.Status;
+                        }
+                        if (isDirty)
+                        {
+                            dllInsurance.SaveDirtyEmployeeInsurance(objEmployee.EmployeeInsurance, objEmployee.SubmissionNo, objEmployee.SequenceNo, objEmployee.EntryBy, tran);
+                        }
+                        else
+                        {
+                        }
+                    }
+
+                    #endregion
+
+                    #region Employee Medical Attributes
+
+                    if (objEmployee.EmpMedicalAttr != null && objEmployee.EmpMedicalAttr.Count > 0)
+                    {
+                        DLLEmployeeMedicalAttr dllMedicalAttr = new DLLEmployeeMedicalAttr();
+                        for (int i = 0; i < objEmployee.EmpMedicalAttr.Count; i++)
+                        {
+                            objEmployee.EmpMedicalAttr[i].RStatus = objEmployee.Status;
+                        }
+                        if (isDirty)
+                        {
+                            dllMedicalAttr.SaveDirtyEmployeeMedicalAttr(objEmployee.EmpMedicalAttr, objEmployee.SubmissionNo, objEmployee.SequenceNo, objEmployee.EntryBy, tran);
+                        }
+                        else
+                        {
+                        }
+                    }
+
+                    #endregion
+
+                    tran.Commit();
+                }
+            }
+
+            catch (Exception ex)
+            {
+
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            //return msg;
+            return msg + "Data saved! Please Note Submission Number! " + objEmployee.SubmissionNo + "</b>";
+        
+        }
+
+        public Boolean CheckUniqueSymbolNo(string SymbolNo) // returns true if the symbol number is unique else false
+        {
+            try
+            {
+				GetConnection getConn = new GetConnection();
+				OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+				List<OracleParameter> paramList = new List<OracleParameter>();
+				string sp = "DCPR_CHECK_UNIQUE_SYMBOL_NO";
+				paramList.Add(SqlHelper.GetOraParam(":p_SYMBOL_NO", SymbolNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+				DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+				int count = Int32.Parse(ds.Tables[0].Rows[0]["COUNT"].ToString());
+				return count == 0;
+			}
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+
+        public ATTPISEmployee GetEmployeeInfo(ATTPISEmployee obj, Int64? ID, OracleConnection conn, bool isDirty = false)
+        {
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                string sp = "CPR_GET_EMPLOYEE";
+
+                if (isDirty)
+                {
+                    sp = "DCPR_GET_EMPLOYEE";
+                }
+
+                paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", ID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow dr = ((DataTable)ds.Tables[0]).Rows[0];
+
+                    if (isDirty)
+                    {
+                        obj.SubmissionNo = Int64.Parse(dr["SUBMISSION_NO"].ToString());
+                    }
+                    else
+                    {
+                        obj.OrgEmpNo = dr["P_ID"].ToString();
+                    }
+
+                    obj.PFNo = dr["PROVIDENT_FUND_NO"].ToString();
+                    obj.SymbolNo = dr["SYMBOL_NO"].ToString();  //
+                    obj.NLKNo = dr["CIT_NO"].ToString();
+                    obj.PanNo = dr["PAN_NO"].ToString();
+                    obj.IdentityMark = dr["IDENTITY_MARK"].ToString();
+                    obj.EntryBy = dr["ENTRY_BY"].ToString();
+                    obj.Status = dr["R_STATUS"].ToString();
+
+                }
+
+                else
+                {
+                    obj = null;
+                }
+
+                return obj;
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+       
+
+
+
+        public ATTPISEmployee GetDirtyEmployee(Int64? submissionNo, string filePath)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser); 
+
+            // GenericUser user = getConn.LoginUser;
+
+            ATTPISEmployee obj = new ATTPISEmployee();
+
+
+            try
+            {
+                obj = GetEmployeeInfo(obj, submissionNo, conn, true);
+
+                if (obj == null)
+                {
+
+                }
+                else
+                {
+                    DLLPerson dllPerson = new DLLPerson();
+                    DLLEmployeeExperience dllExperience = new DLLEmployeeExperience();
+                    DLLEmployeeInsurance dllInsurance = new DLLEmployeeInsurance();
+                    DLLEmployeeTraining dllTraining = new DLLEmployeeTraining();
+                    DLLEmployeeMedicalAttr dllMedicalAttr = new DLLEmployeeMedicalAttr();
+
+                    obj.Person = dllPerson.GetDirtyPerson(filePath, submissionNo, conn);
+                    obj.EmployeeExperience = dllExperience.GetEmpExperiences(submissionNo, conn, true);
+                    obj.EmployeeInsurance = dllInsurance.GetEmpInsurances(submissionNo, conn, true);
+                    obj.EmployeeTraining = dllTraining.GetEmpTraining(submissionNo, conn, true);
+                    obj.EmpMedicalAttr = dllMedicalAttr.GetEmpMedicalConditions(submissionNo, conn, true);
+
+
+                }
+
+
+
+                return obj;
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+
+
+        }
+
+    }
+}

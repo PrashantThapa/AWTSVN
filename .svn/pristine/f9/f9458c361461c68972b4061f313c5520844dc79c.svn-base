@@ -1,0 +1,74 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AdminMaster.Master" AutoEventWireup="true" CodeBehind="Employee.aspx.cs" Inherits="HRFA.Modules.PIS.Employee" %>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="head" runat="server">
+	<script type="text/javascript">
+		$(document).ready(function () {
+			ValidateSession();
+		});
+
+	</script>
+</asp:Content>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+
+	<section class="content">
+		<div class="row pages">
+			<!-- left column -->
+			<div class="col-md-12">
+				<!-- general form elements -->
+				<div class="box box-primary">
+					<div class="box-header with-border">
+						<h3 class="box-title">Employee Details</h3>
+					</div>
+					
+               
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <table id="example1" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <%--<th>Symbol No.</th>--%>
+                                    <th>Employee's Name</th>
+									<th>Office Name</th>
+                                    <th>Action(s)</th>
+                                </tr>
+                            </thead>
+
+							<tbody data-bind="foreach: EmployeeListsAll">
+																	<tr>
+																		<%--<td data-bind="text: $data.SymbolNo"></td>--%>
+																		<td data-bind="text: $data.FnameNep"></td>
+																		<td data-bind="text: $data.OfficeNameEng"></td>
+																		<td>
+                                                                            <a data-bind="click: $root.EditLanguage"><span class="glyphicon glyphicon-edit" title="Edit" ></span></a>
+																		    <a data-bind="click: $root.DeleteLanguage"><span class="glyphicon glyphicon-trash" title="Delete" ></span></a>
+																		</td>
+																	</tr>
+						   </tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+				</div>
+		</div>
+	</section>
+<script>
+  $(function () {
+    $('#example1').DataTable()
+    $('#example2').DataTable({
+      'paging'      : true,
+      'lengthChange': false,
+      'searching'   : false,
+      'ordering'    : true,
+      'info'        : true,
+      'autoWidth'   : false
+    })
+  })
+</script>
+	<script>
+		$('#example2').on( 'draw.dt', function () {
+    alert( 'Table redrawn' );
+} );
+	</script>
+	<script src="../../Scripts/PIS/EmployeeSearch.js" type="text/javascript"></script>
+</asp:Content>

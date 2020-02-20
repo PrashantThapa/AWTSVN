@@ -1,0 +1,182 @@
+﻿using System;
+using System.Data;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLAddress
+    {
+
+        public Int32? SaveAddress(ATTAddress obj, OracleTransaction tran)
+        {
+            try
+            {
+                string msg = "";
+                string sp = "";
+
+                if (obj.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_ADDRESS";
+                }
+                else if (obj.Action == "E")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_ADDRESS";
+                }
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_ID", obj.AddressID, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+					paramList.Add(SqlHelper.GetOraParam(":p_PROVINCE_CD", obj.Province.ProvinceCD, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":p_DISTRICT_CD", obj.District.DistrictCD, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_VDC_CD", obj.Vdc.VdcCD, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_WARD", obj.Ward, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_TOLE_NEPALI", obj.Tole, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_TOLE_ENGLISH", obj.ToleEn, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_HOUSE_NUMBER", obj.HouseNumber, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", obj.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                    paramList[0].Size = 4;
+
+                    SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+
+
+                    if (paramList[0].Value.ToString() != null || paramList[0].Value.ToString() != "")
+                    {
+                        obj.AddressID = int.Parse(paramList[0].Value.ToString());
+                        paramList.Clear();
+                    }
+                    else
+                    {
+                        msg = " Error in Saving ADDRESS !!!";
+                        throw new Exception(msg);
+                    }
+                }
+
+                return obj.AddressID;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+        public ATTAddress GetAddress(int addressID, OracleConnection conn, bool isDirty = false)
+        {
+            ATTAddress obj = new ATTAddress();
+
+            string sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_ADDRESS";
+
+            if (isDirty)
+            {
+                sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_ADDRESS";
+            }
+
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_ID", addressID, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow dr = ds.Tables[0].Rows[0];
+
+                    obj.AddressID = string.IsNullOrEmpty(dr["ADDRESS_ID"].ToString()) ? (Int32?)null : Int32.Parse(dr["ADDRESS_ID"].ToString());
+					obj.Province.ProvinceCD = string.IsNullOrEmpty(dr["PROVINCE_CD"].ToString()) ? (Int32?)null : Int32.Parse(dr["PROVINCE_CD"].ToString());
+					obj.District.DistrictCD = string.IsNullOrEmpty(dr["DISTRICT_CD"].ToString()) ? (Int32?)null : Int32.Parse(dr["DISTRICT_CD"].ToString());
+                    obj.Vdc.VdcCD = string.IsNullOrEmpty(dr["VDC_CD"].ToString()) ? (Int32?)null : Int32.Parse(dr["VDC_CD"].ToString());
+                    obj.Vdc.VDCName = dr["VDC_NAME_NEP"].ToString();
+                    obj.Vdc.VDCEn = dr["VDC_NAME_ENG"].ToString();
+					obj.Vdc.TotalCount = string.IsNullOrEmpty(dr["TOTAL_WARD"].ToString()) ? (Int32?)null : Int32.Parse(dr["TOTAL_WARD"].ToString());
+                    obj.Tole = dr["TOLE_NEP"].ToString();
+                    obj.ToleEn = dr["TOLE_ENG"].ToString();
+                    obj.HouseNumber = dr["HOUSE_NUMBER"].ToString();
+                    obj.Status = dr["R_STATUS"].ToString();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            return obj;
+        }
+
+        #region Dirty
+        public Int32? SaveDirtyAddress(ATTAddress obj, OracleTransaction tran)
+        {
+            try
+            {
+                string msg = "";
+                string sp = "";
+
+                if (obj.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_ADDRESS";
+                }
+                else if (obj.Action == "E")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_EDIT_ADDRESS";
+                }
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDRESS_ID", obj.AddressID, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+					paramList.Add(SqlHelper.GetOraParam(":p_PROVINCE_CD", obj.Province.ProvinceCD, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":p_DISTRICT_CD", obj.District.DistrictCD, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_VDC_CD", obj.Vdc.VdcCD, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_WARD", obj.Ward, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_TOLE_NEPALI", obj.Tole, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_TOLE_ENGLISH", obj.ToleEn, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_HOUSE_NUMBER", obj.HouseNumber, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", obj.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_STATE_CD", obj.State.StateCD, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+
+                    paramList[0].Size = 4;
+
+                    SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+
+
+                    if (paramList[0].Value.ToString() != null || paramList[0].Value.ToString() != "")
+                    {
+                        obj.AddressID = int.Parse(paramList[0].Value.ToString());
+                        paramList.Clear();
+                    }
+                    else
+                    {
+                        msg = " Error in Saving ADDRESS !!!";
+                        throw new Exception(msg);
+                    }
+                }
+
+                return obj.AddressID;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+        #endregion
+    }
+}

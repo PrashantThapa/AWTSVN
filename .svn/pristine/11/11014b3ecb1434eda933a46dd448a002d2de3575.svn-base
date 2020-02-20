@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLSchedule
+    {
+       public JsonResponse GetSchedule(int? scheduleID)
+       {
+
+           JsonResponse response = new JsonResponse();
+           List<ATTSchedule> lstSchedule = new List<ATTSchedule>();
+           DLLSchedule objdllSchedule = new DLLSchedule();
+           try
+           {
+               lstSchedule = objdllSchedule.GetSchedule(scheduleID);
+
+               response.ResponseData = lstSchedule;
+               response.Message = "Success";
+               response.IsSucess = true;
+           }
+           catch (Exception ex)
+           {
+               response.Message = ex.Message;
+               response.IsSucess = false;
+           }
+
+
+           return response;
+       }
+    }
+}

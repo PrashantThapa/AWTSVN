@@ -1,0 +1,220 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLOffice
+    {
+
+        public List<ATTOffice> GetAllOffice(Int32? officeCode)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            string SP = "CPR_GET_OFFICES";
+            List<ATTOffice> lst = new List<ATTOffice>();
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>
+                {
+                    SqlHelper.GetOraParam(":p_OFFICE_CODE", officeCode, OracleDbType.Int32, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output)
+                };
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+               
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTOffice obj = new ATTOffice();
+                    obj.ParentOffice = new ATTOffice();
+
+                    obj.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_CODE"].ToString());
+                        //Convert.ToInt32(drow["OFFICE_CODE"].ToString());
+                    obj.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+                    obj.OfficeNameEng = drow["OFF_NAME_ENGLISH"].ToString();
+                    obj.IRDCode = drow["IRD_CODE"].ToString();
+                    obj.HouseNo = drow["HOUSE_NO"].ToString();
+                    obj.StreetName = drow["STREETNAME"].ToString();
+                    obj.WardNo = drow["WARDNO"].ToString();
+                    obj.Vdc = drow["VDC_TOWN"].ToString();
+                    obj.FaxNo = drow["FAXNO"].ToString();
+                    obj.PhoneNo = drow["PHONENO"].ToString();
+                    obj.DistrictCode = drow["DISTRICT_CODE"].ToString();
+                    obj.Email = drow["EMAIL"].ToString();
+                    obj.Address = drow["ADDRESS"].ToString();
+                    obj.OfficeType = drow["OFFICE_TYPE"].ToString();
+                    obj.ParentOffice.OfficeCode = string.IsNullOrEmpty(drow["PARENT_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["PARENT_ID"].ToString());
+                    obj.PayingOfficeCode = drow["PAYING_OFFCODE"].ToString();
+                    obj.NewPayingOfficeCode = drow["NEW_PAYING_OFFCODE"].ToString();
+                    obj.OfficeName = drow["OFF_NAME"].ToString();
+
+                    lst.Add(obj);
+
+                }
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+
+        }
+
+        public string SaveOffice(ATTOffice objOffice)
+        {
+            string sp = "";
+            string msg = "No Data To Save !!!";
+
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+
+            try
+            {
+
+
+                if (objOffice.Action == "A")
+                {
+                    sp = "CPR_ADD_OFFICES";
+                    msg = "Successfully Saved.";
+                }
+                else if (objOffice.Action == "E")
+                {
+                    sp = "CPR_EDIT_OFFICES";
+                    msg = "Successfully Updated.";
+                }
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>
+                    {
+                        SqlHelper.GetOraParam(":p_OFFICE_CODE", objOffice.OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_OFFICE_NAME_NEPALI", objOffice.OfficeNameNep, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":P_ADDRESS", objOffice.Address, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":P_PHONENO", objOffice.PhoneNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":P_EMAIL", objOffice.Email, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":P_PARENT_ID", objOffice.ParentOffice.OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input)
+                    };
+                    SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                    paramList.Clear();
+                }
+                tran.Commit();
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                return ex.Message;
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+
+        }
+
+		public string DeleteOffice(Int32? officeCode)
+		{
+			GetConnection conn = new GetConnection();
+			OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+
+			try
+			{
+				string SP = "CPR_DELETE_OFFICES";
+				List<OracleParameter> ParamList = new List<OracleParameter>();
+				ParamList.Add(SqlHelper.GetOraParam(":p_OFFICE_CODE", officeCode, OracleDbType.Int32, ParameterDirection.InputOutput));
+				SqlHelper.ExecuteNonQuery(dbConn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+				return "Deleted Successfully!!!";
+
+
+			}
+			catch (Exception ex)
+			{
+
+				return ex.Message;
+
+			}
+			finally
+			{
+
+				conn.CloseDbConn();
+			}
+
+		}
+
+
+
+		public List<ATTOffice> GetPortalOffice(Int32? officeCode)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+
+            string SP = "CPR_GET_OFFICES";
+            List<ATTOffice> lst = new List<ATTOffice>();
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>
+                {
+                    SqlHelper.GetOraParam(":p_OFFICE_CODE", officeCode, OracleDbType.Int32, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output)
+                };
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTOffice obj = new ATTOffice();
+                    obj.ParentOffice = new ATTOffice();
+
+                    obj.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_CODE"].ToString());
+                    //Convert.ToInt32(drow["OFFICE_CODE"].ToString());
+                    obj.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+                    obj.OfficeNameEng = drow["OFF_NAME_ENGLISH"].ToString();
+                    obj.IRDCode = drow["IRD_CODE"].ToString();
+                    obj.HouseNo = drow["HOUSE_NO"].ToString();
+                    obj.StreetName = drow["STREETNAME"].ToString();
+                    obj.WardNo = drow["WARDNO"].ToString();
+                    obj.Vdc = drow["VDC_TOWN"].ToString();
+                    obj.FaxNo = drow["FAXNO"].ToString();
+                    obj.PhoneNo = drow["PHONENO"].ToString();
+                    obj.DistrictCode = drow["DISTRICT_CODE"].ToString();
+                    obj.Email = drow["EMAIL"].ToString();
+                    obj.Address = drow["ADDRESS"].ToString();
+                    obj.OfficeType = drow["OFFICE_TYPE"].ToString();
+                    obj.ParentOffice.OfficeCode = string.IsNullOrEmpty(drow["PARENT_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["PARENT_ID"].ToString());
+                    obj.PayingOfficeCode = drow["PAYING_OFFCODE"].ToString();
+                    obj.NewPayingOfficeCode = drow["NEW_PAYING_OFFCODE"].ToString();
+                    obj.OfficeName = drow["OFF_NAME"].ToString();
+
+                    lst.Add(obj);
+
+                }
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+
+        }
+
+      }
+}
+

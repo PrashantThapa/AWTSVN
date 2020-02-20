@@ -1,0 +1,160 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLRetirement
+    {
+        public string SaveRetirement(ATTRetirement objRetirement, string appID, string modID)
+        {
+            string msg = "";
+            string sp = "";
+
+            if (objRetirement.Action == "A")
+            {
+                sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_RETIREMENT";
+                msg = "Successfully Saved.";
+            }
+            else if (objRetirement.Action == "E")
+            {
+                sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_EDIT_RETIREMENT";
+                msg = "Successfully Updated.";
+            }
+
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+            OracleTransaction tran = dbConn.BeginTransaction();
+
+            try
+            {
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", null, OracleDbType.Varchar2, ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", objRetirement.EmpID, OracleDbType.Int32, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_RETIREMENT_DATE", objRetirement.RetirementDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_RETIREMENT_TYPE", objRetirement.RetirementType, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", objRetirement.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_TO_DATE", objRetirement.ToDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objRetirement.RStatus, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objRetirement.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objRetirement.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_REMARKS", objRetirement.Remarks, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList[0].Size = 25;
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    objRetirement.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+                    if (objRetirement.OldSubmissionNo != null)
+                    {
+                        DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                        dllUTV.SaveVerifyLog(tran, objRetirement.EntryBy, objRetirement.OldSubmissionNo, objRetirement.SubmissionNo, appID, modID);
+                    }
+                    tran.Commit();
+                    paramList.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                msg = "Error in Saving.";
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+            //return msg;
+            return msg + "</br> Please Note Your Submission No.</br><b>" + objRetirement.SubmissionNo + "</b>";		
+        }
+
+        public List<ATTRetirmentType> GetRetirementType(long? retirementTypeId)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+            try
+            {
+                string SP = "GET_RETIREMENT_TYPE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_RETIREMENTTYPE_ID", retirementTypeId, OracleDbType.Int64, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTRetirmentType> lst = new List<ATTRetirmentType>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTRetirmentType obj = new ATTRetirmentType();
+
+                    obj.RetirmentTypeID = string.IsNullOrEmpty(drow["RETIREMENTTYPE_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["RETIREMENTTYPE_ID"].ToString());
+                    obj.RetirmentTypeName = (drow["RETIREMENTTYPE_NAME"].ToString());
+                    obj.RetirmentTypeEnglish = drow["RETIREMENTTYPE_NAME_ENG"].ToString();
+                    obj.EntryBy = drow["ENTRY_BY"].ToString();
+                    obj.EntryDate = drow["ENTRY_DATE"].ToString();
+                    obj.Action = drow["R_STATUS"].ToString()=="I"?"A":"E";
+                    lst.Add(obj);
+                }
+
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+    
+        public List<ATTRetirement> GetRetirement(Int64? submissionNo)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_RETIREMENT";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", submissionNo, OracleDbType.Int64, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTRetirement> lst = new List<ATTRetirement>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTRetirement obj = new ATTRetirement();
+
+                    obj.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString());
+                    obj.RetirementDate = (drow["RETIREMENT_DATE"].ToString());
+                    obj.RetirementType = drow["RETIREMENT_TYPE"].ToString();
+                    obj.EmployeeName = drow["EMP_NAME"].ToString();
+                    obj.Remarks = drow["REMARKS"].ToString();
+                    lst.Add(obj);
+                }
+
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+    }
+}

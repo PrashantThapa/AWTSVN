@@ -1,0 +1,81 @@
+﻿using System;
+using System.Collections.Generic;
+
+
+
+namespace HRFA.ATT
+{
+    public  class ATTBudgetRelease
+    {
+        public ATTBudgetRelease()
+        {
+            _Office = new ATTOffice();
+            _CostCenter = new ATTCostCenter();
+            _BudgetItem = new ATTBudgetItem();
+            _Job = new ATTJob();
+            _FiscalYear = new ATTFiscalYear();
+            AccountChart = new ATTAccountChart();
+            BudgetRelease = new List<ATTBudgetRelease>();
+        }
+
+        private ATTOffice _Office;
+       public ATTOffice Office
+        {
+            get { return _Office; }
+            set { _Office = value; }
+
+        }
+
+       private ATTCostCenter _CostCenter;
+       public ATTCostCenter CostCenter
+       {
+           get { return _CostCenter; }
+           set { _CostCenter = value; }
+
+       }
+       private ATTBudgetItem _BudgetItem;
+       public ATTBudgetItem BudgetItem
+       {
+           get { return _BudgetItem; }
+           set { _BudgetItem = value; }
+
+       }
+       private ATTJob _Job;
+       public ATTJob Job
+       {
+           get { return _Job; }
+           set { _Job = value; }
+
+       }
+
+       public ATTFiscalYear _FiscalYear ;
+       public ATTFiscalYear FiscalYear
+       {
+           get { return _FiscalYear; }
+           set { _FiscalYear = value; }
+       }
+
+       public ATTAccountChart AccountChart ;
+       public List<ATTBudgetRelease> BudgetRelease ;
+
+
+       public double? ReleaseAmount { get; set; }
+       public string RequestDate { get; set; }
+       public string ReleaseDate { get; set; }
+       public double? Amount { get; set; }
+       public string Remarks { get; set; }
+       public string Action { get; set; }
+       public string Status { get; set; }
+       public string EntryBy { get; set; }
+       public string EntryDate { get; set; }
+       public string FromDate { get; set; }
+       public Int64? SubmissionNo { get; set; }
+       public string ToDate { get; set; }
+
+
+       public string ApproveDate { get; set; }
+       public double? ApproveAmount { get; set; }
+       public double? RemainingAmount { get; set; }
+
+    }
+}

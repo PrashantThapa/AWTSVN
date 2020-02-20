@@ -1,0 +1,106 @@
+﻿function Office(data) {
+    var self = this;
+
+    self.OfficeCode = ko.observable(data.OfficeCode);
+    self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+
+
+};
+
+
+function AttendanceReportViewModel() {
+    var self = this;
+    
+    self.Offices = ko.observableArray([]);
+    self.SelectedOffice = ko.observable();
+    self.FromDate = ko.observable();
+    self.ToDate = ko.observable();
+
+    self.ViewReport = function (data, event) {
+        if (self.Validation()) {
+            self.ShowAttendance();
+        }
+    }
+
+    var value = "";
+
+    $.ajax({
+        dataType: "json",
+        cache: false,
+        url: '../../../Handlers/CENTRALLOOKUP/OfficeHandler.ashx',
+        data: { 'method': 'GetAllOffice' },
+        contentType: "application/json; charset=utf-8",
+        success: function (result) {
+            var mappedTask = $.map(result.ResponseData, function (item) {
+
+                return new Office(item)
+            });
+
+            self.Offices(mappedTask);
+
+        },
+        error: function (err) {
+            msg(err.status + " - " + err.statusText, "FAILURE");
+
+        }
+
+    });
+    self.Cancel = function () {
+        self.SelectedOffice("");
+    }
+    self.ShowAttendance = function () {
+        waitMsg("Loading");
+        waitMsg.show();
+        var data = {
+            OfficeCode: self.SelectedOffice(),
+            FromDate: self.FromDate(),
+            ToDate: self.ToDate()
+            }
+        var hght = screen.height;
+        var left = (screen.width / 2) - (900 / 2);
+        var url = "/Reporting/PIS/ReportHandlers/AttendanceHandler.ashx";
+        var winOption = "width=900,resizable=yes,scrollbars=yes,left=" + 230 + ",height=" + hght + "";
+        OpenWindowWithPost(url, winOption, "NewFile", data);
+        self.SelectedOffice("");
+      
+        waitMsg.hide();
+    }
+
+    self.Validation = function () {
+        var errMsg = "";
+        var objFocus = null;
+        if (!self.SelectedOffice()) {
+            errMsg += "Please select office<br>";
+        }
+        if (!self.FromDate()) {
+            errMsg += "Please fill from date<br>";
+        }
+        if (!self.ToDate()) {
+            errMsg += "Please fill to date<br>";
+        }
+        
+        if (errMsg !== "") {
+             msg(errMsg,"WARNING");
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
+
+
+}
+$(document).ready(function () {
+	ValidateSession();
+	var attObj = new AttendanceReportViewModel();
+	ko.applyBindings(attObj);
+	var currentDate = new Date();
+	var bsDate = calenderFunctions.getBsDateByAdDate(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+	var datePattern = "%y.%m.%d";
+	formattedCurrDate = calenderFunctions.bsDateFormat(datePattern, bsDate.bsYear, bsDate.bsMonth, bsDate.bsDate);
+	// otvm.TranDate(formattedCurrDate);
+	checkFronNepDate = element => (valFutureDate(element, 'Y', true)) ? true : attObj.FromDate(formattedCurrDate); 
+	checkToNepDate = element => (valFutureDate(element, 'Y', true)) ? true : attObj.FromDate(formattedCurrDate); 
+});
+var specialChars = [8, 35, 36, 37, 38, 39, 40, 46, 9, 116];
+checkNumber = (x, y = x.which || x.keyCode) => (('0123456789०१२३४५६७८९').split('').map(x => x.charCodeAt(0)).concat(specialChars).includes(y));

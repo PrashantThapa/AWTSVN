@@ -1,0 +1,84 @@
+﻿
+
+function Office(data) {
+    var self = this;
+    self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+    self.OfficeCode = ko.observable(data.OfficeCode);
+}
+
+var FinancialStatementReportViewModel = function (data) {
+    var self = this;
+    //FOR OFFICE
+    self.OfficeNameNep = ko.observable();
+    self.OfficeCode = ko.observable();
+    self.SelectedOffice = ko.observable();
+    self.OfficeName = ko.observable();
+    self.Offices = ko.observableArray([]);
+    self.OfficeArray = ko.observableArray([]);
+
+    data = data || {};
+    self.UpToDate = ko.observable(data.UpToDate || nepaliDate);
+   // self.office = ko.observable(new officeModel());
+    self.DateType = ko.observable(data.DateType || 1);
+
+    /*
+    self.officeCodeListGridView = new ko.simpleGrid.viewModel({
+    url: '/Handlers/FixedAssest/Setup/OrganizationSetupMain.ashx',
+    method: 'GetOfficeList',
+    columns: [
+    { headerText: "Office Code", rowText: "OfficeCode" },
+    { headerText: "Office Name", rowText: "OfficeName" }
+    ],
+    pageSize: 5
+    });
+    */
+    /*
+    self.officeCodeListGridView.selectData = function (item) {
+    self.office(new officeModel({
+    OfficeCode: item.OfficeCode,
+    OfficeName: item.OfficeName
+    }));
+    };
+    */
+	self.reset = function () {
+		self.UpToDate(data.UpToDate || nepaliDate);
+		self.office(new officeModel());
+		self.DateType(data.DateType || 1);
+	};
+
+    self.GetOffice = function () {
+        waitMsg("Loading");
+        waitMsg.show();
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/CENTRALLOOKUP/OfficeHandler.ashx',
+            data: { 'method': 'GetAllOffice', 'args': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+
+                var mappedTask = $.map(result.ResponseData, function (item) {
+					return new Office(item);
+
+                });
+                self.OfficeArray(mappedTask);
+
+                waitMsg.hide();
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+
+    };
+
+   // self.GetOffice();
+};
+
+$(document).ready(function () {
+     ValidateSession();
+     ko.applyBindings(new FinancialStatementReportViewModel());
+});

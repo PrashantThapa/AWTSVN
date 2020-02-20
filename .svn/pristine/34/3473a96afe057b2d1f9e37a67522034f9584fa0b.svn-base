@@ -1,0 +1,20 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.Shared;
+using System.Data;
+namespace Account.Report.ATT
+{
+    public class ReportParams
+    {
+        public static Dictionary<string, ReportDocument> Report = new Dictionary<string, ReportDocument>();
+        public static Dictionary<string, ReportRepo> Report1 = new Dictionary<string, ReportRepo>();
+    }
+     public class ReportRepo
+    {
+         public ReportDocument report { get; set; }
+        public DataTable datasource { get; set; }
+    }
+}

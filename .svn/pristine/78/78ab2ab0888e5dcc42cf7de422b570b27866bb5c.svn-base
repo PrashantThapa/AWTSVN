@@ -1,0 +1,75 @@
+﻿using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+namespace IDS.Handlers.CENTRALLOOKUP
+{
+    /// Summary description for AddressTypeHandler
+    public class AddressTypeHandler : BaseHandler
+    {
+        public object SaveAddressType(string addtype, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            //if (token == CurrentToken())
+            //{
+                BLLAddressType bllAddressType = new BLLAddressType();
+                List<ATTAddressType> objAddressType = JsonUtility.DeSerialize(addtype, typeof(List<ATTAddressType>)) as List<ATTAddressType>;
+                response = bllAddressType.SaveAddressType(objAddressType);
+           // }
+            //else
+            //{
+
+            //    response.Message = "Suspicious Activity !!!";
+            //    response.IsSucess = false;
+            //    response.IsToken = false;
+            //}
+
+
+            return JsonUtility.Serialize(response);
+        }
+
+
+        public object DeleteAddressType(int? addresstypeid, string token)
+        {
+            JsonResponse response = new JsonResponse();
+
+            //if (token == CurrentToken())
+            //{
+                BLLAddressType bllAddressType = new BLLAddressType();
+                response = bllAddressType.DeleteAddressType(addresstypeid);
+            //}
+            //else
+            //{
+            //    response.Message = "Suspicious Activity !!!";
+            //    response.IsSucess = false;
+            //    response.IsToken = false;
+            //}
+
+            return JsonUtility.Serialize(response);
+
+            
+        }
+
+        public object GetAddressType(int? addresstypeid, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLAddressType bllAddressType = new BLLAddressType();
+           
+            //if (token == CurrentToken())
+            //{
+                response = bllAddressType.GetAddressType(addresstypeid);
+            //}
+            //else
+            //{
+            //    response.Message = "Suspicious Activity !!!";
+            //    response.IsSucess = false;
+            //    response.IsToken = false;
+            //}
+
+            return JsonUtility.Serialize(response);
+
+
+        }
+
+    }
+}

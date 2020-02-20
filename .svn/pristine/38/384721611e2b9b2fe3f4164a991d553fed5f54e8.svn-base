@@ -1,0 +1,78 @@
+﻿using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+using System.Collections.Generic;
+
+namespace IDS.Handlers.ACCOUNT
+{
+
+    public class AccountChartHandler : BaseHandler
+    {
+
+        public object SaveAccountChart(string args, string token)
+        {
+
+            JsonResponse response = new JsonResponse();
+            BLLAccountChart ObjbllAccountChart = new BLLAccountChart();
+            List<ATTAccountChart> objAccountChart = JsonUtility.DeSerialize(args, typeof(List<ATTAccountChart>)) as List<ATTAccountChart>;
+            response = ObjbllAccountChart.SaveAccountChart(objAccountChart);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetAccountChart(int? accCode,int? PLgrCode, int? Office_Cd, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLAccountChart bllObjCompany = new BLLAccountChart();
+            response = bllObjCompany.GetAccountChart(accCode, PLgrCode, Office_Cd);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetAccountChartExp(int? accCode, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLAccountChart bllObjCompany = new BLLAccountChart();
+            response = bllObjCompany.GetAccountChartExp(accCode);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetAccountChartSubsideryGL(int? accCode, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLAccountChart bllObjCompany = new BLLAccountChart();
+            response = bllObjCompany.GetAccountChartSubsideryGL(accCode);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetAccountChartHead(int? accCode, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLAccountChart bllObjCompany = new BLLAccountChart();
+            response = bllObjCompany.GetAccountChartHead(accCode);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetAccountChartHeadSubsidery(int? accCode, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLAccountChart bllObjCompany = new BLLAccountChart();
+            response = bllObjCompany.GetAccountChartHeadSubsidery(accCode);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        
+        public object DeleteAccountChart(int? accCode, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLAccountChart bllObjAccountChart = new BLLAccountChart();
+            response = bllObjAccountChart.DeleteAccountChart(accCode);
+            return JsonUtility.Serialize(response);
+        }
+        
+    }
+}

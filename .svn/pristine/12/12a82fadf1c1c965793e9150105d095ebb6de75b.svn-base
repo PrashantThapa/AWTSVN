@@ -1,0 +1,57 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+namespace IDS.Handlers.ACCOUNT
+{
+
+    public class OfficeTranHandler : BaseHandler
+    {
+
+        public object SaveOfficeTran(string args)
+        {
+
+            JsonResponse response = new JsonResponse();
+            ATTOfficeTran objOfficeTran = (ATTOfficeTran)JsonUtility.DeSerialize(args, typeof(ATTOfficeTran));
+            BLLOfficeTran objbllOfficeTran = new BLLOfficeTran();
+            response = objbllOfficeTran.SaveOfficeTran(objOfficeTran);
+
+            return JsonUtility.Serialize(response);
+
+        }
+        public object GetOfficeTran(Int64? submissionNo, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLOfficeTran objbllOfficeTran = new BLLOfficeTran();
+
+            //if (token == CurrentToken())
+            //{
+            response = objbllOfficeTran.GetOfficeTran(submissionNo);
+            //}
+            //else
+            //{
+            //    response.Message = "Suspicious Activity !!!";
+            //    response.IsSucess = false;
+            //    response.IsToken = false;
+            //}
+
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object ValidateBudgetAmount(string fiscalYr, Int64 officeID, Int64 costCenterID, Int64 accCode, double amount)
+        {
+            JsonResponse response = new JsonResponse();
+
+            BLLOfficeTran objBLLOfficeTran = new BLLOfficeTran();
+
+            response = objBLLOfficeTran.ValidateBudgetAmount(fiscalYr, officeID, costCenterID, accCode, amount);
+
+            return JsonUtility.Serialize(response);
+        }
+
+
+       
+    }
+}

@@ -1,0 +1,11 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTGetAccounts
+    {
+        public Int64? AccountID { get; set; }//ATBaccounts
+        public string AccNameNep { get; set; }
+        public string AccNameEng { get; set; }
+    }
+}

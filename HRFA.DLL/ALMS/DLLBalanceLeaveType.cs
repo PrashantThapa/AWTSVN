@@ -1,0 +1,83 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+
+using HRFA.ATT.ALMS;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer.ALMS
+{
+	public class DLLBalanceLeaveType
+	{
+
+		public object GetLeaveBalance(string UptoDate, int EmpID)
+		{
+			GetConnection getConn = new GetConnection();
+			OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+
+			try
+			{
+				string sp = "CPR_GET_BALANCELEAVE";
+				List<OracleParameter> paramList = new List<OracleParameter>();
+
+
+				paramList.Add(SqlHelper.GetOraParam(":P_UPTO_DATE", UptoDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_EMP_ID", EmpID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+				DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+                //DataRow drow = ds.Tables[0].Rows[0];
+
+                //ATTBalanceLeaveType objBalanceLeave = new ATTBalanceLeaveType();
+
+                ////objBalanceLeave.EmpID = string.IsNullOrEmpty(drow["EmpID"].ToString()) ? (decimal?)null : decimal.Parse(drow["EmpID"].ToString());
+                ////objBalanceLeave.UptoDate = drow["UPTO_DATE"].ToString();
+                ////objBalanceLeave.balancedleave = drow["UPTO_DATE"].ToString();
+                //objBalanceLeave.balancedleave = string.IsNullOrEmpty(drow["balancedleave"].ToString()) ? (decimal?)null : decimal.Parse(drow["balancedleave"].ToString());
+                //objBalanceLeave.leavetaken = string.IsNullOrEmpty(drow["leavetaken"].ToString()) ? (decimal?)null : decimal.Parse(drow["leavetaken"].ToString());
+                //objBalanceLeave.homeleave = string.IsNullOrEmpty(drow["homeleave"].ToString()) ? (decimal?)null : decimal.Parse(drow["homeleave"].ToString());
+                //objBalanceLeave.sickleave = string.IsNullOrEmpty(drow["sickleave"].ToString()) ? (decimal?)null : decimal.Parse(drow["sickleave"].ToString());
+                //objBalanceLeave.homeleaveaccumulation = string.IsNullOrEmpty(drow["homeleaveaccumulation"].ToString()) ? (decimal?)null : decimal.Parse(drow["homeleaveaccumulation"].ToString());
+                //objBalanceLeave.sickleaveaccumulation = string.IsNullOrEmpty(drow["sickleaveaccumulation"].ToString()) ? (decimal?)null : decimal.Parse(drow["sickleaveaccumulation"].ToString());
+
+                //return objBalanceLeave;
+
+
+                List<ATTBalanceLeaveType> lst = new List<ATTBalanceLeaveType>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTBalanceLeaveType objBalanceLeave = new ATTBalanceLeaveType();
+
+                    objBalanceLeave.balancedleave = string.IsNullOrEmpty(drow["balancedleave"].ToString()) ? (decimal?)null : decimal.Parse(drow["balancedleave"].ToString());
+                    objBalanceLeave.leavetaken = string.IsNullOrEmpty(drow["leavetaken"].ToString()) ? (decimal?)null : decimal.Parse(drow["leavetaken"].ToString());
+                    objBalanceLeave.homeleave = string.IsNullOrEmpty(drow["homeleave"].ToString()) ? (decimal?)null : decimal.Parse(drow["homeleave"].ToString());
+                    objBalanceLeave.sickleave = string.IsNullOrEmpty(drow["sickleave"].ToString()) ? (decimal?)null : decimal.Parse(drow["sickleave"].ToString());
+                    objBalanceLeave.homeleaveaccumulation = string.IsNullOrEmpty(drow["homeleaveaccumulation"].ToString()) ? (decimal?)null : decimal.Parse(drow["homeleaveaccumulation"].ToString());
+                    objBalanceLeave.sickleaveaccumulation = string.IsNullOrEmpty(drow["sickleaveaccumulation"].ToString()) ? (decimal?)null : decimal.Parse(drow["sickleaveaccumulation"].ToString());
+
+
+
+                    //obj.Action = "E";
+                    lst.Add(objBalanceLeave);
+                }
+
+                return lst;
+            }
+			catch (Exception ex)
+			{
+
+				throw (ex);
+			}
+			finally
+
+            {
+				getConn.CloseDbConn();
+			}
+		}
+	}
+}
+	

@@ -1,0 +1,368 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AdminMaster.Master" AutoEventWireup="true"
+    CodeBehind="OfficeVoucherTransaction.aspx.cs" Inherits="HRFA.Modules.ACCOUNTS.OfficeVoucherTransaction" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <div class="container wrapper">
+        <div class="col-md-12">
+            <h3 class=" margin-top-15 margin-left-25">
+                Branch Voucher Entry</h3>
+            <form class="form-horizontal" role="form">
+            <div class="row margin-bottom-15" id="divSubNo">
+                <div class="col-md-2 inputSubNo" style='display: none'>
+                    Submission Number :
+                </div>
+                <div class="col-md-3 inputSubNo" style='display: none'>
+                    <input type="text" id="inSubNo" class="form-control" data-bind="value:SubmissionNo" onkeydown="return checkNumber(event)"/>
+                </div>
+                <div class="col-md-3">
+                    <button data-bind="click:viewDetails" class="btn btn-primary" id='viewDetails'>
+                        View Details</button>
+                </div>
+            </div>
+           
+            <div id="VoucherForm">
+                <div class="row">
+                    <div class="col-md-2">
+                        Voucher Type <span class="mandatory">*</span>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="dropdown one-seventy margin-left-0">
+                            <select id="Select6" class="dropdown-select" data-bind='options:VoucherGroups, 
+                            optionsText: "VoucherGroupDesc",
+                            optionsValue:$data,
+                            value:SelectedVGroup, 
+                            optionsCaption:"-----छान्नुहोस्-----", event:{change: GetAccChartByVGroup}'>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        Voucher Date <span class="mandatory">*</span></div>
+                    <div class="col-md-3">
+                        <input type="text" id="txtDate" data-bind="value:TranDate" class='required form-control bod-picker'
+                            onkeypress="return isNumberKey(event)" onblur="return checkNepDate(this,'Y',true);"
+                            placeholder="YYYY.MM.DD" onfocus="UnicodeFocus(event,this);" onpaste="return true" />
+                    </div>
+                </div>
+                <%-- <div class="row">
+                <div class="col-md-2">
+                    Voucher Type <span class="mandatory">*</span>
+                </div>
+                <div class="col-md-3">
+                    <div class="dropdown" style="margin-left: 0px; width: 100%;">
+                        <select id="ddlVoucherType" class="dropdown-select" data-bind='options:VoucherTypes,
+                         optionsText: "VoucherTypeName", optionsValue: $data,value:SelectedVoucherType,
+                          optionsCaption:"------छान्नुहोस्-------"'>
+                        </select>
+                    </div>
+                </div>
+            </div>--%>
+                <div class="row">
+                    <div class="col-md-2">
+                        Voucher No <span class="mandatory">*</span>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" id="txtVoucherNo" class="form-control" data-bind="value:VoucherNo" /></div>
+                    <div class="col-md-2">
+                        Voucher Category <span class="mandatory">*</span>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="dropdown one-seventy margin-left-0">
+                            <select id="CategorySel" class="dropdown-select" data-bind='options:VoucherCats,
+                            optionsText: "CatName",
+                            optionsValue: "CatID",
+                            value:SelectedVCat,
+                            optionsCaption:"-----छान्नुहोस्-----",
+                            event:{ change: ShowHideBankVoucher }'>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        Narration <span class="mandatory">*</span>
+                    </div>
+                    <div class="col-md-6">
+                        <textarea id="textNarration" class="form-control" data-bind="value:Narration"></textarea>
+                    </div>
+                </div>
+                <div class="row" id="divBankOnly" style="border: 1px #ccc solid; padding-top: 15px;" data-bind="visible: ShowHideBankVoucher">
+                    <div class="col-md-12">
+                        <div class="col-md-4">
+                            <h3 style="font-size: 19px; color: Red;">
+                                Only Enter for Bank Voucher</h3>
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="col-md-12">
+                        <div class='row'>
+                            <div class="col-md-2">
+                                <small>Bank Name <span class="mandatory">*</span></small>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" id="txtBankName" class="form-control input-xs" data-bind="value:BankName" />
+                            </div>
+                            <div class="col-md-2">
+                                <small>Cheque No. <span class="mandatory">*</span></small>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" id="txtChequeNo" class="form-control" data-bind="value:ChequeNo" />
+                            </div>
+                            <div class="col-md-2">
+                                <small>Cheque Amount <span class="mandatory">*</span></small>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" id="txtChequeAmount" class="form-control" data-bind="value:ChequeAmount" />
+                            </div>
+                        </div>
+                        <div class='row'>
+                            <div class="col-md-2">
+                                <small>Received By <span class="mandatory">*</span></small>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" id="txtReceivedBy" class="form-control" data-bind="value:ReceivedBy" />
+                            </div>
+                            <div class="col-md-2">
+                                <small>Reasons to Pay<span class="mandatory">*</span></small>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" id="txtReasonstoPay" class="form-control" data-bind="value:ReasonstoPay" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row margin-top-15" style="padding-top: 15px;">
+                    <div class="col-md-2">
+                        GL Code <span class="mandatory">*</span></div>
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2 ccenter" data-bind="visible: reqCCenter" style="margin-left: 2em;">
+                        Functional Unit <span class="mandatory">*</span>
+                    </div>
+                    <div class="col-md-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2 dropdown">
+                        <select id="ddlGlCode" class="dropdown-select" data-bind='options: GlCodeList, 
+                                                optionsText: "AccName",
+                                                optionsValue: $data,
+                                                value: SelectedGlCode,
+                                                optionsCaption: "-----छान्नुहोस्-----", event:{ change:GetContraOrLvl } '>
+                        </select>
+                    </div>
+                    <!--Bibek-->
+                    <div class="col-md-2 dropdown" id="divContra">
+                        <select id="selContra" class="dropdown-select" data-bind='options:ContraAccountList, 
+                            optionsText: "AccName",
+                            optionsValue:$data,
+                            value:SelectedContraAccount, 
+                            optionsCaption:"-----छान्नुहोस्-----", event:{change:GetContraGlCode }'>
+                        </select>
+                    </div>
+                    <div class="col-md-2 dropdown" id="divLvl2">
+                        <select id="Select3" class="dropdown-select" data-bind='options: GlCodeLvl2List, 
+                                                optionsText: "AccName",
+                                                optionsValue: $data,
+                                                value: SelectedLvl2GlCode,
+                                                optionsCaption: "-----छान्नुहोस्-----" , event:{ change:GetLvl3GlCode }'>
+                        </select>
+                    </div>
+                    <!--/Bibek-->
+                    <div class="col-md-2 dropdown ccenter" data-bind="visible: reqCCenter">
+                        <select id="Select5" class="dropdown-select" data-bind='options:CostCenters, 
+                            optionsText: "CostCenterName",
+                            optionsValue:$data,
+                            value:SelectedCostCenter, 
+                            optionsCaption:"-----छान्नुहोस्-----"'>
+                        </select>
+                    </div>
+                    <div class="col-md-2 dropdown" id="divLvl3">
+                        <select id="Select4" class="dropdown-select" data-bind='options: GlCodeLvl3List, 
+                                                optionsText: "AccName",
+                                                optionsValue: $data,
+                                                value: SelectedLvl3GlCode,
+                                                optionsCaption: "-----छान्नुहोस्-----",event:{ change:GetLvl4GlCode }'>
+                        </select>
+                    </div>
+                    <!--Bibek-->
+                    <div class="col-md-2 dropdown" id="divLvl4">
+                        <select id="Select7" class="dropdown-select" data-bind='options: GlCodeLvl4List, 
+                                                optionsText: "AccName",
+                                                optionsValue: $data,
+                                                value: SelectedLvl4GlCode,
+                                                optionsCaption: "-----छान्नुहोस्-----",event:{ change:GetLvl6GlCode }'>
+                        </select>
+                    </div>
+                    <!--/Bibek-->
+                    <!--Shanjeev-->
+                    <div class="col-md-2 dropdown" id="divLvl5">
+                        <select id="Select8" class="dropdown-select" data-bind='options: GlCodeLvl5List, 
+                                                optionsText: "AccName",
+                                                optionsValue: $data,
+                                                value: SelectedLvl5GlCode,
+                                                optionsCaption: "-----छान्नुहोस्-----",event:{ change:GetLvl7GlCode }'>
+                        </select>
+                    </div>
+                    <!--/Shanjeev-->
+                </div>
+                <div class="row">
+                    <div id="ddlGLSubsidary" class="col-md-2 margin-left-15">
+                        Subsidary Acc. <span class="mandatory">*</span>
+                    </div>
+                    <div class="col-md-1" style="display: none;">
+                        Account<span class="mandatory">*</span>
+                    </div>
+                    <div class="col-md-2 margin-left-15">
+                        Description
+                    </div>
+                    <div class="col-md-2 margin-left-15">
+                        Dr.<span class="mandatory">*</span></div>
+                    <div class="col-md-2 margin-left-15">
+                        Cr.<span class="mandatory">*</span></div>
+                    <div class="col-md-1 margin-left-15">
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="ddlGLSubsidarys" class="dropdown col-md-2">
+                        <select id="Select1" class="dropdown-select" data-bind='options: GLCodeSubsidarysLst, 
+                                                    optionsText: "AccName",
+                                                    optionsValue:$data,
+                                                    value:SelectedGLCodeSubsidary, 
+                                                    optionsCaption:"-----छान्नुहोस्-----"'>
+                        </select>
+                    </div>
+                    <div class="col-md-2" style="display: none;">
+                        <div class="dropdown">
+                            <select id="Select2" class="dropdown-select" data-bind='options: AccountNumbserList,
+                                                optionsText: "AccNameNep", 
+                                                optionsValue:$data,
+                                                value:SelectedAcNo, 
+                                                optionsCaption:"-----छान्नुहोस्-----"'>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <%--<textarea id="Text1" data-bind="value:Description" class=" form-control"></textarea>--%>
+                        <input type="text" id="Text1" data-bind="value:Description" class=" form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" id="Text2" data-bind="value:Dr, disable:Cr" onkeypress="return isNumberKey(event)"
+                            class=" form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" id="Text4" data-bind="value:Cr, disable:Dr" onkeypress="return isNumberKey(event)"
+                            class=" form-control" /></div>
+                    <div class="col-md-1">
+                        <button type="submit" style="display: block;" id="Button2" class="btn btn-primary pull-right"
+                            data-bind="click:AddVoucher">
+                            Add</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-fixed-header resizable" id="tblVoucherDet"
+                                width="100%" style="border-bottom: none;border-right:0">
+                                <thead style="border-right: 1px solid #dddddd;">
+                                    <tr>
+                                        <th>
+                                            SN.
+                                        </th>
+                                        <th>
+                                            GL Code
+                                        </th>
+                                        <th id="GLCodeSubsidary">
+                                            Sub Acc
+                                        </th>
+                                        <th>
+                                            Functional Unit
+                                        </th>
+                                        <th>
+                                            Description
+                                        </th>
+                                        <th style="display: none; width: 0px;">
+                                            Account
+                                        </th>
+                                        <th style="display: none; width: 0px;">
+                                            Amount
+                                        </th>
+                                        <th>
+                                            Dr.Amount
+                                        </th>
+                                        <th>
+                                            Cr.Amount
+                                        </th>
+                                        <th class="editDeleteSection">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: OfficeTranDetail" style="border-bottom:1px solid #dddddd; border-right: 1px solid #dddddd;">
+                                    <tr>
+                                        <td>
+                                            <span data-bind="text: ($index()+1)"></span>
+                                        </td>
+                                        <td style="display: none; width: 0px;">
+                                            <span data-bind="text:OfficeCompanyAccChart().AccountChart.AccCode"></span>
+                                        </td>
+                                        <td>
+                                            <span data-bind="text: Accounts().AccNameNep"></span>
+                                        </td>
+                                        <td>
+                                            <span data-bind="text: AccName"></span>
+                                        </td>
+                                        <td>
+                                            <span data-bind="text: OfficeCompanyAccChart().Company.CompanyName"></span>
+                                        </td>
+                                        <td style="display: none; width: 0px;">
+                                            <span data-bind="text: Amount()"></span>
+                                        </td>
+                                        <td>
+                                            <span data-bind="text: Description()"></span>
+                                        </td>
+                                        <td>
+                                            <span data-bind="text: Dr()"></span>
+                                        </td>
+                                        <td>
+                                            <span data-bind="text: Cr()"></span>
+                                        </td>
+                                        <td class="editDeleteSection">
+                                            <a href='#' id="EditVoucherInfoBtn" class="glyphicon glyphicon-edit" title="Edit"
+                                                data-bind="click:$root.EditVoucherInfo" style="visibility: hidden;"></a><a href='#'
+                                                    id="DeleteVoucherInfoBtn" class="glyphicon glyphicon-trash" title="Delete" data-bind="click:$root.DeleteVoucherInfo">
+                                                </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody>
+                                    <tr style="font-weight: bold; border: none;">
+                                        <td colspan="5" style="text-align: right; border-left:none;">Total</td>
+                                        <td style="border-left: none;" data-bind="text: totalDr()"></td>
+                                        <td style="border-right: none; border-left:none;" data-bind="text: totalCr()"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 pull-right">
+                        <button id="btnSubmit" class="btn btn-primary" data-bind="click:SubmitOfficeTran">
+                            Submit</button>
+                        <button id="btnPrint" class="btn btn-primary" style='display: none;' data-bind="click:PrintJVBankCashVoucher">
+                            Print</button>
+                        <button id="btnCancel" class="btn btn-primary" data-bind="click: ClearSubmitControls">
+                            Cancel</button>
+                    </div>
+                    <div class="col-md-9">
+                    </div>
+                </div>
+                <br />
+            </form>
+        </div>
+    </div>
+    </div>
+    <script src="../../../Scripts/ACCOUNT/OfficeVoucherTransaction.js" type="text/javascript"></script>
+</asp:Content>

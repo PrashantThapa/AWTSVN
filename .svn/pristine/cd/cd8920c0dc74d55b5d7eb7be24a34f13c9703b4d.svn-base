@@ -1,0 +1,85 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace HRFA.ATT
+{
+    public class ATTBudgetApprove
+    {
+        public ATTBudgetApprove()
+        {
+            _Office = new ATTOffice();
+            _BudgetItem = new ATTBudgetItem();
+            _Job = new ATTJob();
+            _CostCenter = new ATTCostCenter();
+            AccountChart = new ATTAccountChart();
+            _FiscalYear = new ATTFiscalYear();
+            _IncomeType = new ATTIncomeType();
+            BudgetApprove = new List<ATTBudgetApprove>();
+        }
+
+        private ATTOffice _Office;
+       public ATTOffice Office
+        {
+            get { return _Office; }
+            set { _Office = value; }
+
+        }
+       private ATTBudgetItem _BudgetItem;
+       public ATTBudgetItem BudgetItem
+       {
+           get { return _BudgetItem; }
+           set { _BudgetItem = value; }
+
+       }
+
+       private ATTJob _Job;
+       public ATTJob Job
+       {
+           get { return _Job; }
+           set { _Job = value; }
+
+       }
+       private ATTCostCenter _CostCenter;
+       public ATTCostCenter CostCenter
+       {
+           get { return _CostCenter; }
+           set { _CostCenter = value; }
+
+       }
+       public ATTAccountChart AccountChart ;
+
+       public string RequestDate { get; set; }
+       public string ReqDate { get; set; }
+       public string ApproveDate { get; set; }
+       public double? Amount { get; set; }
+       public double? ApproveAmount { get; set; }
+       public double? ReqAmount { get; set; }
+       public string Remarks { get; set; }
+       public string Action { get; set; }
+       public string Status { get; set; }
+       public string EntryBy { get; set; }
+       public string EntryDate { get; set; }
+       public string FromDate { get; set; }
+       public Int64? SubmissionNo { get; set; }
+       public Int64? OldSubmissionNo { get; set; }
+       public string ToDate { get; set; }
+
+       public ATTFiscalYear _FiscalYear;
+       public ATTFiscalYear FiscalYear
+       {
+           get { return _FiscalYear; }
+           set { _FiscalYear = value; }
+       }
+
+       public ATTIncomeType _IncomeType ;
+       public ATTIncomeType IncomeType
+       {
+           get { return _IncomeType; }
+           set { _IncomeType = value; }
+       }
+       public List<ATTBudgetApprove> BudgetApprove;
+
+       public Int32? SeqNo { get; set; }
+
+    }
+}

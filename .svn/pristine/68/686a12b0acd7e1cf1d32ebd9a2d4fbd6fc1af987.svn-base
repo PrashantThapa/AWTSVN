@@ -1,0 +1,188 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLCostCenter
+    {
+        public string SaveCostCenter(ATTCostCenter objCostCenter)
+        {
+            string SP = "";
+            string msg = "";
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+            OracleTransaction tran = dbConn.BeginTransaction();
+            try
+            {
+
+                if (objCostCenter.Action == "A")
+                {
+                    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_COSTCENTER";
+                    msg = "Successfully Saved.";
+                }
+                else if (objCostCenter.Action == "E")
+                {
+                    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_COSTCENTER";
+                    msg = "Successfully Updated.";
+                }
+                if (SP != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+                    //objSalaryItem.SalaryItems.SalaryItemID,
+                    paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CD", objCostCenter.Office.OfficeCode, OracleDbType.Int32, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_COSTCENTER_ID", objCostCenter.CostCenterID, OracleDbType.Int16, ParameterDirection.Input));
+                    //paramList.Add(SqlHelper.GetOraParam(":p_COSTCENTER_NAME", objCostCenter.CostCenterName, OracleDbType.Varchar2, ParameterDirection.Input));
+
+                    //paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_NAME_ENG", objCostCenter.CostCenterNameEng, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", objCostCenter.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", objCostCenter.ToDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", objCostCenter.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", objCostCenter.EntryDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    //paramList.Add(SqlHelper.GetOraParam(":P_STATUS", objCostCenter.Status, OracleDbType.Varchar2, ParameterDirection.Input));
+
+
+                    //                  paramList[0].Size = 50;
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+                }
+                tran.Commit();
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw new Exception("Error" + ex.Message);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+
+
+        }
+
+        public List<ATTCostCenter> GetCostCenter(Int32? officeCode, Int16? CostCenterID)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_COSTCENTER";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CD", officeCode, OracleDbType.Int32, ParameterDirection.Input));
+
+                paramList.Add(SqlHelper.GetOraParam(":p_COSTCENTER_ID", CostCenterID, OracleDbType.Int16, ParameterDirection.Input));
+
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTCostCenter> lst = new List<ATTCostCenter>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTCostCenter obj = new ATTCostCenter();
+
+                    obj.CostCenterID = string.IsNullOrEmpty(drow["COSTCENTER_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["COSTCENTER_ID"].ToString());
+                    // Convert.ToInt16(drow["COSTCENTER_ID"].ToString());
+                    obj.CostCenterName = drow["COSTCENTER_NAME"].ToString();
+
+                    lst.Add(obj);
+                }
+
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+        public List<ATTCostCenter> GetAllCostCenter( Int16? CostCenterID)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_CLK_COSTCENTER";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":p_COSTCENTER_ID", CostCenterID, OracleDbType.Int16, ParameterDirection.Input));
+
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTCostCenter> lst = new List<ATTCostCenter>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTCostCenter obj = new ATTCostCenter();
+
+                    obj.CostCenterID = string.IsNullOrEmpty(drow["COSTCENTER_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["COSTCENTER_ID"].ToString());
+                    // Convert.ToInt16(drow["COSTCENTER_ID"].ToString());
+                    obj.CostCenterName = drow["COSTCENTER_NAME"].ToString();
+
+                    lst.Add(obj);
+                }
+
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+    }
+}
+
+       //public List<ATTCostCenter> GetCostCenterDetails(Int32? officeCode, Int64? CostCenterID)
+       //{
+       //    GetConnection conn = new GetConnection();
+       //    OracleConnection dbConn = conn.GetDbConn();
+       //    try
+       //    {
+       //        string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_COSTCENTER_BYOFFICE";
+
+       //        List<OracleParameter> paramList = new List<OracleParameter>();
+
+       //        paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CD", officeCode, OracleDbType.Int64, ParameterDirection.Input));
+       //        paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, ParameterDirection.Output));
+       //        DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+       //        List<ATTCostCenter> lst = new List<ATTCostCenter>();
+
+       //        foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+       //        {
+       //            ATTCostCenter obj = new ATTCostCenter();
+
+       //            obj.CostCenterID = Convert.ToInt64(drow["COSTCENTER_ID"].ToString());
+       //            obj.CostCenterName = drow["COSTCENTER_NAME"].ToString();
+
+       //            lst.Add(obj);
+       //        }
+
+       //        return lst;
+
+       //    }
+       //    catch (Exception ex)
+       //    {
+       //        throw (ex);
+       //    }
+       //}
+

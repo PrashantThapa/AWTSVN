@@ -1,0 +1,552 @@
+﻿using System;
+using System.Data;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLPerson
+    {
+        
+        public string SavePerson(ATTPerson objPerson, OracleTransaction tran)
+        {
+            string msg = "";
+
+            bool isDirty = false;
+
+            if (objPerson.Source == "DIRTY")
+            {
+                isDirty = true;
+            }
+
+            try
+            {
+                SavePersonInfo(objPerson, tran);
+
+                #region Person Documents
+
+                if (objPerson.PersonDocs != null && objPerson.PersonDocs.Count > 0)
+                {
+                    DLLPersonDoc dllPersonDoc = new DLLPersonDoc();
+                    for (int i = 0; i < objPerson.PersonDocs.Count; i++) 
+                    {
+                        objPerson.PersonDocs[i].Status = objPerson.Status;
+                    }
+                    if (isDirty)
+                    {
+                        dllPersonDoc.SaveDirtyPersonDocs(objPerson.PersonDocs, objPerson.SubmissionNo, objPerson.SeqNo, objPerson.EntryBy, tran);
+                    }
+                    else
+                    {
+                        dllPersonDoc.SavePersonDocs(objPerson.PersonDocs, objPerson.PID, objPerson.EntryBy, tran);
+                    }
+                }
+
+                #endregion               
+
+                #region Person Marital Status
+                if (objPerson.PersonMaritalStatus != null)
+                {
+                    DLLMaritalStatus dllMaritalStatus = new DLLMaritalStatus();
+                    objPerson.PersonMaritalStatus.Status = objPerson.Status;
+                    if (isDirty)
+                    {
+                        dllMaritalStatus.SaveDirtyPersonMaritalStatus(objPerson.PersonMaritalStatus, objPerson.SubmissionNo, objPerson.SeqNo, objPerson.EntryBy, tran);
+                    }
+                    else
+                    {
+                        dllMaritalStatus.SavePersonMaritalStatus(objPerson.PersonMaritalStatus, objPerson.PID, objPerson.EntryBy, tran);
+                    }
+                }
+
+                #endregion
+
+                #region Person Addresses
+                if (objPerson.PersonAddresses != null && objPerson.PersonAddresses.Count > 0)
+                {
+                    DLLPersonAddress dllPersonAddress = new DLLPersonAddress();
+                    for (int i = 0; i < objPerson.PersonAddresses.Count; i++)
+                    {
+                        objPerson.PersonAddresses[i].Status = objPerson.Status;
+                    }
+                    if (isDirty)
+                    {
+                         dllPersonAddress.SaveDirtyPersonAddress(objPerson.PersonAddresses, objPerson.SubmissionNo, objPerson.SeqNo, objPerson.EntryBy, tran);
+                    }
+                    else
+                    {
+                        dllPersonAddress.SavePersonAddress(objPerson.PersonAddresses, objPerson.PID, objPerson.EntryBy, tran);
+                    }
+                }
+
+                #endregion
+
+                #region Person Contacts
+                if (objPerson.PersonContacts != null && objPerson.PersonContacts.Count > 0)
+                {
+                    DLLPersonContact dllPersonContact = new DLLPersonContact();
+                    for (int i = 0; i < objPerson.PersonContacts.Count; i++)
+                    {
+                        objPerson.PersonContacts[i].Status = objPerson.Status;
+                    }
+                    if (isDirty)
+                    {
+                        dllPersonContact.SaveDirtyPersonContact(objPerson.PersonContacts, objPerson.SubmissionNo, objPerson.SeqNo, objPerson.EntryBy, tran);
+                    }
+                    else
+                    {
+                        dllPersonContact.SavePersonContact(objPerson.PersonContacts, objPerson.PID, objPerson.EntryBy, tran);
+                    }
+
+                }
+
+                #endregion
+
+                #region Person Dependents
+
+                if (objPerson.Dependents != null && objPerson.Dependents.Count > 0)
+                {
+                    DLLPersonDependent dllDependent = new DLLPersonDependent();
+                    for (int i = 0; i < objPerson.Dependents.Count; i++)
+                    {
+                        objPerson.Dependents[i].Status = objPerson.Status;
+                    }
+                    if (isDirty)
+                    {
+                        //objPerson.Dependents.Status = objPerson.Status;
+                        dllDependent.SaveDirtyPersonDependent(objPerson.Dependents, objPerson.SubmissionNo, objPerson.SeqNo, objPerson.EntryBy, tran);
+                    }
+                    else
+                    {
+                        dllDependent.SavePersonDependent(objPerson.Dependents, objPerson.PID, objPerson.EntryBy, tran);
+                    }
+                }
+
+                #endregion
+
+                #region Person Languages
+
+                if (objPerson.PersonLanguages != null && objPerson.PersonLanguages.Count > 0)
+                {
+                    DLLPersonLanguage dllLanguage = new DLLPersonLanguage();
+                    for (int i = 0; i < objPerson.PersonLanguages.Count; i++)
+                    {
+                        objPerson.PersonLanguages[i].Status = objPerson.Status;
+                    }
+                    if (isDirty)
+                    {
+                        dllLanguage.SaveDirtyPersonLanguage(objPerson.PersonLanguages, objPerson.SubmissionNo, objPerson.SeqNo, objPerson.EntryBy, tran);
+                    }
+                    else
+                    {
+                        //dllDependent.SavePersonDependent(objPerson.Dependents, objPerson.PID, objPerson.EntryBy, tran);
+                    }
+                }
+
+                #endregion
+
+                #region Person Qualification
+
+                if (objPerson.PersonQualifications != null && objPerson.PersonQualifications.Count > 0)
+                {
+                    DLLPersonQualification dllQualification = new DLLPersonQualification();
+                    for (int i = 0; i < objPerson.PersonQualifications.Count; i++)
+                    {
+                        objPerson.PersonQualifications[i].Status = objPerson.Status;
+                    }
+                    if (isDirty)
+                    {
+                        dllQualification.SaveDirtyPersonQualification(objPerson.PersonQualifications, objPerson.SubmissionNo, objPerson.SeqNo, objPerson.EntryBy, tran);
+                    }
+                    else
+                    {
+                    }
+                }
+
+                #endregion
+
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            
+
+        }
+
+        
+        public bool SavePersonInfo(ATTPerson obj, OracleTransaction tran)
+        {
+            try
+            {
+                string sp = "";
+
+				//string msgs = "Image Field is Empty";
+
+                bool isDirty = false;
+
+                if (obj.Source == "DIRTY")
+                {
+                    isDirty = true;
+                }
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                if (isDirty)
+                {
+                    if (obj.Action == "A")
+                    {
+                        sp = "DCPR_ADD_PERSON";
+                    }
+					else if (obj.Action == "E")
+					{
+						sp = "DCPR_EDIT_PERSON";
+					}
+
+					paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", obj.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":P_SEQ_NO", obj.SeqNo, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+                }
+                else
+                {
+                    if (obj.Action == "A")
+                    {
+                        sp = "CPR_ADD_PERSON";
+                    }
+					else if (obj.Action == "E")
+					{
+						sp = "CPR_EDIT_PERSON";
+					}
+
+					paramList.Add(SqlHelper.GetOraParam(":p_PERSON_ID", obj.PID, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                }
+
+
+                if (sp != "")
+                {
+                    byte[] bytes;
+
+                    if (obj.PersonImage == null || obj.PersonImage == "")
+                        bytes = null;
+                    else
+                    {
+                        bytes = image2byteConverter.image2byte(obj.PersonImage.ToString());
+                    } 
+                 
+                    paramList.Add(SqlHelper.GetOraParam(":p_PERSON_FIRST_NAME", obj.FirstName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PERSON_MIDDLE_NAME", obj.MiddleName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PERSON_LAST_NAME", obj.LastName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PERSON_FIRST_NAME_ENG", obj.FirstNameEn, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PERSON_MIDDLE_NAME_ENG", obj.MiddleNameEn, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PERSON_LAST_NAME_ENG", obj.LastNameEn, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PERSON_DOB", obj.DOB, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PERSON_GENDER", obj.Gender, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_DS_AGENCY_ID", 0, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_DS_ID", null, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PERSON_SSID",null, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_COUNTRY_CODE", obj.Country.CountryCode, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_REL_ID", obj.Religion.ReligionTypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_ETH_ID", 1, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", obj.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    //paramList.Add(SqlHelper.GetOraParam(":P_TRAN_NO", 0, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ALERT_SOURCE", obj.AlertSource, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ALT_SOURCE_VAL", obj.AlertSourceValue, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+					//paramList.Add(SqlHelper.GetOraParam(":P_IMAGE_FILE", bytes, OracleDbType.Blob, System.Data.ParameterDirection.Input));
+   					paramList.Add(SqlHelper.GetOraParam(":P_IMAGE_FILE", bytes, OracleDbType.Blob, ParameterDirection.Input));
+					
+                    paramList[0].Size = 16 ;
+                    paramList[1].Size = 16;
+
+                    SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                    if (obj.Action == "A")
+                    {
+                        if (isDirty)
+                        {
+
+                            if (paramList[0].Value.ToString() != null || paramList[0].Value.ToString() != "")
+                            {
+                                obj.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+                            }
+
+
+                            if (paramList[1].Value.ToString() != null || paramList[1].Value.ToString() != "")
+                            {
+                                obj.SeqNo = int.Parse(paramList[1].Value.ToString());
+                            }
+
+                            paramList.Clear();
+                        }
+                        else
+                        {
+                            if (paramList[0].Value.ToString() != null || paramList[0].Value.ToString() != "")
+                            {
+                                obj.PID = Int64.Parse(paramList[0].Value.ToString());
+                            }
+                        }
+                    }
+                }
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+        public ATTPerson GetPersonInfo(Int64? PID, string filePath)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            try
+            {
+                ATTPerson obj = new ATTPerson();
+                obj = GetPersonInfo(filePath, obj, PID, conn);
+
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+        public ATTPerson GetPerson(Int64? PID, string filePath)
+        {
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            
+            ATTPerson obj = new ATTPerson();
+            try
+            {
+                obj = GetPersonInfo(filePath, obj, PID, conn);
+
+                DLLPersonDoc dllPersonDoc = new DLLPersonDoc();
+                //DLLSkillType dllSkillType = new DLLSkillType();
+                //DLLMedicalAtt dllMedicalAtt = new DLLMedicalAtt();
+                //DLLLiteracyType dllLiteracyType = new DLLLiteracyType();
+                DLLMaritalStatus dllMaritalStatus = new DLLMaritalStatus();
+                DLLPersonContact dllPersonContact = new DLLPersonContact();
+                DLLPersonAddress dllPersonAddress = new DLLPersonAddress();
+                DLLPersonDependent dllDependent = new DLLPersonDependent();
+
+                obj.PersonDocs = dllPersonDoc.GetPersonDocs(PID, 0, conn);
+                //obj.PersonSkills = dllSkillType.GetPersonSkills(PID, 0, conn);
+                //obj.PersonMedAttributes = dllMedicalAtt.GetPersonMas(PID, 0, conn);
+                //obj.PersonLiteracy = dllLiteracyType.GetPersonLiteracy(PID, 0, conn);
+                obj.PersonMaritalStatus = dllMaritalStatus.GetPersonMaritalStatus(PID, 0, conn);
+                obj.PersonAddresses = dllPersonAddress.GetPersonAddress(PID, 0, conn);
+                obj.PersonContacts = dllPersonContact.GetPersonContact(PID, 0, conn);
+                obj.Dependents = dllDependent.GetPersonDependent(PID, 0, conn);
+
+
+                return obj;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+
+        public ATTPerson GetPersonInfo(string filePath, ATTPerson obj, Int64? ID, OracleConnection conn, bool isDirty = false)
+        {
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                string sp = "CPR_GET_PERSON";
+
+                if (isDirty)
+                {
+                    sp = "DCPR_GET_PERSON";
+                    paramList.Add(SqlHelper.GetOraParam(":P_SEQ_NO", obj.SeqNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                }
+
+                paramList.Add(SqlHelper.GetOraParam(":p_ID", ID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow dr = ((DataTable)ds.Tables[0]).Rows[0];
+
+                    if (isDirty)
+                    {
+                        obj.SubmissionNo = string.IsNullOrEmpty(dr["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(dr["SUBMISSION_NO"].ToString());
+                        obj.SeqNo = string.IsNullOrEmpty(dr["SEQ_NO"].ToString()) ? (Int32?)null : Int32.Parse(dr["SEQ_NO"].ToString());
+                    }
+                    else
+                    {
+                        obj.PID = string.IsNullOrEmpty(dr["P_ID"].ToString()) ? (Int64?)null : Int64.Parse(dr["P_ID"].ToString());
+                    }
+
+                    obj.FirstName = dr["FNAME_NEP"].ToString();
+                    obj.MiddleName = dr["MNAME_NEP"].ToString();
+                    obj.LastName = dr["LNAME_NEP"].ToString();
+                    obj.FirstNameEn = dr["FNAME_ENG"].ToString();
+
+                    obj.MiddleNameEn = dr["MNAME_ENG"].ToString();
+                    obj.LastNameEn = dr["LNAME_ENG"].ToString();
+
+
+                    obj.DOB = dr["DOB"].ToString();
+                    obj.Gender = dr["GENDER"].ToString();
+
+                    obj.Country.CountryCode = dr["COUNTRY_CODE"].ToString();
+                    obj.Status = dr["R_STAUS"].ToString();
+
+                    obj.Religion.ReligionTypeID = string.IsNullOrEmpty(dr["REL_ID"].ToString()) ? (Int32?)null : Int32.Parse(dr["REL_ID"].ToString());
+                   
+
+                    obj.AlertSource = dr["ALERT_SOURCE"].ToString();
+                    obj.AlertSourceValue = dr["ALT_SOURCE_VAL"].ToString();
+
+                    obj.PersonImage = ((dr["IMAGE_FILE"] != DBNull.Value) ? image2byteConverter.Byte2Photo((byte[])dr["IMAGE_FILE"], filePath) : "");
+
+                    //byte[] FileByte = dr["IMAGE_FILE"] == DBNull.Value ? null : (byte[])dr["IMAGE_FILE"];
+                    ////string FilePath = HttpContext.Current.Server.MapPath("../../PhotoHandle/temp");
+                    //if (FileByte == null)
+                    //    obj.PersonImage = null;
+                    //else
+                    //{
+                    //    //obj.PersonImage = FilePath + "/" + image2byteConverter.Byte2Photo(FileByte, FilePath);
+                    //    //char[] chars = new char[FileByte.Length / sizeof(char)];
+                    //    //System.Buffer.BlockCopy(FileByte, 0, chars, 0, FileByte.Length);
+                    //    //obj.PersonImage = new string(chars);
+                    //}
+                }
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+        
+        public ATTPerson GetPerson(string filePath, Int64? ID,  OracleConnection conn, bool isDirty = false)
+        {
+            ATTPerson obj = new ATTPerson();
+
+            try
+            {
+                DLLPersonDoc dllPersonDoc = new DLLPersonDoc();
+                //DLLSkillType dllSkillType = new DLLSkillType();
+                //DLLMedicalAtt dllMedicalAtt = new DLLMedicalAtt();
+                //DLLLiteracyType dllLiteracyType = new DLLLiteracyType();
+                DLLMaritalStatus dllMaritalStatus = new DLLMaritalStatus();
+                DLLPersonAddress dllPersonAddress = new DLLPersonAddress();
+                DLLPersonContact dllPersonContact = new DLLPersonContact();
+                DLLPersonDependent dllDependent = new DLLPersonDependent();
+
+                if (isDirty)
+                {
+                    obj = GetPersonInfo(filePath, obj, ID, conn, true);
+                    obj.PersonDocs = dllPersonDoc.GetPersonDocs(ID, obj.SeqNo ,conn, true);
+                    obj.PersonMaritalStatus = dllMaritalStatus.GetPersonMaritalStatus(ID, obj.SeqNo, conn, true);
+                    obj.PersonAddresses = dllPersonAddress.GetPersonAddress(ID, obj.SeqNo, conn, true);
+                    obj.PersonContacts = dllPersonContact.GetPersonContact(ID, obj.SeqNo, conn, true);
+                    obj.Dependents = dllDependent.GetPersonDependent(ID, obj.SeqNo, conn, true);
+
+
+                    //obj.PersonSkills = dllSkillType.GetPersonSkills(ID, obj.SeqNo, conn, true);
+                    //obj.PersonMedAttributes = dllMedicalAtt.GetPersonMas(ID, obj.SeqNo, conn, true);
+                    //obj.PersonLiteracy = dllLiteracyType.GetPersonLiteracy(ID, obj.SeqNo, conn, true);
+                }
+                else
+                {
+                    obj = GetPersonInfo(filePath, obj, ID, conn);
+                    obj.PersonDocs = dllPersonDoc.GetPersonDocs(ID, obj.SeqNo ,conn);
+                    //obj.PersonSkills = dllSkillType.GetPersonSkills(ID, obj.SeqNo ,conn);
+                    //obj.PersonMedAttributes = dllMedicalAtt.GetPersonMas(ID, obj.SeqNo, conn);
+                    //obj.PersonLiteracy = dllLiteracyType.GetPersonLiteracy(ID, obj.SeqNo, conn);
+                    obj.PersonMaritalStatus = dllMaritalStatus.GetPersonMaritalStatus(ID, obj.SeqNo, conn);
+
+                    obj.PersonAddresses = dllPersonAddress.GetPersonAddress(ID, obj.SeqNo, conn);
+
+                    obj.PersonContacts = dllPersonContact.GetPersonContact(ID, obj.SeqNo, conn);
+                    obj.Dependents = dllDependent.GetPersonDependent(ID, obj.SeqNo, conn);
+                }
+
+
+                return obj;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+
+        public ATTPerson GetDirtyPerson(string filePath, Int64? submissionNo, OracleConnection conn, int seqNo = 1)
+        {
+            ATTPerson obj = new ATTPerson();
+            obj.SeqNo = seqNo;
+
+            try
+            {
+                obj = GetPersonInfo(filePath, obj, submissionNo, conn, true);
+
+                DLLPersonDoc dllPersonDoc = new DLLPersonDoc();
+                DLLMaritalStatus dllMaritalStatus = new DLLMaritalStatus();
+                DLLPersonContact dllPersonContact = new DLLPersonContact();
+                DLLPersonAddress dllPersonAddress = new DLLPersonAddress();
+                DLLPersonDependent dllDependent = new DLLPersonDependent();
+                DLLPersonQualification dllQualification = new DLLPersonQualification();
+                DLLPersonLanguage dllLanguage = new DLLPersonLanguage();
+
+
+                //DLLSkillType dllSkillType = new DLLSkillType();
+                //DLLMedicalAtt dllMedicalAtt = new DLLMedicalAtt();
+                //DLLLiteracyType dllLiteracyType = new DLLLiteracyType();
+
+                obj.PersonDocs = dllPersonDoc.GetPersonDocs(obj.SubmissionNo, obj.SeqNo, conn, true);
+                obj.PersonMaritalStatus = dllMaritalStatus.GetPersonMaritalStatus(obj.SubmissionNo, obj.SeqNo, conn, true);
+                obj.PersonAddresses = dllPersonAddress.GetPersonAddress(obj.SubmissionNo, obj.SeqNo, conn, true);
+                obj.PersonContacts = dllPersonContact.GetPersonContact(obj.SubmissionNo, obj.SeqNo, conn, true);
+                obj.Dependents = dllDependent.GetPersonDependent(obj.SubmissionNo, obj.SeqNo, conn, true);
+                obj.PersonQualifications = dllQualification.GetPersonQualifications(obj.SubmissionNo, obj.SeqNo, conn, true);
+                obj.PersonLanguages = dllLanguage.GetPersonLanguages(obj.SubmissionNo, obj.SeqNo, conn, true);
+
+
+                //obj.PersonSkills = dllSkillType.GetPersonSkills(obj.SubmissionNo, obj.SeqNo, conn, true);
+                //obj.PersonMedAttributes = dllMedicalAtt.GetPersonMas(obj.SubmissionNo, obj.SeqNo, conn, true);
+                //obj.PersonLiteracy = dllLiteracyType.GetPersonLiteracy(obj.SubmissionNo, obj.SeqNo, conn, true);
+
+
+                return obj;
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            
+
+        }
+
+    }
+}

@@ -1,0 +1,160 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT.PAYROLL;
+using HRFA.COMMON;
+using System.Configuration;
+using System.Collections.ObjectModel;
+using System.Linq;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer.PAYROLL
+{
+  public  class DLLSalaryParameter
+    {
+        public string SaveEmpGrade(ATTSalaryParameter SalaryParameter, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+            string entryby = "";
+            string submissionNo = null;
+            string oldSubmissionNo = null;
+            Int32? spid = null;
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+
+				var p_INS = "INS";
+				if (SalaryParameter.Action == "E")
+                    {
+                        p_INS = "UP";
+                        sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_EDIT_SALARYPARAMETER";
+                        msg = "Successfully Edited.";
+                    }
+                    else if (SalaryParameter.Action == "A")
+                    {
+                        p_INS = "INS";
+                        sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_SALARYPARAMETER";
+                        msg = "Successfully Saved.";
+                    }
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+                    paramList.Add(SqlHelper.GetOraParam(":P_SP_ID", SalaryParameter.SPID, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", submissionNo, OracleDbType.Varchar2, System.Data.ParameterDirection.InputOutput));
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", SalaryParameter.EmpID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_GRADE_ID", SalaryParameter.GradeID, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_CIT_PER", SalaryParameter.CITPer, OracleDbType.Decimal, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_CIT_RS", SalaryParameter.CITRs, OracleDbType.Decimal, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_PF_PER", SalaryParameter.PFPer, OracleDbType.Decimal, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_PF_RS", SalaryParameter.PFRs, OracleDbType.Decimal, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", SalaryParameter.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", SalaryParameter.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_TAX_DEDUCTION_ID", SalaryParameter.TaxDeduction, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_GRADE_LEVEL", SalaryParameter.GradeLevelName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_TAX", SalaryParameter.Tax, OracleDbType.Decimal, System.Data.ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_INSURANCEAMT", SalaryParameter.InsuranceAmt, OracleDbType.Decimal, System.Data.ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_ADVANCEAMT", SalaryParameter.AdvanceAmt, OracleDbType.Decimal, System.Data.ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":P_LUNCHAMT", SalaryParameter.LunchAmt, OracleDbType.Decimal, System.Data.ParameterDirection.Input));
+
+
+					paramList[1].Size = 16;
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    spid = Int32.Parse(paramList[0].Value.ToString());
+                    submissionNo = paramList[1].Value.ToString();
+					oldSubmissionNo = submissionNo.ToString();
+                    entryby = SalaryParameter.EntryBy;
+                    paramList.Clear();
+                    if(SalaryParameter.extrallowancedata!=null)
+                        new DLLAddressType().SaveExtraAllowance(SalaryParameter.extrallowancedata, spid,tran);
+
+                }
+
+                if (oldSubmissionNo != null)
+                {
+                    DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                    dllUTV.SaveVerifyLog(tran, entryby, Convert.ToInt64(oldSubmissionNo), Convert.ToInt64(submissionNo), appID, modID);
+                }
+                tran.Commit();
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            //return msg;
+            return msg + "Data saved! Please Note your submission number!!" + submissionNo + "</b>";
+        }
+
+		public object GetEmpGrade(Int64? submissionNo)
+		{
+			GetConnection getConn = new GetConnection();
+			OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+			try
+			{
+                string SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_EMP_GRADE_HISTORY";
+                //string SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".GET_ALL_GRADE_SCALE_SETUP";
+
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+				paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", submissionNo, OracleDbType.Int64, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+				DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+				List<ATTSalaryParameter> lst = new List<ATTSalaryParameter>();
+
+				foreach (DataRow drow in ds.Tables[0].Rows)
+				{
+					ATTSalaryParameter objEmpGrade = new ATTSalaryParameter();
+                    objEmpGrade.SPID = string.IsNullOrEmpty(drow["SP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["SP_ID"].ToString());
+					objEmpGrade.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString());
+					objEmpGrade.GradeID = drow["GRADE_ID"].ToString();
+					//objEmpGrade.GradeValue = drow["GRADE_UNIT_AMOUNT"].ToString();
+					objEmpGrade.CITPer = Decimal.Parse(drow["CIT_PER"].ToString());
+					objEmpGrade.CITRs = Decimal.Parse(drow["CIT_RS"].ToString());
+					objEmpGrade.PFPer = Decimal.Parse(drow["PF_PER"].ToString());
+					objEmpGrade.PFRs = Decimal.Parse(drow["PF_RS"].ToString());
+					objEmpGrade.EntryBy = drow["ENTRY_BY"].ToString();
+					objEmpGrade.EntryDate = drow["ENTRY_DATE"].ToString();
+                    objEmpGrade.OldSubmissionNo = drow["SUBMISSION_NO"].ToString();
+                    objEmpGrade.RStatus = drow["R_STATUS"].ToString();
+					objEmpGrade.GradeLevelName = drow["TAX_DEDUCTION_ID"].ToString();
+					objEmpGrade.Tax = Decimal.Parse(drow["TAX"].ToString());
+					objEmpGrade.InsuranceAmt = Decimal.Parse(drow["INSURANCEAMT"].ToString());
+					objEmpGrade.LunchAmt = Decimal.Parse(drow["LUNCHAMT"].ToString());
+
+					lst.Add(objEmpGrade);
+				}
+
+
+				return lst;
+			}
+			catch (Exception ex)
+			{
+
+				throw (ex);
+			}
+			finally
+			{
+				getConn.CloseDbConn();
+			}
+		}
+
+
+
+	}
+}

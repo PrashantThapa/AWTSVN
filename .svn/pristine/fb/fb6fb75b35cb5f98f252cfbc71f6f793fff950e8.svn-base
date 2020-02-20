@@ -1,0 +1,1382 @@
+﻿//jshint esversion: 6
+
+var formattedCurrDate;
+
+function OfficeCompanyAccChart(data) {
+    var self = this;
+    self.Company = ko.observable(data.Company);
+    self.AccountChart = ko.observable(data.AccountChart);
+    self.AccName = ko.observable(data.AccountChart.AccName);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.FromDate = ko.observable(data.FromDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.ToDate = ko.observable(data.ToDate);
+    self.TranNo = ko.observable(data.TranNo);
+    self.Action = ko.observable(data.Action);
+    self.Selected = ko.observable(data.Selected);
+    self.HaveSubs = ko.observable(data.HaveSubs);
+}
+
+function OfficeCompanyAccChartSub(data) {
+    var self = this;
+    self.AccCode = ko.observable(data.AccountChart.AcNo);
+    self.AccName = ko.observable(data.AccountChart.AccName);
+}
+
+function ContraAccount(data) {
+    var self = this;
+    self.AccCode = ko.observable(data.AccountChart.AcNo);
+    self.AccName = ko.observable(data.AccountChart.AccName);
+}
+
+function Company(data) {
+    var self = this;
+    self.Office = ko.observable(data.Office);
+    self.CompanyID = ko.observable(data.CompanyID);
+    self.CompanyName = ko.observable(data.CompanyName);
+    self.CompanyNameEng = ko.observable(data.CompanyNameEng);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.RStatus = ko.observable(data.RStatus);
+    self.TranNo = ko.observable(data.TranNo);
+    self.Action = ko.observable(data.Action);
+}
+
+function CostCenter(data) {
+    var self = this;
+    if (data != undefined) {
+        self.OfficeCode = ko.observable(data.OfficeCode);
+        self.CostCenterID = ko.observable(data.CostCenterID);
+        self.CostCenterName = ko.observable(data.CostCenterName);
+        self.CostCenterNameEng = ko.observable(data.CostCenterNameEng);
+        self.Status = ko.observable(data.Status);
+        self.FromDate = ko.observable(data.FromDate);
+        self.ToDate = ko.observable(data.ToDate);
+        self.EntryBy = ko.observable(data.EntryBy);
+        self.EntryDate = ko.observable(data.EntryDate);
+        self.Action = ko.observable(data.Action);
+    }
+}
+
+function Office(data) {
+    var self = this;
+    self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+    self.OfficeCode = ko.observable(data.OfficeCode);
+}
+
+function AccountChart(data) {
+    var self = this;
+    self.AccCode = ko.observable(data.AccCode);
+    self.AccName = ko.observable(data.AccName);
+    self.GLGroup = ko.observable(data.GLGroup);
+    self.PaACCode = ko.observable(data.PaACCode);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.TranNo = ko.observable(data.TranNo);
+    self.HeadTran = ko.observable(data.HeadTran);
+    self.Balance = ko.observable(data.Balance);
+    self.GlCode = ko.observable(data.GlCode);
+    self.ACNameEng = ko.observable(data.ACNameEng);
+    self.Action = ko.observable(data.Action);
+    self.HaveSubs = ko.observable(data.HaveSubs);
+    self.ShowHide = ko.observable(parseInt(data.AccountChart.ShowHide, 16));
+}
+
+function GLGroup(data) {
+    var self = this;
+    self.GroupID = ko.observable(data.GroupID);
+    self.GroupName = ko.observable(data.GroupName);
+}
+
+function VoucherGroup(data) {
+    var self = this;
+    self.VoucherGroupID = ko.observable(data.VoucherGroupID);
+    self.VoucherGroupDesc = ko.observable(data.VoucherGroupDesc);
+}
+
+/*********************Structure Begin ******************************************/
+
+function GetAccounts(data) {
+    var self = this;
+    self.AccountID = ko.observable(data.AccountID);
+    self.AccNameNep = ko.observable(data.AccNameNep);
+    self.AccNameEng = ko.observable(data.AccNameEng);
+}
+
+function AccChart(data) {
+    var self = this;
+    self.AccCode = ko.observable(data.AccountChart.AccCode);
+    self.AccName = ko.observable(data.AccountChart.AccName);
+    self.VoucherGroupID = ko.observable(data.VoucherGroup.VoucherGroupID);
+    self.CodeNo = ko.observable(data.AccountChart.CodeNo);
+    self.HaveSubs = ko.observable(data.AccountChart.HaveSubs);
+   
+    self.ShowHide = ko.observable(parseInt(data.AccountChart.ShowHide, 16)); // parse from hexadecimal number to decimal
+}
+
+function Accounts(data) {
+    var self = this;
+    AccountID = ko.observable(data.AccountID);
+    AccountDate = ko.observable(data.AccountDate);
+    AccountStatus = ko.observable(data.AccountStatus);
+    SourceTypes = ko.observable(data.SourceTypes);
+    SourceID = ko.observable(data.SourceID);
+    EntryBy = ko.observable(data.EntryBy);
+    EntryDate = ko.observable(data.EntryDate);
+    RStatus = ko.observable(data.RStatus);
+    TranNo = ko.observable(data.TranNo);
+}
+
+function OfficeTranDetail(data) {
+    var self = this;
+    self.TranNo = ko.observable(data.TranNo);
+    self.OfficeCompanyAccChart = ko.observable(data.OfficeCompanyAccChart);
+    self.AcNo = ko.observable(data.AcNo);
+    self.AccName = ko.observable(data.AccName);
+    self.Accounts = ko.observable(data.Accounts);
+    self.DrCr = ko.observable(data.DrCr);
+    self.Dr = ko.observable(data.Dr);
+    self.Cr = ko.observable(data.Cr);
+    self.Description = ko.observable(data.Description);
+    self.Amount = ko.observable(data.Amount);
+    self.TranSeqNo = ko.observable(data.TranSeqNo);
+    self.EntryBY = ko.observable(data.EntryBY);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.Action = ko.observable(data.Action);
+}
+
+function OfficeTransaction(data) {
+    var self = this;
+    self.TranNo = ko.observable(data.TranNo);
+    self.TranDate = ko.observable(data.TranDate);
+    self.VoucherType = ko.observable(data.VoucherType);
+    self.VoucherNo = ko.observable(data.VoucherNo);
+    self.VoucherCat = ko.observable(data.VoucherCat);
+    self.TotDr = ko.observable(data.TotDr);
+    self.TotCr = ko.observable(data.TotCr);
+    self.Office = ko.observable(data.Office);
+    self.EntryBY = ko.observable(data.EntryBY);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.Action = ko.observable(data.Action);
+    self.Narration = ko.observable(data.Narration);
+    self.ReasonstoPay = ko.observable(data.ReasonstoPay);
+    self.ChequeNo = ko.observable(data.ChequeNo);
+    self.ChequeAmount = ko.observable(data.ChequeAmount);
+    self.ReceivedBy = ko.observable(data.ReceivedBy);
+    self.BankName = ko.observable(data.BankName);
+    self.OfficeTranDetail = ko.observableArray(data.OfficeTranDetail);
+}
+/************************Structure End ******************************************/
+
+
+/*********************View Model Begin ******************************************/
+function OfficeTransactionViewModel() {
+    var self = this;
+    self.TranNo = ko.observable();
+    self.TranDate = ko.observable();
+    self.formMode = ko.observable(true);
+
+    self.SelectedVoucherType = ko.observable();
+    self.VoucherNo = ko.observable();
+    // By Bibek for Voucher Category
+    self.VoucherCats = ko.observableArray([
+        { 'CatID': 'JV', 'CatName': 'Journal Voucher' },
+        { 'CatID': 'BV', 'CatName': 'Bank Voucher' },
+        { 'CatID': 'CV', 'CatName': 'Cash Voucher' }
+    ]);
+    self.Mask = ko.observable('f');
+    self.VoucherCat = ko.observable();
+    self.SelectedVCat = ko.observable();
+    self.TotDr = ko.observable();
+    self.TotCr = ko.observable();
+    self.Office = ko.observable();
+    self.EntryBY = ko.observable();
+    self.EntryDate = ko.observable();
+    self.Rstatus = ko.observable();
+    self.Action = ko.observable();
+    self.OfficeTranDetail = ko.observableArray([]);
+    self.Action = ko.observable();
+    self.Narration = ko.observable();
+
+    /**********For grid data Tran details ****/
+    self.SelectedGlCode = ko.observable();
+    self.GlCodeList = ko.observableArray([]);
+    self.GlCodeListBorC = ko.observableArray([]);
+
+    self.AccountNumbserList = ko.observableArray([]);
+    self.SelectedAcNo = ko.observable();
+
+    self.Dr = ko.observable();
+    self.Cr = ko.observable();
+    self.Description = ko.observable();
+    self.CompanyArray = ko.observableArray([]);
+    self.SelectedCompany = ko.observable();
+
+    // cost center
+    self.OfficeCode = ko.observable();
+    self.CostCenterID = ko.observable();
+    self.CostCenterName = ko.observable();
+    self.CostCenterNameEng = ko.observable();
+    self.CostCenters = ko.observableArray([]);
+    self.SelectedCostCenter = ko.observable();
+    self.ParentOffID = ko.observable();
+    self.ParentCostCenterID = ko.observable();
+    self.ParentID = ko.observable();
+    self.OfficeName = ko.observable();
+    self.Offices = ko.observableArray([]);
+    self.SelectedOffice = ko.observable();
+    self.OfficeArray = ko.observableArray([]);
+
+    self.OfficeTranDetail = ko.observableArray([]);
+    self.selectedItem = ko.observable();
+
+    self.GLCodeSubsidarysLst = ko.observableArray([]);
+    self.SelectedGLCodeSubsidary = ko.observable();
+
+    self.HaveSubs = ko.observable();
+    self.SubmissionNo = ko.observable();
+
+    self.GlCodeLvl2List = ko.observableArray([]);
+    self.GlCodeLvl3List = ko.observableArray([]);
+    self.GlCodeLvl4List = ko.observableArray([]);   //Bibek
+    self.ContraAccountList = ko.observableArray([]); //Bibek
+    self.VoucherGroups = ko.observableArray([]);
+
+    self.SelectedLvl2GlCode = ko.observable();
+    self.SelectedLvl3GlCode = ko.observable();
+    self.SelectedLvl4GlCode = ko.observable(); //Bibek
+
+    self.GlCodeLvl5List = ko.observableArray([]); //shanjeev
+    self.SelectedLvl5GlCode = ko.observable(); //shanjeev
+
+    self.SelectedContraAccount = ko.observable(); //Bibek
+    self.SelectedVGroup = ko.observable();
+
+    self.ToSaveGlCode = ko.observable();
+    self.isSubsidary = ko.observable(false);
+
+    //by shanjeev for cheque info
+    self.ReasonstoPay = ko.observable();
+    self.ChequeNo = ko.observable();
+    self.ChequeAmount = ko.observable();
+    self.ReceivedBy = ko.observable();//
+    self.BankName = ko.observable();
+    self.reqCCenter = ko.observable(false); // to track if Cost Center is required
+
+    var CompanyNames = getUrlParamVal('CompanyName');
+    var values = CompanyNames.split('.');
+    var OfficeID = values[0];
+    var OfficeNameNep = values[1];
+    var VGroupID = values[2];
+    var VGroupDesc = values[3];
+    $("#OfficeID").text(OfficeID);
+    $("#OfficeNameNep").text(OfficeNameNep);
+    $("#VGroupID").text(VGroupID);
+    $("#VGroupDesc").text(VGroupDesc);
+
+    $("#ddlGLSubsidary").hide();
+    $("#ddlGLSubsidarys").hide();
+    // $("#divSubNo").hide();
+    $("#divLvl2").hide();
+    $("#divLvl3").hide();
+    $("#divLvl4").hide(); //Bibek
+    $("#divLvl5").hide(); //shanjeev
+    $("#divContra").hide();
+
+    self.GetCostCenter = function () {
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '/Handlers/FAMS/CostCenterHandler.ashx',
+            data: { 'method': 'GetCostCenter', 'officeCode': $("#offcode").text(), 'CostCenterID': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new CostCenter(item);
+                });
+                self.CostCenters(mappedTask);
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+            }
+        });
+    };
+
+    self.GetCapitalExpenseCostCenter = function () {
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '/Handlers/FAMS/CostCenterHandler.ashx',
+            data: { 'method': 'GetCostCenter', 'officeCode': $("#offcode").text(), 'CostCenterID': 0 },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new CostCenter(item);
+                });
+                self.CostCenters(mappedTask);
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+            }
+        });
+    };
+
+    self.GetVoucherGroup = function () {
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/ACCOUNT/OfficeVoucherTranHandler.ashx',
+            data: { 'method': 'GetVoucherGroup' },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new VoucherGroup(item);
+                });
+                self.VoucherGroups(mappedTask);
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+            }
+        });
+    };
+
+    self.GetVoucherGroup();
+    self.GetCostCenter();
+
+    //Get GL code with subsidary
+
+    self.GetGLCodeSubsidary = function (glcode) {
+        if (ko.toJS(glcode).HaveSubs == "Y") {
+            $("#ddlGLSubsidary").show();
+            $("#ddlGLSubsidarys").show();
+            self.isSubsidary(true);
+            $.ajax({
+                type: 'GET',
+                async: false,
+                dataType: "json",
+                url: '/Handlers/ACCOUNT/OfficeCompanyAccChartHandler.ashx',
+                data: { 'method': 'GetGLCodewithSubsidary', 'OfficeID': $("#offcode").text(), 'AccCode': ko.toJS(glcode).AccCode },
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    var mappedTasks = $.map(data.ResponseData, function (item) {
+                        return new OfficeCompanyAccChartSub(item);
+                    });
+                    self.GLCodeSubsidarysLst(mappedTasks);
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+                }
+            });
+        }
+        else {
+            $("#ddlGLSubsidary").hide();
+            $("#ddlGLSubsidarys").hide();
+            self.GLCodeSubsidarysLst("");
+            self.isSubsidary(false);
+        }
+    };
+
+    /*Start budget check */
+
+    self.ValidateBudgetAmount = function () {
+        var errMessage = "";
+        var fiscalyear = GetFyscalYear(self.TranDate());
+        var officeID = $("#offcode").text();
+        var costcenterID = (self.SelectedCostCenter())? self.SelectedCostCenter().CostCenterID : null;
+        var accCode = self.ToSaveGlCode().AccCode;
+        var amount = null;
+        if (self.Dr() == null || self.Dr() == "" || self.Dr() == 'undefined') {
+            amount = self.Cr();
+        }
+        else {
+            amount = self.Dr();
+        }
+
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/ACCOUNT/OfficeTranHandler.ashx',
+            data: { 'method': 'ValidateBudgetAmount', 'fiscalYr': fiscalyear, 'officeID': officeID, 'costCenterID': costcenterID, 'accCode': accCode, 'amount': amount },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                // if (!result.IsSucess) {
+                errMessage = result.Message;
+                // }
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+            }
+        });
+
+        if (errMessage != "OK") {
+            msg(errMessage, "WARNING", "Warning");
+           // return false;
+           return true;
+        }
+        else {
+            return true;
+        }
+    };
+
+    /*End budget check */
+
+    /* End Get cost center*/
+
+    /**********For grid data Tran details ************/
+
+    /*********************Grid ADD Button  Begin ******************************************/
+
+    self.AddVoucher = function () {
+        // $('.editDeleteSection').show();
+        var Voucherdet = self.selectedItem();
+        var btnAdd = $("button.icon-ok");
+        if (Voucherdet != undefined) {
+            // NB: edit  Case
+            if (self.ValidationVoucher()) {
+                // var action = self.Action() == "A" ? "A" : "E";
+                Voucherdet.TranNo(self.TranNo());
+                Voucherdet.Description(self.Description());
+                Voucherdet.Dr(self.Dr());
+                Voucherdet.Cr(self.Cr());
+                // clear out the selected voucher
+                self.selectedItem(null);
+                btnAdd.removeClass("icon-ok").addClass("icon-add");
+                btnAdd.text("Add");
+                //self.ClearVoucherControls();
+            }
+        }
+
+        else {
+            // NB: New Add Case
+            var CompanyName = getUrlParamVal('CompanyName');
+            var values = CompanyName.split('.');
+            var OfficeID = values[0];
+            var OfficeNameNep = values[1];
+            var compID, compName;
+            if (self.ValidationVoucher()) {
+                if (ko.toJS(self.SelectedGlCode()).AccCode == 900000) {
+//                    if (self.ValidateBudgetAmount()) {
+//                    }
+//                    else {
+//                        return;
+//                    }
+                }
+
+                var off =
+                    {
+                        OfficeCode: $("#offcode").text()
+                    };
+
+                if (self.SelectedCostCenter() == undefined) {
+                    compID = null;
+                    compName = "";
+                }
+                else {
+                    compID = ko.toJS(self.SelectedCostCenter()).CostCenterID;
+                    compName = ko.toJS(self.SelectedCostCenter()).CostCenterName;
+                }
+
+                var com = {
+                    Office: off,
+                    // CompanyID: self.SelectedCompany().CompanyID
+                    CompanyID: compID,
+                    CompanyName: compName
+                };
+                var AccountCharts =
+                    {
+                        // GlCode: self.SelectedGlCode().GlCode
+                        AccCode: self.ToSaveGlCode().AccCode,
+                        FromDate: self.ToSaveGlCode().FromDate
+                    };
+
+                var OfficeCompanyAccCharts =
+                    {
+                        Company: com,
+                        AccountChart: AccountCharts
+                    };
+
+                var drcr = "";
+                if (self.Dr() == null || self.Dr() == "" || self.Dr() == 'undefined') {
+                    drcr = 'Cr';
+                    self.Amount = self.Cr();
+                }
+                else {
+                    drcr = 'Dr';
+                    self.Amount = self.Dr();
+                }
+
+                var accounts = {
+                    AccountID: 0,
+                    AccNameNep: self.ToSaveGlCode().AccName,
+                    AccNameEng: self.ToSaveGlCode().AccNameEng
+                };
+
+                var subName;
+                var acno;
+                if (ko.toJS(self.ToSaveGlCode).HaveSubs == "Y") {
+                    subName = ko.toJS(self.SelectedGLCodeSubsidary()).AccName;
+                    acno = ko.toJS(self.SelectedGLCodeSubsidary()).AccCode;
+                }
+                else {
+                    subName = "";
+                    acno = null;
+                }
+
+                var VoucherDet = {
+                    TranNo: self.TranNo(),
+                    OfficeCompanyAccChart: OfficeCompanyAccCharts, //class
+                    AcNo: acno, // ko.toJS(self.SelectedAcNo()).AccountID,
+                    Accounts: accounts,
+                    AccName: subName,
+                    DrCr: drcr,
+                    Description: self.Description(),
+                    Amount: self.Amount,
+                    Dr: self.Dr(),
+                    Cr: self.Cr(),
+                    TranSeqNo: null,
+                    EntryBY: $("#user").text(),
+                    EntryDate: null,
+                    Rstatus: "F",
+                    Action: "A"
+                };
+
+                // check to see that the VoucherDet doesn't already exist in our list
+                if (self.OfficeTranDetail.indexOf(VoucherDet) > -1) {
+                    return;
+                }
+
+                self.OfficeTranDetail.push(new OfficeTranDetail(VoucherDet));
+
+                btnAdd = $("button.icon-ok");
+                btnAdd.removeClass("icon-ok").addClass("icon-add");
+                btnAdd.text("Add");
+                self.ClearVoucherControls();
+            }
+        }
+    };
+
+    /*********************Grid ADD Button  End ******************************************/
+    /********************* Begin Edit grid **********************************************/
+
+    //--------------------------------------------------------------
+    //NB: To Edit Grid Data
+    //--------------------------------------------------------------
+    self.EditVoucherInfo = function (vouch) {
+        self.TranNo(vouch.TranNo());
+        self.Description(vouch.Description());
+        self.Dr(vouch.Dr());
+        self.Cr(vouch.Cr());
+        self.EntryBY($("#user").text());
+        self.EntryDate(null);
+        // console.log("voucher>>>", ko.toJS(vouch));
+        var acIndex = 0;
+        for (let i = 0; i < self.AccountNumbserList().length; i++) {
+            if (ko.toJS(self.AccountNumbserList()[i].AcNo) == ko.toJS(vouch.AcNo)) {
+                acIndex = i;
+            }
+        }
+        var GLIndex = 0;
+        for (let i = 0; i < self.GlCodeList().length; i++) {
+            if (ko.toJS(self.GlCodeList()[i].GlCode) == ko.toJS(vouch.OfficeCompanyAccChart().AccountChart.AccCode)) {
+                GLIndex = i;
+            }
+        }
+        self.SelectedGlCode(self.GlCodeList()[GLIndex]);
+        var GLSubsidaryIndex = 0;
+        for (var i = 0; i < GLCodeSubsidarysLst().length; i++) {
+            if (ko.toJS(self.GLCodeSubsidarysLst()[i].AccCode == ko.toJS(vouch.Accounts().AccNameNep))) {
+                GLSubsidaryIndex = i;
+            }
+        }
+        self.SelectedGLCodeSubsidary(self.GLCodeSubsidarysLst()[GLSubsidaryIndex]);
+        //self.SelectedAcNo(self.AccountNumbserList()[acIndex]);
+        self.Rstatus("F");
+        self.Action("A");
+        self.selectedItem(vouch);
+        var btnAdd = $("button.icon-add");
+        btnAdd.removeClass("icon-add").addClass("icon-ok");
+        btnAdd.text("Update");
+    };
+
+    /* ************************* End Edit grid ******************************************/
+
+    /* ************************* Begin Delete grid ******************************************/
+
+    self.DeleteVoucherInfo = function (vouch) {
+        Confirm('Are you sure to Delete?', 'Confirmation Dialog', function (r) {
+            if (r) {
+                waitMsg("Deleting");
+                waitMsg.show();
+                self.OfficeTranDetail.remove(vouch);
+            }
+        });
+    };
+
+    /* ************************* End Delete grid ******************************************/
+
+    /*********************Submit Begin *****************************************************/
+    self.SubmitOfficeTran = function () {
+        if (self.ValidationSubmit()) {
+            var offcode = {
+                OfficeCode: $("#offcode").text()
+            };
+            if (self.OfficeTranDetail().length >= 1) {
+                Confirm('एकपटक Submit गरिसकेपछि अर्को पटक विवरण फेरि परिवर्तन गर्न पइने छैन। \n के तपाई Submit गर्न चाहनुहन्छ ?', 'Confirmation Dialog', function (r) {
+                    if (r) {
+                        var OfficeTran = {
+                            TranNo: null,
+                            TranDate: self.TranDate(),
+                            VoucherType: self.SelectedVGroup().VoucherGroupID,
+                            VoucherNo: self.VoucherNo(),
+                            VoucherCat: self.SelectedVCat(),
+                            TotDr: 0,
+                            TotCr: 0,
+                            Office: offcode,
+                            EntryBY: $("#user").text(),
+                            EntryDate: null,
+                            Rstatus: "F",
+                            Action: "A",
+                            Narration: self.Narration(),
+                            ReasonstoPay : self.ReasonstoPay(),
+                            ChequeNo : self.ChequeNo(),
+                            ChequeAmount : self.ChequeAmount(),
+                            ReceivedBy : self.ReceivedBy(),//BankName
+                            BankName : self.BankName(),
+                            OfficeTranDetail: self.OfficeTranDetail()
+                        };
+                        method = 'SaveOfficeTranBV';
+                        var url = "/Handlers/ACCOUNT/OfficeVoucherTranHandler.ashx";
+                        var data = { 'method': method, 'args': JSON.stringify(ko.toJS(OfficeTran)) };
+                        $.post(url, data, function (result) {
+                            var obj = jQuery.parseJSON(result);
+                            if (obj.IsSucess) {
+//                              if (obj.Message == "NOBC") {
+//                                  obj.Message = "Atleast select one Bank or one Cash GL";
+//                              }
+//                              else {
+                                if (obj.Message.match(/Successfully/g)) {
+                                    self.SubmissionNo(parseInt(obj.Message.match(/\d+/g)[0]));
+									//self.PrintJVBankCashVoucher();
+                                }
+                              //  $('#btnPrint').show();
+                                self.ClearSubmitControls();
+////                            }
+                            }
+                            msg(obj.Message);
+                        });
+                    }
+                });
+            }
+        }
+    };
+    /***************************************Submit End *************************************/
+
+    /***************************************Print Start ************************************/
+	self.PrintJVBankCashVoucher = function () {
+        var TranNo = self.SubmissionNo();
+        data = { TranNo: TranNo };
+        url = '../../Reporting/Account/ReportHandlers/PrintJVBankCashVoucherHandler.ashx';
+        var hght = screen.height;
+        var winOption = "width=900,resizable=yes,scrollbars=yes,left=" + 230 + ",height=" + hght + "";
+        OpenWindowWithPost(url, winOption, "NewFile", data);
+    };
+
+    /***************************************Print End ************************************/
+
+    /*********************Clear Submit controls Begin *******************************************/
+    self.ClearSubmitControls = function () {
+        self.SelectedGLCodeSubsidary("");
+        $("#ddlGLSubsidary").hide();
+        $("#ddlGLSubsidarys").hide();
+        self.SubmissionNo('');
+        self.SelectedGlCode(null);
+        self.SelectedCompany(null);
+        self.SelectedVoucherType(null);
+        self.TranDate("");
+        self.VoucherNo("");
+        self.VoucherCat("");
+        self.Narration("");
+        self.SelectedVGroup("");
+        self.ReasonstoPay("");
+        self.ChequeNo("");
+        self.ChequeAmount("");
+        self.ReceivedBy("");//BankName
+        self.BankName("");
+        self.OfficeTranDetail([]);
+        // self.TranDate(formattedCurrDate);
+        var btnAddVoucherDet = $("button.icon-ok");
+        btnAddVoucherDet.removeClass("icon-ok").addClass("icon-add");
+        btnAddVoucherDet.text("Add");
+        self.formMode(false);
+        self.formMode(!self.formMode());
+        $('.inputSubNo').hide();
+        $('#VoucherForm').show();
+        // cancel after get details
+        $('#VoucherForm button').show();
+        $('.editDeleteSection').show();
+        // $('.navbar-toggle').hide();
+        $('form').find('input, select, textarea').attr('disabled', false);
+        $('#btnPrint').hide();
+    };
+
+    /*********************Clear Submit controls End ******************************************/
+
+    /*********************Clear controls Begin **********************************************/
+    self.ClearVoucherControls = function () {
+        // self.SelectedGLCodeSubsidary("");
+        $("#ddlGLSubsidarys").hide();
+        $("#ddlGLSubsidary").hide();
+        self.SelectedGlCode(null);
+        // self.SelectedAcNo(null);
+        self.Dr("");
+        self.Cr("");
+        self.Description("");
+        self.ToSaveGlCode("");
+        self.SelectedGlCode("");
+        self.GlCodeLvl2List([]);
+        self.GlCodeLvl3List([]);
+        self.GlCodeLvl4List([]);
+        self.GLCodeSubsidarysLst([]);
+        self.SelectedCostCenter('');
+        // self.SelectedVGroup("");
+        var btnAddVoucherDet = $("button.icon-ok");
+        btnAddVoucherDet.removeClass("icon-ok").addClass("icon-add");
+        btnAddVoucherDet.text("Add");
+    };
+
+    /*********************Clear controls End ******************************************/
+
+    self.GetACChartWithOfficeCostcenter = function () {
+        if (self.SelectedVoucherType() == null || self.SelectedVoucherType() == undefined) {
+            self.GlCodeList([]);
+        }
+        else {
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                async: false,
+                url: '../../../Handlers/Account/OfficeCompanyAccChartHandler.ashx',
+                data: { 'method': 'GetOfficeComanyAcchart', 'OfficeID': $("#offcode").text(), 'companyID': 0, 'P_all': 'N', 'token': $("#token").text(), 'VType': ko.toJS(self.SelectedVoucherType()).VoucherTypeID },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    waitMsg.hide();
+                    if (result.IsSucess) {
+                        self.GlCodeList([]);
+                        for (var i = 0; i < result.ResponseData.length; i++) {
+                            self.GlCodeList.push(result.ResponseData[i].AccountChart);
+                        }
+                    }
+                    else {
+                        msg(result.Message, "WARNING");
+                    }
+                },
+                error: function (err) {
+                    waitMsg.hide();
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+                }
+            });
+        }
+    };
+
+    self.GetAccChartByVGroup = function () {
+        if ( self.SelectedVGroup() ) {
+            if ( self.SelectedVGroup().VoucherGroupID() <=4 ) {
+                var exp = self.SelectedVGroup().VoucherGroupID() - 1;
+                self.Mask(2**exp);
+            }
+        } else {
+            self.Mask(15);
+        }
+        if (self.SelectedVGroup() == undefined) {
+            self.GlCodeList([]);
+        }
+        else {
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                async: false,
+                url: '../../../Handlers/ACCOUNT/OfficeVoucherTranHandler.ashx',
+                data: { 'method': 'GetAccChartByVGroup', 'vGroupID': ko.toJS(self.SelectedVGroup()).VoucherGroupID },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    if (result.IsSucess) {
+                        //console.log(result.ResponseData);
+                        var mappedTasks = $.map(result.ResponseData, function (item) {
+                            return new AccChart(item);
+                        }).filter(x => (x.ShowHide() & self.Mask()) || self.Mask() == 15);;
+                        self.GlCodeList(mappedTasks);
+                        //console.log(ko.toJS(self.GlCodeList()));
+                    }
+                    else {
+                        msg(result.Message, "WARNING");
+                    }
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+                }
+            });
+        }
+    };
+
+   
+    self.GetLvl2GlCode = function () {
+        if (self.SelectedGlCode() == undefined) {
+            self.GlCodeLvl2List([]);
+            self.GlCodeLvl3List([]);
+            $("#divLvl2").hide();
+            $("#divLvl3").hide();
+            $("#ddlGLSubsidary").hide();
+            $("#ddlGLSubsidarys").hide();
+            self.reqCCenter(false);
+        }
+        else {
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                async: false,
+                url: '../../../Handlers/ACCOUNT/OfficeVoucherTranHandler.ashx',
+                data: { 'method': 'GetAccChartChild', 'accCode': ko.toJS(self.SelectedGlCode()).AccCode, 'OfficeID': $("#offcode").text() },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    if (result.IsSucess) {
+                        var mappedTasks = $.map(result.ResponseData, function (item) {
+                            return new AccChart(item);
+                        }).filter(x => (x.ShowHide() & self.Mask()) || self.Mask() == 15);
+                        self.GlCodeLvl2List(mappedTasks);
+
+                        if (self.GlCodeLvl2List().length > 0) {
+                            $("#divLvl2").show();
+                        }
+                        else {
+                            $("#divLvl2").hide();
+                        }
+                    }
+                    else {
+                        msg(result.Message, "WARNING");
+                    }
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+                }
+            });
+        }
+    };
+   
+    self.GetContraAccount = function () {
+        alert('Contac Called');
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/ACCOUNT/OfficeVoucherTranHandler.ashx',
+            data: { 'method': 'GetContraAccount', 'vGroupID': ko.toJS(self.SelectedVGroup().VoucherGroupID), 'OfficeID': $("#offcode").text() },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                if (result.IsSucess) {
+                    var mappedTasks = $.map(result.ResponseData, function (item) {
+                        return new AccChart(item);
+                    });
+                    self.ContraAccountList(mappedTasks);
+
+                    if (self.ContraAccountList().length > 0) {
+                        $("#divContra").show();
+                    }
+                    else {
+                        $("#divContra").hide();
+                    }
+                }
+                else {
+                    msg(result.Message, "WARNING");
+                }
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+            }
+        });
+    };
+    self.GetContraGlCode = function () {
+        if (self.SelectedContraAccount() == undefined) {
+            self.ToSaveGlCode("");
+            $("#ddlGLSubsidary").hide();
+            $("#ddlGLSubsidarys").hide();
+        }
+        else {
+            self.ToSaveGlCode(self.SelectedContraAccount());
+            self.GetGLCodeSubsidary(self.SelectedContraAccount());
+        }
+    };
+   
+    var ccenterGL = [901000, 902000, 903000, 908000, 909000];
+
+    self.GetLvl3GlCode = function () {
+        self.SelectedCostCenter('');
+        if (!self.SelectedLvl2GlCode()) {
+            self.GlCodeLvl3List([]);
+            self.ToSaveGlCode("");
+            $("#divLvl3").hide();
+            $("#divLvl4").hide();
+            $("#divLvl5").hide();//shanjeev
+            $("#ddlGLSubsidary").hide();
+            $("#ddlGLSubsidarys").hide();
+            self.reqCCenter(false);
+        }
+        else {
+            self.reqCCenter(!!ccenterGL.find(x => x == self.SelectedLvl2GlCode().AccCode()));
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                async: false,
+                url: '../../../Handlers/ACCOUNT/OfficeVoucherTranHandler.ashx',
+                data: { 'method': 'GetAccChartChild', 'accCode': ko.toJS(self.SelectedLvl2GlCode()).AccCode, 'OfficeID': $("#offcode").text() },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    if (result.IsSucess) {
+                        var mappedTasks = $.map(result.ResponseData, function (item) {
+                            return new AccChart(item);
+                        }).filter(x => (x.ShowHide() & self.Mask()) || self.Mask() == 15);
+                        self.GlCodeLvl3List(mappedTasks);
+
+                        if (self.GlCodeLvl3List().length > 0) {
+                            $("#divLvl3").show();
+                            self.ToSaveGlCode("");
+                        }
+
+                        else {
+                            $("#divLvl3").hide();
+                            $("#ddlGLSubsidary").hide();
+                            $("#ddlGLSubsidarys").hide();
+                            self.ToSaveGlCode(self.SelectedLvl2GlCode());
+                            self.GetGLCodeSubsidary(self.SelectedLvl2GlCode());
+                        }
+                    }
+                    else {
+                        msg(result.Message, "WARNING");
+                    }
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+
+                }
+            });
+        }
+    };
+    
+    self.GetLvl4GlCode = function () {
+        if (self.SelectedLvl3GlCode() == undefined) {
+            self.GlCodeLvl4List([]);
+            self.ToSaveGlCode("");
+            $("#divLvl4").hide();
+            $("#ddlGLSubsidary").hide();
+            $("#ddlGLSubsidarys").hide();
+        }
+        else {
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                async: false,
+                url: '../../../Handlers/ACCOUNT/OfficeVoucherTranHandler.ashx',
+                data: { 'method': 'GetAccChartChild', 'accCode': ko.toJS(self.SelectedLvl3GlCode()).AccCode, 'OfficeID': $("#offcode").text() },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    if (result.IsSucess) {
+                        var mappedTasks = $.map(result.ResponseData, function (item) {
+                            return new AccChart(item);
+                        }).filter(x => (x.ShowHide() & self.Mask()) || self.Mask() == 15);
+                        self.GlCodeLvl4List(mappedTasks);
+
+                        if (self.GlCodeLvl4List().length > 0) {
+                            $("#divLvl4").show();
+                            $("#ddlGLSubsidary").hide();
+                            $("#ddlGLSubsidarys").hide();
+                            self.ToSaveGlCode("");
+                        }
+
+                        else {
+                            $("#divLvl4").hide();
+                            self.ToSaveGlCode(self.SelectedLvl3GlCode());
+                            self.GetGLCodeSubsidary(self.SelectedLvl3GlCode());
+                        }
+                    }
+                    else {
+                        msg(result.Message, "WARNING");
+                    }
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+                }
+            });
+        }
+    };
+
+    self.GetLvl5GlCode = function () {
+        if (self.SelectedLvl4GlCode() == undefined) {
+            self.ToSaveGlCode("");
+            $("#ddlGLSubsidary").hide();
+            $("#ddlGLSubsidarys").hide();
+        }
+        else {
+            self.ToSaveGlCode(self.SelectedLvl4GlCode());
+            self.GetGLCodeSubsidary(self.SelectedLvl4GlCode());
+        }
+    };
+    
+    self.GetLvl6GlCode = function () {
+        if (self.SelectedLvl4GlCode() == undefined) {
+            self.GlCodeLvl5List([]);
+            self.ToSaveGlCode("");
+            $("#divLvl5").hide();
+            $("#ddlGLSubsidary").hide();
+            $("#ddlGLSubsidarys").hide();
+
+        }
+        else {
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                async: false,
+                url: '../../../Handlers/ACCOUNT/OfficeVoucherTranHandler.ashx',
+                data: { 'method': 'GetAccChartChild', 'accCode': ko.toJS(self.SelectedLvl4GlCode()).AccCode, 'OfficeID': $("#offcode").text() },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    if (result.IsSucess) {
+                        var mappedTasks = $.map(result.ResponseData, function (item) {
+                            return new AccChart(item);
+                        }).filter(x => (x.ShowHide() & self.Mask()) || self.Mask() == 15);
+                        self.GlCodeLvl5List(mappedTasks);
+                       
+                        if (self.GlCodeLvl5List().length > 0) {
+                            $("#divLvl5").show();
+                            $("#ddlGLSubsidary").hide();
+                            $("#ddlGLSubsidarys").hide();
+                            self.ToSaveGlCode("");
+                        }
+                        else {
+                            self.ToSaveGlCode(self.SelectedLvl4GlCode());
+                            self.GetGLCodeSubsidary(self.SelectedLvl4GlCode());
+                        }
+                    }
+                    else {
+                        msg(result.Message, "WARNING");
+                    }
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+                }
+            });
+        }
+    };
+
+    self.GetLvl7GlCode = function () {
+        if (self.SelectedLvl5GlCode() == undefined) {
+            self.ToSaveGlCode("");
+            $("#ddlGLSubsidary").hide();
+            $("#ddlGLSubsidarys").hide();
+        }
+        else {
+            self.ToSaveGlCode(self.SelectedLvl5GlCode());
+            self.GetGLCodeSubsidary(self.SelectedLvl5GlCode());
+        }
+    };
+   // self.ShowHideBankVoucher =  (ko.toJS(self.SelectedVCat()) === 'BV' || ko.toJS(self.SelectedVCat()) === 'CV');
+    self.GetContraOrLvl = function () {       
+        $("#ddlGLSubsidary").hide();
+        $("#ddlGLSubsidarys").hide();
+        if (self.SelectedGlCode() == undefined) {
+            self.ContraAccountList([]);
+            $('#divContra').hide();
+            self.reqCCenter(false);
+            $("#divLvl2").hide();
+            $("#divLvl3").hide();
+            $("#divLvl4").hide();
+            $("#divLvl5").hide();//shanjeev
+        }
+        else if (ko.toJS(self.SelectedGlCode()).AccCode == 1) {
+            $('#divContra').show();
+            self.reqCCenter(false);
+            $("#divLvl2").hide();
+            $("#divLvl3").hide();
+            $("#divLvl4").hide();
+            $("#divLvl5").hide();//shanjeev
+            self.GetContraAccount();
+        }
+        else {
+            $('#divContra').hide();
+            self.GetLvl2GlCode();
+        }
+    };
+
+    self.ShowHideBankVoucher =    ko.computed(function () {
+        return (ko.toJS(self.SelectedVCat()) === 'BV' || ko.toJS(self.SelectedVCat()) === 'CV');
+});
+    
+
+	
+
+    self.viewDetails = function () {
+        self.OfficeTranDetail([]);
+        if (self.formMode()) {
+            self.formMode(!self.formMode());
+            $('.inputSubNo').show();
+            $('#VoucherForm').hide();
+        } else {
+            $('.inputSubNo').show();
+            $('#VoucherForm').show();
+            self.GetVoucherBySubmissionNo();
+        }
+    }
+
+    self.GetVoucherBySubmissionNo = function () {
+        self.SubmissionNo(self.SubmissionNo() || getUrlParamVal('SubmissionNumber'));
+        // console.log(ko.toJS(self.SubmissionNo()) || 'nothing');
+        // return;
+        if (!self.SubmissionNo()) return;
+        else {
+            $('button').hide();
+            $('form').find('input, select, textarea').attr('disabled', 'disabled');
+            document.getElementById('inSubNo').disabled = false;
+            $("#txtDr").attr("disabled", true);
+            $("#txtCr").attr("disabled", true);
+            $("#divSubNo").show();
+            $("#viewDetails").show();
+            $("#btnCancel").show();
+            $.ajax({
+                dataType: "json",
+                url: '../../Handlers/ACCOUNT/OfficeVoucherTranHandler.ashx',
+                data: { 'method': 'GetOfficeTranBV', 'submissionNo': self.SubmissionNo(), 'token': $("#token").text() },
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                success: function (data) {
+                    if (!data.ResponseData.VoucherType) {
+                        msg("Submission number is not valid !!!");
+                        self.ClearSubmitControls();
+                    }
+                        
+                    if (data.ResponseData == null) {
+                        msg("Submission number is not valid !!!");
+                    }
+                    else {
+                        //$("#OfficeNameNep").text(data.ResponseData.OfficeTranDetail[0].OfficeCompanyAccChart.Company.Office.OfficeNameNep);
+                        //$("#OfficeID").text(data.ResponseData.OfficeTranDetail[0].OfficeCompanyAccChart.Company.Office.OfficeCode);
+                        // $("#CompanyID").text(data.ResponseData.OfficeTranDetail[0].OfficeCompanyAccChart.Company.CompanyID);
+                        //$("#CompanyName").text(data.ResponseData.OfficeTranDetail[0].OfficeCompanyAccChart.Company.CompanyName);
+
+                        var officeid = data.ResponseData.OfficeTranDetail[0].OfficeCompanyAccChart.Company.Office.OfficeCode;
+                        var companyid = data.ResponseData.OfficeTranDetail[0].OfficeCompanyAccChart.Company.CompanyID;
+                        self.TranDate(data.ResponseData.TranDate);
+
+                        for (let i = 0; i < self.VoucherGroups().length; i++) {
+                            if (data.ResponseData.VoucherType == ko.toJS(self.VoucherGroups())[i].VoucherGroupID) {
+                                self.SelectedVGroup(self.VoucherGroups()[i]);
+                            }
+                        }
+
+                        self.VoucherNo(data.ResponseData.VoucherNo);
+                        self.SelectedVCat(data.ResponseData.VoucherCat);
+                        self.Narration(data.ResponseData.Narration);
+
+                        // added for cheque info by shanjeev
+                         if (data.ResponseData.BankName) {
+                             self.ReasonstoPay(data.ResponseData.ReasonstoPay);
+                             self.ChequeNo(data.ResponseData.ChequeNo);
+                             self.ReceivedBy(data.ResponseData.ReceivedBy);
+                             self.ChequeAmount(data.ResponseData.ChequeAmount);//BankName
+                             self.BankName(data.ResponseData.BankName);
+                         }
+
+                        for (let i = 0; i < data.ResponseData.OfficeTranDetail.length; i++) {
+                            var off = {
+                                OfficeCode: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.Company.Office.OfficeCode
+                            };
+                            var compID = {
+                                CompanyID: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.Company.CompanyID,
+                                CompanyName: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.Company.CompanyName
+                            };
+
+                            var com = {
+                                Office: off,
+                                CompanyID: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.Company.CompanyID,
+                                CompanyName: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.Company.CompanyName
+                            };
+                            var AccountCharts = {
+                                AccCode: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.AccountChart.AccCode,
+                                FromDate: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.Company.FromDate
+                            };
+
+                            var OfficeCompanyAccCharts = {
+                                Company: com,
+                                AccountChart: AccountCharts
+                            };
+
+                            var accounts = {
+                                AccountID: 0,
+                                AccNameNep: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.AccountChart.AccName
+                            };
+
+                            var subName;
+                            var acno;
+
+                            subName = data.ResponseData.OfficeTranDetail[i].Accounts.AccountName;
+                            acno = data.ResponseData.OfficeTranDetail[i].Accounts.AccountID;
+
+                            var drAmount = "";
+                            var crAmount = "";
+                            if (data.ResponseData.OfficeTranDetail[i].DrCr == "Dr") {
+                                drAmount = data.ResponseData.OfficeTranDetail[i].Amount;
+                            }
+                            else if (data.ResponseData.OfficeTranDetail[i].DrCr == "Cr") {
+                                crAmount = data.ResponseData.OfficeTranDetail[i].Amount;
+                            }
+
+                            var VoucherDet = {
+                                TranNo: self.TranNo(),
+                                OfficeCompanyAccChart: OfficeCompanyAccCharts,
+                                AcNo: acno,
+                                Accounts: accounts,
+                                AccName: subName,
+                                DrCr: data.ResponseData.OfficeTranDetail[i].DrCr,
+                                Description: data.ResponseData.OfficeTranDetail[i].Description,
+                                Amount: data.ResponseData.OfficeTranDetail[i].Amount,
+                                Dr: drAmount,
+                                Cr: crAmount,
+                                TranSeqNo: null,
+                                EntryBY: data.ResponseData.OfficeTranDetail[i].EntryBY,
+                                EntryDate: data.ResponseData.OfficeTranDetail[i].EntryDate,
+                                Rstatus: data.ResponseData.OfficeTranDetail[i].Rstatus,
+                                Action: ""
+                            };
+                            self.OfficeTranDetail.push(new OfficeTranDetail(VoucherDet));
+                        }
+                    }
+                    $('.editDeleteSection').hide();
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText);
+                }
+            });
+        }
+    };
+
+
+    /*********************Validation Voucher Begin ******************************************/
+
+    self.ValidationVoucher = function () {
+        var errMsg = "";
+        var objFocus = null;
+
+        if (!self.TranDate())
+            errMsg += "Please Enter Voucher Date !!!<br>";
+
+        if (!self.ToSaveGlCode())
+            errMsg += "Please Select GL Code !!!<br>";
+
+        if (self.isSubsidary()) {
+            if (self.SelectedGLCodeSubsidary() == undefined || self.SelectedGLCodeSubsidary() == "") {
+                errMsg += "Please Select Subsidary Account !!!<br>";
+            }
+        }
+        if (self.reqCCenter())
+            if (!self.SelectedCostCenter())
+                errMsg += "Please Select Functional Unit !!!<br>";
+
+        if (!self.Dr() && !self.Cr())
+            errMsg += "Please Enter Dr or Cr Amounts !!!<br>";
+
+        if (errMsg) {
+             msg(errMsg,"WARNING");
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
+    /*********************Validation Voucher End ******************************************/
+	/*********************begin calculating sum of Dr column and Cr column ***********************/
+	
+	self.totalDr = ko.computed(function () {
+		var totDRLocal = 0;
+		for (var i = 0; i < ko.toJS(self.OfficeTranDetail().length); i++) {
+			totDRLocal += isNaN(Number(ko.toJS(self.OfficeTranDetail()[i].Dr()))) ? 0 : Number(ko.toJS(self.OfficeTranDetail()[i].Dr()));
+		}
+		return totDRLocal.toFixed(2);
+		
+	});
+
+
+    self.totalCr = ko.computed(function () {
+        var totalCr = 0;
+        for (var i = 0; i < ko.toJS(self.OfficeTranDetail().length); i++) {
+            totalCr += isNaN(Number(ko.toJS(self.OfficeTranDetail()[i].Cr()))) ? 0 : Number(ko.toJS(self.OfficeTranDetail()[i].Cr()));
+        }
+        return totalCr.toFixed(2);
+		
+	});
+
+    /*********************End calculating sum of Dr column and Cr column *****************/
+    /*********************Validation Submit Begin ******************************************/
+
+    self.ValidationSubmit = function () {
+        var errMsg = "";
+        var objFocus = null;
+        //            if (self.CompanyID() == undefined || self.CompanyID() == "") {
+        //                errMsg += "Company is not given !!!<br>";
+        //            }
+        if (!self.TranDate()) {
+            errMsg += "Please Enter Date !!!<br>";
+        }
+        if (!self.SelectedVGroup()) {
+            errMsg += "Please select Voucher Type !!!<br>";
+        }
+        if (!self.VoucherNo()) {
+            errMsg += "Please Enter Voucher No !!!<br>";
+        }
+        if (!self.SelectedVCat()) {
+            errMsg += "Please Enter Voucher Category !!!<br>";
+        }
+        if (self.OfficeTranDetail().length == 0) {
+            errMsg += "Please Add atleast one data in grid !!!<br>";
+        }
+        if (self.totalDr() !== self.totalCr())
+            errMsg += "Total Dr. must be equal to total Cr.!!!<br>";
+
+        if (!self.Narration()) {
+            errMsg += "Please Enter Narration !!!<br>";
+        }
+        if (errMsg !== "") {
+             msg(errMsg,"WARNING");
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
+    /*********************Validation Submit End ******************************************/
+
+    self.totalDr();
+    self.totalCr();
+    self.GetVoucherBySubmissionNo();
+}
+/*********************View Model End ******************************************/
+$(document).ready(function () {
+    ValidateSession();
+    var otvm = new OfficeTransactionViewModel();
+    ko.applyBindings(otvm);
+    var currentDate = new Date();
+    var bsDate = calenderFunctions.getBsDateByAdDate(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+    var datePattern = "%y.%m.%d";
+    formattedCurrDate = calenderFunctions.bsDateFormat(datePattern, bsDate.bsYear, bsDate.bsMonth, bsDate.bsDate);
+    // otvm.TranDate(formattedCurrDate);
+    checkNepDate = element => (valFutureDate(element, 'Y', true)) ? true : otvm.TranDate(formattedCurrDate); 
+    // ValidateSession();
+    // ko.applyBindings(new OfficeTransactionViewModel());
+});
+
+var specialChars = [8, 35, 36, 37, 38, 39, 40, 46, 9, 116];
+checkNumber = (x, y = x.which || x.keyCode) => (('0123456789०१२३४५६७८९').split('').map(x => x.charCodeAt(0)).concat(specialChars).includes(y));

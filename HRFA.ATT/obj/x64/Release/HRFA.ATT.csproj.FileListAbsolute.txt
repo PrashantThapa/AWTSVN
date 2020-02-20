@@ -1,0 +1,6 @@
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\bin\x64\Release\HRFA.ATT.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\bin\x64\Release\HRFA.ATT.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\obj\x64\Release\HRFA.ATT.csprojAssemblyReference.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\obj\x64\Release\HRFA.ATT.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\obj\x64\Release\HRFA.ATT.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\obj\x64\Release\HRFA.ATT.pdb

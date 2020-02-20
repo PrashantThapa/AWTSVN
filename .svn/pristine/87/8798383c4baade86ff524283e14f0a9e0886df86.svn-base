@@ -1,0 +1,45 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTAccountChart
+    {
+        private ATTGLGroup _GLGroup { get; set; }
+        public Int32? AccCode { get; set; }
+        public string AcNo { get; set; }
+        public string AccName { get; set; }
+        public ATTGLGroup GLGroup
+        {
+            get { return _GLGroup; }
+            set { _GLGroup = value; }
+        }
+        // public Int32? GroupID { get; set; }
+        public Int64? PaACCode { get; set; }
+        public string EntryBy { get; set; }
+        public string EntryDate { get; set; }
+        public string Rstatus { get; set; }
+        public Int64? TranNo { get; set; }
+        public string HeadTran { get; set; }
+        public double? Balance { get; set; }
+        public string GlCode { get; set; }
+        public string ACNameEng { get; set; }
+        public string DRCR { get; set; }
+        public string Action { get; set; }
+        public string FromDate { get; set; }
+        public string ToDate { get; set; }
+        public bool SubsideryBool { get; set; }
+        public string Subsidery { get; set; }
+
+        public string HaveSubs { get; set; }
+        public string BORC { get; set; }
+        public string CodeNo { get; set; }
+        public string ShowHide { get; set; }
+       public string ScheduleCode { get; set; }
+
+        public ATTAccountChart()
+        {
+            _GLGroup = new ATTGLGroup();
+        }
+
+    }
+}

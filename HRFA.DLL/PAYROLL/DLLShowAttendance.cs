@@ -1,0 +1,69 @@
+﻿using HRFA.ATT.PAYROLL;
+using HRFA.COMMON;
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer.PAYROLL
+{
+	public class DLLShowAttendance
+	{
+		public List<ATTShowAttendance> ShowAttendance(int? OfficeCode, string SymbolNo,string FromDate, string ToDate)
+		{
+			GetConnection getConn = new GetConnection();
+			OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+			try
+				{
+				
+				string	sp = "RPR_ATTENDANCE_DET";
+
+				List<OracleParameter> paramList = new List<OracleParameter>();
+
+				paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", OfficeCode, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_SYMBOL_NO", SymbolNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+				paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+				DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+				List<ATTShowAttendance> lst = new List<ATTShowAttendance>();
+
+				if (ds.Tables[0].Rows.Count > 0)
+				{
+					foreach (DataRow dr in ((DataTable)ds.Tables[0]).Rows)
+					{
+						ATTShowAttendance obj = new ATTShowAttendance();
+						obj.ATT_DATE = dr["ATT_DATE"].ToString();
+						obj.IN_TIME= dr["IN_TIME"].ToString();
+						obj.OUT_TIME = dr["OUT_TIME"].ToString();
+						obj.EMP_ID = string.IsNullOrEmpty(dr["EMP_ID"].ToString()) ? (int?)null : int.Parse(dr["EMP_ID"].ToString());
+						obj.EMP_NAME = dr["EMP_NAME"].ToString();
+						obj.OFFICE_NAME_NEPALI = dr["OFFICE_NAME_NEPALI"].ToString();
+
+						lst.Add(obj);
+
+					}
+					return lst;
+				}
+			}
+			catch (Exception ex)
+			{
+
+				throw (ex);
+			}
+			finally
+			{
+				getConn.CloseDbConn();
+			}
+
+			return null;
+		}
+	}
+}

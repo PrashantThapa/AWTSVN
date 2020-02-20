@@ -1,0 +1,16 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTFAMSCategory
+    {
+        public Int16? CategoryID { get; set; }
+        public string CategoryDescEng { get; set; }
+        public string CategoryDesc { get; set; }
+        public string Status { get; set; }
+        public string FromDate { get; set; }
+        public string ToDate { get; set; }
+        public string EntryBy { get; set; }
+        public string EntryDate { get; set; }
+    }
+}

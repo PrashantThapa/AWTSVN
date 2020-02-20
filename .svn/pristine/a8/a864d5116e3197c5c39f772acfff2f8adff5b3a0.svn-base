@@ -1,0 +1,211 @@
+﻿using System;
+using System.Collections.Generic;
+using Oracle.DataAccess.Client;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using System.Collections.ObjectModel;
+using System.Linq;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEmpGrade
+    {
+        private readonly ReadOnlyCollection<string> gradeTypesToIgnore = new List<string> {
+            "Grade Upgrade Month",
+            "Grade Unit Amount",
+            "Transportation",
+            "Residence",
+            "Sawari",
+        }.AsReadOnly();
+
+        public string SaveEmpGrade(ATTEmpGradeLoan EmpGradeLoan, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+            string entryby = "";
+            Int64? submissionNo = null;
+            Int64? oldSubmissionNo = null;
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                foreach (ATTEmpGrade objEmpGrade in EmpGradeLoan.EmpGrade)
+                {
+                    if (
+                        gradeTypesToIgnore
+                        .Any( gradeType => string.Equals(objEmpGrade.GradeType, gradeType, StringComparison.OrdinalIgnoreCase))
+                       )
+                    {
+                        continue;
+                    }
+
+                    var p_INS = "INS";
+                    if (objEmpGrade.Action == "E")
+                    {
+                        p_INS = "UPD";
+                        sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_EMP_GRADE_HISTORY";
+                        msg = "Successfully Edited.";
+                    }
+                    else if (objEmpGrade.Action == "A")
+                    {
+                        p_INS = "INS";
+                        sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_EMP_GRADE_HISTORY";
+                        msg = "Successfully Saved.";
+                    }
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+                        paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", p_INS, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", submissionNo, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                        paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", objEmpGrade.EmpID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_GRADE_TYPE", objEmpGrade.GradeType, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", objEmpGrade.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_TO_DATE", objEmpGrade.ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_GRADE_VALUE", objEmpGrade.GradeValue, OracleDbType.Double, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objEmpGrade.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objEmpGrade.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objEmpGrade.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                        paramList[0].Size = 16;
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                        submissionNo = Int64.Parse(paramList[1].Value.ToString());
+                        oldSubmissionNo = objEmpGrade.OldSubmissionNo;
+                        entryby = objEmpGrade.EntryBy;
+                        paramList.Clear();
+                    }
+                }
+
+                // Save loans
+
+                DLLEmpLoan dllEmpLoan = new DLLEmpLoan();
+                string result = dllEmpLoan.SaveEmpLoan(EmpGradeLoan.Loans, submissionNo, tran);
+
+                if (oldSubmissionNo != null)
+                {
+                    DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                    dllUTV.SaveVerifyLog(tran, entryby, oldSubmissionNo, submissionNo, appID, modID);
+                }
+                tran.Commit();
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            //return msg;
+            return msg + "Data saved! Please Note your submission number!!" + submissionNo + "</b>";
+        }
+
+        public ATTEmpGradeLoan GetEmpGrade(Int64? submissionNo)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_EMP_GRADE_HISTORY";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", submissionNo, OracleDbType.Int64, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTEmpGrade> lst = new List<ATTEmpGrade>();
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTEmpGrade objEmpGrade = new ATTEmpGrade();
+                    objEmpGrade.SubmissionNo = string.IsNullOrEmpty(drow["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                    objEmpGrade.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString());
+                    objEmpGrade.EmployeeName = drow["EMP_NAME"].ToString();
+                    objEmpGrade.GradeType = drow["GRADE_TYPE"].ToString();
+                    objEmpGrade.FromDate = drow["FROM_DATE"].ToString();
+                    objEmpGrade.GradeValue = string.IsNullOrEmpty(drow["GRADE_VALUE"].ToString()) ? (Double?)null : Double.Parse(drow["GRADE_VALUE"].ToString());
+                    objEmpGrade.EntryBy = drow["ENTRY_BY"].ToString();
+                    objEmpGrade.RStatus = drow["R_STATUS"].ToString();
+                    lst.Add(objEmpGrade);
+                }
+                DLLEmpLoan dllEmpLoan = new DLLEmpLoan();
+                List<ATTLoan> lstLoans = dllEmpLoan.GetEmpLoans(submissionNo);
+                ATTEmpGradeLoan EmpGradeLoan = new ATTEmpGradeLoan();
+                EmpGradeLoan.EmpGrade = lst;
+                EmpGradeLoan.Loans = lstLoans;
+
+                return EmpGradeLoan;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+        public ATTEmpGradeLoan GetEmpGradeByEmpID(Int32? Emp_ID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_EMPGRADE_HIST_BYEMPID";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_EMP_ID", Emp_ID, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTEmpGrade> lst = new List<ATTEmpGrade>();
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTEmpGrade objEmpGrade = new ATTEmpGrade();
+                    objEmpGrade.SubmissionNo = null;// string.IsNullOrEmpty(drow["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                    objEmpGrade.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString());
+                    objEmpGrade.EmployeeName = string.Empty;//drow["EMP_NAME"].ToString();
+                    objEmpGrade.GradeType = drow["GRADE_TYPE"].ToString();
+                    objEmpGrade.FromDate = drow["FROM_DATE"].ToString();
+                    objEmpGrade.GradeValue = string.IsNullOrEmpty(drow["GRADE_VALUE"].ToString()) ? (Double?)null : Double.Parse(drow["GRADE_VALUE"].ToString());
+                    objEmpGrade.EntryBy = drow["ENTRY_BY"].ToString();
+                    objEmpGrade.RStatus = drow["R_STATUS"].ToString();
+                    lst.Add(objEmpGrade);
+                }
+
+                DLLEmpLoan dllEmpLoan = new DLLEmpLoan();
+                List<ATTLoan> lstLoans = dllEmpLoan.GetEmpLoansByEmpID(Emp_ID);
+                ATTEmpGradeLoan EmpGradeLoan = new ATTEmpGradeLoan();
+                EmpGradeLoan.EmpGrade = lst;
+                EmpGradeLoan.Loans = lstLoans;
+
+                return EmpGradeLoan;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+    }
+}

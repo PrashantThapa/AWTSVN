@@ -1,0 +1,183 @@
+﻿using System;
+using System.Collections.Generic;
+using Oracle.DataAccess.Client;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+
+
+namespace HRFA.DataLayer
+{
+    public class DLLVendor
+    {
+        public string SaveVendor(ATTVendor objVendor, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                if (objVendor.Action == "E")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_EDIT_VENDOR";
+                    msg = "Successfully Edited.";
+                }
+                else if (objVendor.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_VENDOR_REG";
+                    msg = "Successfully Saved.";
+
+                }
+
+
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", objVendor.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":p_VENDORS_NAME", objVendor.VendorName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_TYPE_ID", objVendor.Type.TypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CAT_ID", objVendor.Category.CategoryID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_ADDRESS", objVendor.Address, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EMAIL", objVendor.Email, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_NO", objVendor.ContactNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CONTACT_PERSON", objVendor.ContactPerson, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", objVendor.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_TO_DATE", objVendor.ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objVendor.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objVendor.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objVendor.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                    paramList[0].Size = 16;
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    objVendor.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+
+                    if (objVendor.OldSubmissionNo != null)
+                    {
+                        DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                        dllUTV.SaveVerifyLog(tran, objVendor.EntryBy, objVendor.OldSubmissionNo, objVendor.SubmissionNo, appID, modID);
+                    }
+
+                    paramList.Clear();
+                    tran.Commit();
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            //return msg;
+            return msg + "</br> Please Note Your Submission No.</br><b>" + objVendor.SubmissionNo + "</b>";
+        }
+
+
+        public List<ATTVendor> GetVendor(Int16? vendorID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            List<ATTVendor> lstVendor = new List<ATTVendor>();
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_VENDORS";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_VENDORS_ID", vendorID, OracleDbType.Int16, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTVendor objVendor = new ATTVendor();
+                    objVendor.VendorID = string.IsNullOrEmpty(drow["VENDORS_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["VENDORS_ID"].ToString());
+                    objVendor.VendorName = drow["VENDORS_NAME"].ToString(); 
+
+                    lstVendor.Add(objVendor);
+                }
+
+                return lstVendor;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+
+        public ATTVendor GetVendorBySubmissionNo(Int64? submissionNo)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_VENDOR_REG";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", submissionNo, OracleDbType.Int64, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+
+                ATTVendor objVendor = new ATTVendor();
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow drow = ds.Tables[0].Rows[0];
+                    objVendor.SubmissionNo = string.IsNullOrEmpty(drow["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                    objVendor.VendorName = drow["VENDORS_NAME"].ToString();
+                    objVendor.Type.TypeID = string.IsNullOrEmpty(drow["TYPE_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["TYPE_ID"].ToString());
+                    objVendor.Type.TypeName = drow["TYPE_NAME"].ToString();
+                    objVendor.Category.CategoryID = string.IsNullOrEmpty(drow["CAT_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["CAT_ID"].ToString());
+                    objVendor.Category.CategoryDesc = drow["CAT_DESC"].ToString();
+                    objVendor.Address= drow["CONTACT_ADDRESS"].ToString();
+                    objVendor.Email = drow["EMAIL"].ToString();
+                    objVendor.ContactNo = drow["CONTACT_NO"].ToString();
+                    objVendor.ContactPerson = drow["CONTACT_PERSON"].ToString();
+                    objVendor.FromDate = drow["FROM_DATE"].ToString();
+                    objVendor.ToDate = drow["TO_DATE"].ToString();
+                    objVendor.EntryBy = drow["ENTRY_BY"].ToString();
+                    objVendor.EntryDate = drow["ENTRY_DATE"].ToString();
+                }
+                else
+                {
+                    objVendor = null;
+                }
+                return objVendor;
+
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+    }
+}

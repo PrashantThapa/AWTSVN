@@ -1,0 +1,181 @@
+﻿using System;
+using System.Data;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLReligionType
+    {
+
+        /// <summary>
+        /// This method Save/Update Religion Type
+        /// </summary>
+        /// <param name="lst"></param>
+        /// <returns>String as a Message about Save/Update Religion Type</returns>
+        /// 
+        public string SaveReligionType(List<ATTReligionType> lst)
+        {
+            string sp = "";
+            string msg = "No Data To Save !!!";
+            string status = "";
+
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+
+            try
+            {
+                foreach (ATTReligionType obj in lst)
+                {
+
+                    if (obj.Status == true)
+                    {
+                        status = "A";
+                    }
+                    else
+                    {
+                        status = "I";
+                    }
+
+
+                    if (obj.Action == "A")
+                    {
+                        sp = "CPR_ADD_RELIGION";
+                        msg = "Successfully Saved.";
+                    }
+                    else if (obj.Action == "E")
+                    {
+                        sp = "CPR_EDIT_RELIGION";
+                        msg = "Successfully Updated.";
+                    }
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+
+                        //obj.EntryBy = "SOSYS_MAIN";
+
+                        paramList.Add(SqlHelper.GetOraParam(":p_RELIGION_ID", obj.ReligionTypeID, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+                        paramList.Add(SqlHelper.GetOraParam(":p_RELIGION_NAME", obj.ReligionTypeName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_RELIGION_NAME_ENG", obj.ReligionTypeNameEng, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_STATUS", status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", obj.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                        paramList.Clear();
+                    }
+                }
+                tran.Commit();
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw new Exception("Error" + ex.Message);
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+
+        }
+
+
+        /// <summary>
+        /// Retrives a list of Religion Type(s)
+        /// </summary>
+        /// <param name="reltypeID"></param>
+        /// <returns>Religion Type or Null if Religion Type does not exist</returns>
+        /// 
+        public List<ATTReligionType> GetReligionType(int? reltypeID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            List<ATTReligionType> lst = new List<ATTReligionType>();
+
+            try
+            {
+                string SP = "CPR_GET_RELIGION";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":p_RELIGION_ID", reltypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                //paramList.Add(SqlHelper.GetOraParam(":p_status", "A", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTReligionType obj = new ATTReligionType();
+
+                    obj.ReligionTypeID = Int32.Parse(drow["REL_ID"].ToString());
+                    obj.ReligionTypeName = drow["REL_NAME"].ToString();
+                    obj.ReligionTypeNameEng = drow["REL_NAME_ENG"].ToString();
+                    obj.Status = drow["STATUS"].ToString() == "A" ? true : false;
+                    obj.FromDate = drow["FROM_DATE"].ToString();
+                    obj.ToDate = drow["TO_DATE"].ToString();
+                    obj.Action = "";
+
+                    lst.Add(obj);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+
+        /// <summary>
+        /// This method Delete Religion Type
+        /// </summary>
+        /// <param name="reltypeID">reltypeID to be deleted</param>
+        /// <returns>String as a Message about Delete Religion Type</returns>
+        ///
+        public string DeleteReligionType(int? reltypeID)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+
+            try
+            {
+                string SP = "CPR_DEL_RELIGION";
+
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":p_RELIGION_ID", reltypeID, OracleDbType.Int32, ParameterDirection.InputOutput));
+                ParamList.Add(SqlHelper.GetOraParam(":P_TO_DATE", "", OracleDbType.Varchar2, ParameterDirection.InputOutput));
+                //ParamList.Add(SqlHelper.GetOraParam(":p_status", "I", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                SqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+                return "Deleted Successfully.";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+        }
+
+
+
+    }
+}

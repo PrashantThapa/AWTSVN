@@ -1,0 +1,184 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AdminMaster.Master" AutoEventWireup="true" CodeBehind="AccountChartSetup.aspx.cs" Inherits="IDS.Modules.ACCOUNTS.AccountChartSetup" %>
+<asp:Content ID="Content2" ContentPlaceHolderID="head" runat="server">
+	<script type="text/javascript">
+		$(document).ready(function () {
+			ValidateSession();
+		});
+
+	</script>
+</asp:Content>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+
+	<style>
+     .treegrid-indent {width:10% !important; height: 16px; display: inline-block; position: relative;background-repeat: no-repeat;}
+
+.treegrid-expander {width:10% !important; height: 16px; display: inline-block; position: relative; cursor: pointer;background-repeat: no-repeat;}
+
+.treegrid-expander-expanded{background-image: url("../../Images/collapse.png"); }
+     .treegrid-expander-collapsed {
+         background-image: url("../../Images/expand.png");
+     }
+ </style>
+	<!-- general form elements -->
+		<section class="content">
+		<div class="row pages">
+			<!-- left column -->
+			<div class="col-md-12">
+				<!-- general form elements -->
+				<div class="box box-primary">
+					<div class="box-header with-border">
+						<h3 class="box-title">Account Chart Setup </h3>
+					</div>
+					<!-- /.box-header -->
+					<!-- form start -->
+					<form role="form">
+						<div class="box-body">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>GL Group<span class="red">*</span>  </label>
+										<select id="ddlGLGroup" class="form-control select2"
+											data-bind='options: GLGroup_Array, 
+                            optionsText: "GroupName",
+                            optionsValue:$data,
+                            value:SelectedGLGroup, 
+                            optionsCaption:"------छान्नुहोस्-------", event:{ change: $data.LoadAllGL }'>
+                     </select> 
+									</div>
+								</div>
+								
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Parent GL </label>
+										<select id="ddlParentGL" class="form-control select2"
+											data-bind='options: ParentGL_ArrayHead, 
+                            optionsText: "ACNameEng",
+                            optionsValue:$data,
+                            value:SelectedParentGL, 
+                            optionsCaption:"------छान्नुहोस्-------", event:{ change: $data.GetParentGL }'>
+                    </select> 
+									</div>
+								</div>
+
+
+
+								</div>
+						<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>GL Code<span class="red">*</span> </label>
+<input type="text" id="txtGLCode" class="form-control" data-bind="value:GlCode" onkeypress="return isNumberKey(event)"  maxlength="15"/>									</div>
+								</div>
+																<div class="col-md-6">
+									<div class="form-group">
+										<label>Schedule Code </label>
+<input type="text" id="txtSlCode" class="form-control" data-bind="value:ScheduleCode"  maxlength="10"/>									</div>
+								</div>
+								<!-- /.row -->
+							</div>
+																						<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>GL Name Nepali<span class="red">*</span> </label>
+             <input type="text" id="txtGLNameNep" class="form-control" maxlength="100" data-bind="value:AccName"/>
+								</div>
+									</div>
+																<div class="col-md-6">
+									<div class="form-group">
+										<label>GL Name English </label>
+<input type="text" id="Text2" class="form-control" data-bind="value:ACNameEng" maxlength="100"/>								</div>
+								</div>
+								<!-- /.row -->
+							</div>
+							<div class="row">
+													<div class="col-md-3">
+														<div class="form-group">
+															<label>Type<span class="red">*</span> </label>
+															<div class="checkbox">
+													<input type="radio" name="type" value="H" data-bind="checked:HeadTran" class="minimal" />&nbsp;Head 
+												<label></label>
+													<input type="radio" name="type" value="T" data-bind="checked:HeadTran" class="minimal" />&nbsp;Transactional 																		
+												</div>
+														</div>
+													</div>
+								<div class="col-md-3">
+														<div class="form-group">
+															<label>DrCr<span class="red">*</span> </label>
+															<div class="checkbox">
+													<input type="radio" name="DRCR" value="Dr" data-bind="checked:DRCR" class="minimal" />&nbsp;Dr
+												<label></label>
+													<input type="radio" name="DRCR" value="Cr" data-bind="checked:DRCR" />&nbsp;Cr																	
+												</div>
+														</div>
+													</div>
+												</div>
+														
+																					<div class="row">
+													<div class="col-md-6">
+														<div class="form-group">
+															
+															<div class="checkbox">
+													<label>
+																<input id ="Subsidery" type="checkbox" data-bind="checked: SubsideryBool" class="minimal" />&nbsp;Has Subsidery
+
+															</label>												
+												</div>
+														</div>
+													</div>
+												</div>
+							<div class="row">
+													<div class="col-md-6">
+														<div class="form-group">
+															<button type="submit" class="btn btn-info" id="btnSubmit" data-bind="click:SaveAccountChart">Add</button>
+															<button type="submit" class="btn btn-default" data-bind="click:ClearFields"
+>Cancel</button>
+														</div>
+													</div>
+												</div>
+														<div class="row">
+
+								<div class="col-md-12">
+									<table data-bind="visible: true" border="0" class="table table-bordered table-striped">
+										<tr>
+											<th>GL Name</th>
+											<th>GL Code</th>
+											<th>Head Tran</th>
+											<th>Dr/Cr</th>
+											<th>Subsidery</th>
+											<th>Action</th>
+										</tr>
+										<tbody data-bind="foreach: ParentGL_Array">
+                    <tr data-bind="attr: {class: $root.getTreegridClass($data)}">
+                        <td data-bind="text: $data.ACNameEng"></td>
+                      <td data-bind="text: $data.AccCode"></td>                      
+                      <td data-bind="text: $data.HeadTran"></td>
+                        <td data-bind="text: $data.DRCR"></td>
+                        <td data-bind="text: $data.Subsidery"></td>
+                        <td><a data-bind="click: $root.EditGL"><span class="glyphicon glyphicon-edit" title="Edit" ></span></a></td>
+                    </tr>
+									</table>
+<%--									<button type="submit" class="btn btn-info pull-right" data-bind="click: SaveBank">Submit</button>--%>
+
+
+								</div>
+							</div>
+
+
+
+
+							
+						
+						</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+
+	 <script src="../../Scripts/jquery.treegrid.js"></script>
+
+    <script src="../../Scripts/ACCOUNT/AccountChartSetup.js" type="text/javascript"></script>
+
+</asp:Content>
+

@@ -1,0 +1,189 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLPosition
+    {
+        /// <summary>
+        /// This method Save/Update Position
+        /// </summary>
+        /// <param name="lst"></param>
+        /// <returns>String as a Message about Save/Update Position</returns>
+        public string SavePosition(List<ATTPosition> lst)
+        {
+            string SP = "";
+            string msg = "No Data To Save!!!";
+            string status = "";
+
+            foreach (ATTPosition obj in lst)
+            {
+                if (obj.Status == true)
+                {
+                    status = "A";
+                }
+                else
+                {
+                    status = "I";
+                }
+
+                if (obj.Action == "E")
+                {
+                    SP = "SPR_EDIT_SLK_CM_POS";
+                    msg = "Successfully Updated";
+                }
+                else
+                {
+                    SP = "SPR_ADD_SLK_CM_POS";
+                    msg = "Successfully Added ";
+                }
+
+                
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_POS_ID", obj.PosID, OracleDbType.Int32, ParameterDirection.InputOutput));
+                paramList.Add(SqlHelper.GetOraParam(":P_POS_NAME", obj.PosName, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_POS_NAME_ENG", obj.PosEngName, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_STATUS", status, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", obj.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+
+                GetConnection conn = new GetConnection();
+                OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+                OracleTransaction tran = dbConn.BeginTransaction();
+
+
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                    tran.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tran.Rollback();
+                    throw new Exception("Error" + ex.Message);
+                }
+
+                finally
+                {
+
+                    conn.CloseDbConn();
+                }
+
+            }
+            return msg;
+        }
+
+
+        /// <summary>
+        /// Retrives a list of Position(s)
+        /// </summary>
+        /// <param name="positionid"></param>
+        /// <returns>Position or Null if Position does not exist</returns>
+        public List<ATTPosition> GetPosition(int? positionid)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+            List<ATTPosition> lst = new List<ATTPosition>();
+
+            try
+            {
+                string SP = "SPR_GET_SLK_CM_POS";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_POS_ID", positionid, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTPosition obj = new ATTPosition();
+
+                    obj.PosID = Int32.Parse(drow["POS_ID"].ToString());
+                    obj.PosName = drow["POS_NAME"].ToString();
+                    obj.PosEngName = drow["POS_NAME_ENG"].ToString();
+                    if (drow["STATUS"].ToString() == "A")
+                    {
+                        obj.Status = true;
+                    }
+                    else
+                    {
+                        obj.Status = false;
+                    }
+                    obj.FromDate = drow["FROM_DATE"].ToString();
+                    obj.Action = "";
+
+                    lst.Add(obj);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+
+
+        /// <summary>
+        /// This method Delete Position
+        /// </summary>
+        /// <param name="positionid">positionid to be deleted</param>
+        /// <returns>String as a Message about Delete Position</returns>
+        /// 
+        public string DeletePosition(int? positionid)
+        {
+
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+            string SP = "";
+            string msg = "";
+
+
+            try
+            {
+                SP = "SPR_DEL_SLK_CM_POS";
+                msg = "Record Deleted Successfully";
+
+
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_POS_ID", positionid, OracleDbType.Int32, ParameterDirection.InputOutput));
+
+                paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", null, OracleDbType.Varchar2, ParameterDirection.Input));
+
+
+                SqlHelper.ExecuteNonQuery(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                return msg;
+            }
+
+            catch (Exception ex)
+            {
+
+                throw (ex);
+
+            }
+            finally
+            {
+
+                conn.CloseDbConn();
+            }
+
+        }
+    }
+}

@@ -1,0 +1,47 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace HRFA.ATT
+{
+    public  class ATTOfficeTran
+    {
+
+        public Int64? TranNo { get; set; }
+        public string TranDate { get; set; }
+        public string VoucherType { get; set; }
+        public string VoucherNo { get; set; }
+        public string VoucherCat { get; set; }
+        public string TotDr { get; set; }
+        public string TotCr { get; set; }//P_NARRATION
+        public string Narration { get; set; }
+       // public Int32? OfficeID { get; set; }
+        private ATTOffice _Office ;
+        public ATTOffice Office
+        {
+            get { return _Office; }
+            set { _Office = value; }
+        }
+        public string EntryBY { get; set; }
+        public string EntryDate { get; set; }
+        public string Rstatus { get; set; }
+        public string Action { get; set; }
+        private List<ATTOfficeTranDetail> _OfficeTranDetail;
+        public List<ATTOfficeTranDetail> OfficeTranDetail
+        {
+            get { return _OfficeTranDetail; }
+            set { _OfficeTranDetail = value; }
+        }
+
+      public string ReasonstoPay { get; set; }
+      public string ChequeNo { get; set; }
+      public double? ChequeAmount { get; set; }
+      public string ReceivedBy { get; set; }//
+      public string BankName { get; set; }
+      public ATTOfficeTran()
+        {
+            _Office = new ATTOffice();
+            _OfficeTranDetail = new List<ATTOfficeTranDetail>();
+
+        }
+    }
+}

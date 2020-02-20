@@ -1,0 +1,176 @@
+﻿
+function Office(data) {
+    if (data !== undefined) {
+        var self = this;
+        self.OfficeCode = ko.observable(data.OfficeCode);
+        self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+        self.OfficeNameEng = ko.observable(data.OfficeNameEng);
+    }
+}
+
+function Device(data) {
+    if (data !== undefined) {
+        var self = this;
+        self.IPAddress = ko.observable(data.IPAddress);
+        self.DeviceName = ko.observable(data.DeviceName);
+        self.DeviceIP = ko.observable(data.DeviceName+ ' / ' + data.IPAddress);
+    }
+}
+
+function Attendence(data) {
+    if (data !== undefined) {
+        var self = this;
+        self.Office = ko.observable(data.Office);
+        self.IPAddress = ko.observable(data.IPAddress);
+        self.DownloadDate = ko.observable(data.DownloadDate);
+        self.Status = ko.observable(data.Status);
+        self.EntryBy = ko.observable(data.EntryBy);
+        self.EntryDate = ko.observable(data.EntryDate);
+    }
+}
+
+
+var AttendenceViewModel = function () {
+    var self = this;
+
+    self.SelectedOffice = ko.observable();
+    self.SelectedIP = ko.observable();
+
+    self.Offices = ko.observableArray([]);
+    self.Devices = ko.observableArray([]);
+
+    var entryBy = $("#user").text();
+    self.EntryBy = ko.observable(entryBy);
+
+
+    //get offices
+    $.ajax({
+        dataType: "json",
+        cache: false,
+        url: '../../../Handlers/CENTRALLOOKUP/OfficeHandler.ashx',
+        data: { 'method': 'GetAllOffice', 'officeCode': null },
+        contentType: "application/json; charset=utf-8",
+        success: function (result) {
+            var mappedTask = $.map(result.ResponseData, function (item) {
+                return new Office(item)
+            });
+
+            self.Offices(mappedTask);
+        },
+        error: function (err) {
+            msg(err.status + " - " + err.statusText, "FAILURE");
+        }
+
+    });
+
+
+    self.GetIPAddress = function () {
+        if (ko.toJS(self.SelectedOffice) === undefined) {
+            self.SelectedIP('');
+            $('#ddlIPAddress').attr('disabled', true);
+        }
+        else {
+            var officeCode = self.SelectedOffice().OfficeCode;
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                url: '../../../Handlers/ALMS/DeviceRegistrationHandler.ashx',
+                data: { 'method': 'GetDeviceRegistration', 'officeCode': officeCode },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    var mappedTask = $.map(result.ResponseData, function (item) {
+                        return new Device(item)
+                    });
+
+                    self.Devices(mappedTask);
+                    $('#ddlIPAddress').attr('disabled', false);
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+                }
+
+            });
+        }
+    }
+
+    self.SaveAttendenceInfo = function () {
+
+        if (self.Validation()) {
+            var office = {
+                OfficeCode: self.SelectedOffice().OfficeCode,
+                OfficeNameNepali: self.SelectedOffice().OfficeNameNepali
+            }
+
+            var attdownload = {
+                Office: office,
+                IPAddress: self.SelectedIP(),
+                DownloadDate: "",
+                Status: "",
+                EntryBy: self.EntryBy(),
+                EntryDate: ""
+            }
+
+
+            var url = "/Handlers/ALMS/AttendenceHandler.ashx";
+            var method = "SaveAttendenceInfo";
+            var data = { 'method': method, 'args': JSON.stringify(ko.toJS(attdownload)) };
+            waitMsg("Loading");
+            waitMsg.show();
+            $.post(url, data,
+                                    function (result) {
+                                        var obj = jQuery.parseJSON(result);
+                                        if (obj.IsSucess) {
+                                            waitMsg.hide();
+
+                                            msg(obj.Message);
+                                            self.ClearControls();
+                                        }
+                                        else {
+                                            msg(obj.Message, "WARNING");
+                                        }
+
+                                    });
+        }
+    }
+
+
+    self.ClearControls = function () {
+        self.SelectedOffice('');
+        self.SelectedIP('');
+        $('#ddlIPAddress').attr('disabled', true);
+    }
+
+
+    self.Validation = function () {
+        var errMsg = "";
+
+        if (self.SelectedOffice() === undefined) {
+            errMsg += "Please Select Office !!!<br>";
+        }
+        if (self.SelectedIP() === undefined) {
+            errMsg += "Please Select Device / IPAddress !!!<br>";
+        }
+        if (errMsg !== "") {
+             msg(errMsg,"WARNING");
+            return false;
+        }
+        else {
+            return true;
+        }
+
+	}
+	Object.keys(self).map(function (key) {
+    if (!self.loading) self.loading = {};
+    if (!self.loaded) self.loaded = {};
+    self.loading[key] = ko.observable(true);
+    self.loaded[key] = ko.observable(false);
+  });
+}
+
+$(document).ready(function () {
+    ValidateSession();
+
+    $('#ddlIPAddress').attr('disabled', true);
+    var avm = new AttendenceViewModel();
+    ko.applyBindings(avm);
+});

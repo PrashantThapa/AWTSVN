@@ -1,0 +1,138 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLGLGroup
+    {
+
+       public string SaveGLGroup(List<ATTGLGroup> lstGLGroup)
+        {
+            string sp = "";
+            string msg = "No Data To Save !!!";
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+            try
+            {
+                foreach (ATTGLGroup objGLGroup in lstGLGroup)
+                {
+                    if (objGLGroup.Action == "A")
+                    {
+                        sp = "APR_ADD_GROUP";
+                        msg = "Successfully Saved.";
+                    }
+                    else if (objGLGroup.Action == "E")
+                    {
+                        sp = "APR_EDIT_GROUP";
+                        msg = "Successfully Updated.";
+                    }
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+                        paramList.Add(SqlHelper.GetOraParam(":P_GROUP_ID", objGLGroup.GroupID, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+                        paramList.Add(SqlHelper.GetOraParam(":P_GROUP_NAME", objGLGroup.GroupName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", objGLGroup.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", objGLGroup.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", objGLGroup.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                        paramList.Clear();
+                    }
+                }
+                tran.Commit();
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw new Exception("Error" + ex.Message);
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+
+        }
+
+
+       public List<ATTGLGroup> GetGLGroup(int? groupID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            List<ATTGLGroup> lstGLGroup = new List<ATTGLGroup>();
+
+            try
+            {
+                string SP = "APR_GET_GROUP";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_GROUP_ID", groupID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTGLGroup objGLGroup = new ATTGLGroup();
+                    objGLGroup.GroupID = string.IsNullOrEmpty(drow["GROUP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["GROUP_ID"].ToString());
+                    objGLGroup.GroupName = drow["GROUP_NAME"].ToString();
+                    objGLGroup.EntryBy = drow["ENTRY_BY"].ToString();
+                    objGLGroup.EntryDate = drow["ENTRY_DATE"].ToString();
+                    objGLGroup.RStatus = drow["R_STATUS"].ToString();
+                    objGLGroup.TranNo = string.IsNullOrEmpty(drow["Tran_No"].ToString()) ? (Int64?)null : Int64.Parse(drow["Tran_No"].ToString());
+                    objGLGroup.Action = "";
+                    lstGLGroup.Add(objGLGroup);
+
+                }
+
+                return lstGLGroup;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+       public string DeleteGLGroup(int? groupID)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+
+            try
+            {
+                string SP = "APR_Delete_GROUP";
+
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":P_", groupID, OracleDbType.Int32, ParameterDirection.InputOutput));
+
+                SqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+                return "Deleted Successfully.";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+        }
+
+
+
+
+    }
+}

@@ -1,0 +1,230 @@
+﻿using System;
+using System.Collections.Generic;
+using Oracle.DataAccess.Client;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEmployeeShiftAssignment
+    {
+        public string SaveEmployeeShiftAssignment(List<ATTEmployeeShiftAssignment> objEmpShifts)
+        {
+            string msg = "";
+            string sp = "";
+
+            foreach (ATTEmployeeShiftAssignment objEmpShift in objEmpShifts)
+            {
+
+                if (objEmpShift.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_EMP_SHIFT";
+                    msg = "Successfully Saved.";
+                }
+                else if (objEmpShift.Action == "E")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_EMP_SHIFT";
+                    msg = "Successfully Updated.";
+                }
+                else {
+                    sp = "";
+                }
+
+                GetConnection conn = new GetConnection();
+                OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+                OracleTransaction tran = dbConn.BeginTransaction();
+
+                try
+                {
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+                        paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", objEmpShift.EmpID, OracleDbType.Int32, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CD", objEmpShift.Office.OfficeCode, OracleDbType.Int32, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_DEPT_ID", objEmpShift.Department.DeptID, OracleDbType.Int32, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_SHIFT_ID", objEmpShift.Shift.ShiftID, OracleDbType.Int32, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_STATUS", objEmpShift.Status, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", objEmpShift.Shift.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", objEmpShift.ToDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", objEmpShift.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", objEmpShift.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_EMP_SH_FROM_DATE", objEmpShift.EmpShFromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                        tran.Commit();
+                        paramList.Clear();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string err = ex.ToString();
+                    if (err.Contains("ORA-00001"))
+                    {
+                        msg = "This shift has already been assigned to this employee !!!";
+                    }
+                    else {
+                        msg = "Error in Saving.";
+                    }
+                    tran.Rollback();
+
+                }
+                finally
+                {
+                    conn.CloseDbConn();
+                }
+            }
+            return msg;
+        }
+
+        public string GetEmployeeName(int? empID, int? officeCD)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            string empName = "";
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_EMP_NAMEBY_OFFICE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_EMP_ID", empID, OracleDbType.Int16, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", officeCD, OracleDbType.Int16, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    empName = drow["EMP_NAME"].ToString();
+                }
+                return empName;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+        public List<ATTEmployeeShiftAssignment> GetEmployeeShift(int? empID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_EMP_SHIFT";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                //paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", officeCD, OracleDbType.Int16, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_EMP_ID", empID, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTEmployeeShiftAssignment> lstEmpShift = new List<ATTEmployeeShiftAssignment>();
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTEmployeeShiftAssignment objEmpShift = new ATTEmployeeShiftAssignment();
+                    objEmpShift.Office = new ATTOffice();
+                    objEmpShift.Department = new ATTDepartment();
+                    objEmpShift.Shift = new ATTShift();
+                    objEmpShift.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString()); 
+                    objEmpShift.EmployeeName = drow["EMP_NAME"].ToString();
+                    objEmpShift.Shift.ShiftID = string.IsNullOrEmpty(drow["SHIFT_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["SHIFT_ID"].ToString()); 
+                    objEmpShift.Shift.ShiftName = drow["SHIFT_NAME"].ToString();
+                    objEmpShift.Shift.FromDate = drow["FROM_DATE"].ToString();
+                    objEmpShift.EmpShFromDate = drow["EMP_SH_FROM_DATE"].ToString();
+                    objEmpShift.Department.DeptID = string.IsNullOrEmpty(drow["DEPT_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["DEPT_ID"].ToString()); 
+                    objEmpShift.Department.DeptDesc = drow["DEPT_DESC"].ToString();
+                    objEmpShift.Office.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_CD"].ToString()); 
+                    objEmpShift.Office.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+                    lstEmpShift.Add(objEmpShift);
+                }
+                return lstEmpShift;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+        //public List<ATTDepartment> GetDepartmentByOfficeCD(int? officeCD,int? deptID)
+        //{
+        //    GetConnection getConn = new GetConnection();
+        //    OracleConnection conn = getConn.GetDbConn();
+        //    try
+        //    {
+        //        string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_DEPARTMENT";
+
+        //        List<OracleParameter> paramList = new List<OracleParameter>();
+        //        paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", officeCD, OracleDbType.Int16, ParameterDirection.Input));
+        //        paramList.Add(SqlHelper.GetOraParam(":P_DEPT_ID", deptID, OracleDbType.Int16, ParameterDirection.Input));
+        //        paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+        //        DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+
+        //        List<ATTDepartment> lstDept = new List<ATTDepartment>();
+        //        foreach (DataRow drow in ds.Tables[0].Rows)
+        //        {
+        //            ATTDepartment objDept = new ATTDepartment();
+        //            objDept.DeptID = int.Parse(drow["DEPT_ID"].ToString());
+        //            objDept.DeptDesc = drow["DEPT_DESC"].ToString();
+        //            lstDept.Add(objDept);
+        //        }
+        //        return lstDept;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw (ex);
+        //    }
+        //    finally
+        //    {
+        //        conn.Close();
+        //    }
+        //}
+
+        public List<ATTShift> GetDepartmentShift(int? officeCD, int? deptID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_DEPARTMENT_SHIFT";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", officeCD, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_DEPT_ID", deptID, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTShift> lstShift = new List<ATTShift>();
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTShift objShift = new ATTShift();
+                    objShift.ShiftID = string.IsNullOrEmpty(drow["SHIFT_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["SHIFT_ID"].ToString()); 
+                    objShift.ShiftName = drow["SHIFT_NAME"].ToString();
+                    objShift.FromDate = drow["FROM_DATE"].ToString();
+                    lstShift.Add(objShift);
+                }
+                return lstShift;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+    }
+}

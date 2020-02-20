@@ -1,0 +1,50 @@
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.ATT\bin\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.ATT\bin\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.ATT\bin\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.ATT\bin\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.ATT\bin\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.ATT\bin\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.ATT\bin\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.ATT\bin\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.ATT\obj\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.ATT\bin\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.ATT\bin\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.ATT\obj\Debug\HRFA.ATT.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.ATT\obj\Debug\HRFA.ATT.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.ATT\obj\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.ATT\obj\Debug\HRFA.ATT.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.ATT\bin\Debug\HRFA.ATT.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.ATT\bin\Debug\HRFA.ATT.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.ATT\obj\Debug\HRFA.ATT.csprojAssemblyReference.cache
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.ATT\obj\Debug\HRFA.ATT.csproj.CoreCompileInputs.cache
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.ATT\obj\Debug\HRFA.ATT.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.ATT\obj\Debug\HRFA.ATT.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA.ATT\bin\Debug\HRFA.ATT.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA.ATT\bin\Debug\HRFA.ATT.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA.ATT\obj\Debug\HRFA.ATT.csprojAssemblyReference.cache
+D:\Projects\AccessWorldNet\HRFA\HRFA.ATT\obj\Debug\HRFA.ATT.csproj.CoreCompileInputs.cache
+D:\Projects\AccessWorldNet\HRFA\HRFA.ATT\obj\Debug\HRFA.ATT.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA.ATT\obj\Debug\HRFA.ATT.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\bin\Debug\HRFA.ATT.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\bin\Debug\HRFA.ATT.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\obj\Debug\HRFA.ATT.csprojAssemblyReference.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\obj\Debug\HRFA.ATT.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\obj\Debug\HRFA.ATT.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\obj\Debug\HRFA.ATT.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.ATT\bin\Debug\HRFA.ATT.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.ATT\bin\Debug\HRFA.ATT.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.ATT\obj\Debug\HRFA.ATT.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.ATT\obj\Debug\HRFA.ATT.pdb

@@ -1,0 +1,184 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLServiceType
+    {
+
+
+
+        /// <summary>
+        /// This method Save/Update Service Type
+        /// </summary>
+        /// <param name="lst"></param>
+        /// <returns>String as a Message about Save/Update Service Type</returns>
+        /// 
+        public string SaveServiceType(List<ATTServiceType> lst)
+        {
+            string msg = "No Data To Save!!! ";
+            string SP = "";
+
+            string status = "";
+            foreach (ATTServiceType obj in lst)
+            {
+
+                if (obj.Status == true)
+                {
+                    status = "A";
+                }
+                else
+                {
+                    status = "I";
+                }
+
+
+                if (obj.Action == "A")
+                {
+                    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_SERVICE_TYPE";
+                    msg = "Successfully Saved.";
+                }
+                else if (obj.Action == "E")
+                {
+                    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_SERVICE_TYPE";
+                    msg = "Successfully Updated.";
+                }
+
+                List<OracleParameter> paramlist = new List<OracleParameter>();
+
+                paramlist.Add(SqlHelper.GetOraParam(":p_SERVICE_TYPE_ID ", obj.STypeID, OracleDbType.Int32, ParameterDirection.InputOutput));
+                paramlist.Add(SqlHelper.GetOraParam(":p_SERVICE_TYPE_NAME", obj.STypeName, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_SERVICE_TYPE_NAME_ENG", obj.STypeNameEng, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_STATUS", status, OracleDbType.Char, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramlist.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", obj.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+
+
+                GetConnection conn = new GetConnection();
+                OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+                OracleTransaction tran = dbConn.BeginTransaction();
+
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, SP, paramlist.ToArray());
+                    tran.Commit();
+
+                }
+                catch (Exception ex)
+                {
+                    tran.Rollback();
+                    throw new Exception("Error" + ex.Message);
+                }
+
+                finally
+                {
+
+                    conn.CloseDbConn();
+                }
+
+            }
+            return msg;
+        }
+
+
+        /// <summary>
+        /// This method Delete Service Type
+        /// </summary>
+        /// <param name="sertypeid">sertypeid to be deleted</param>
+        /// <returns>String as a Message about Delete Service Type</returns>
+        ///
+        public string DeleteServiceType(int? sertypeid)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_DEL_SERVICE_TYPE";
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":p_SERVICE_TYPE_ID", sertypeid, OracleDbType.Int32, ParameterDirection.InputOutput));
+                ParamList.Add(SqlHelper.GetOraParam(":P_TO_DATE", null, OracleDbType.Date, ParameterDirection.Input));
+                SqlHelper.ExecuteNonQuery(dbConn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+                return "Deleted Successfully!!!";
+
+
+            }
+            catch (Exception ex)
+            {
+
+                return ex.Message;
+
+            }
+            finally
+            {
+
+                conn.CloseDbConn();
+            }
+
+        }
+
+        /// <summary>
+        /// Retrives a list of Service Type(s)
+        /// </summary>
+        /// <param name="sertypeid"></param>
+        /// <returns>Service Type or Null if Service Type does not exist</returns>
+        /// 
+
+        public List<ATTServiceType> GetServiceType(int? sertypeid)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+            List<ATTServiceType> lst = new List<ATTServiceType>();
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_SERVICE_TYPE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":p_SERVICE_TYPE_ID", sertypeid, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTServiceType obj = new ATTServiceType();
+                    obj.STypeID = Int32.Parse(drow["STYPE_ID"].ToString());
+                    obj.STypeName = drow["STYPE_NAME"].ToString();
+                    obj.STypeNameEng = drow["STYPE_NAME_ENG"].ToString();
+                    if (drow["STATUS"].ToString() == "A")
+                    {
+                        obj.Status = true;
+                    }
+                    else
+                    {
+                        obj.Status = false;
+                    }
+                    obj.FromDate = drow["FROM_DATE"].ToString();
+                    obj.Action = "";
+                    lst.Add(obj);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+
+            }
+            return lst;
+        }
+    }
+}

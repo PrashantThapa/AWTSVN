@@ -1,0 +1,182 @@
+﻿using System;
+using System.Data;
+using System.Collections.Generic;
+
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLRelationType
+    {
+
+        /// <summary>
+        /// This method Save/Update Relation Type
+        /// </summary>
+        /// <param name="lst"></param>
+        /// <returns>String as a Message about Save/Update Relation Type</returns>
+        /// 
+       public string SaveRelationType(List<ATTRelationType> lst)
+       {
+           string sp = "";
+           string msg = "No Data To Save !!!";
+           string status = "";
+
+           GetConnection GetConn = new GetConnection();
+           OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+           OracleTransaction tran = conn.BeginTransaction();
+           
+
+           try
+           {
+               foreach (ATTRelationType obj in lst)
+               {
+
+                   if (obj.Status == true)
+                   {
+                       status = "A";
+                   }
+                   else
+                   {
+                       status = "I";
+                   }
+                    
+                 
+                   if (obj.Action == "A")
+                   {
+                       sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_RELATION_TYPE";
+                       msg = "Successfully Saved.";
+                   }
+                   else if (obj.Action == "E")
+                   {
+                       sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_RELATION_TYPE";
+                       msg = "Successfully Updated.";
+                   }
+
+                   if (sp != "")
+                   {
+                       List<OracleParameter> paramList = new List<OracleParameter>();
+
+                     //  obj.EntryBy = "SOSYS_MAIN";
+
+                       paramList.Add(SqlHelper.GetOraParam(":p_RELATION_TYPE_ID", obj.RelTypeID, OracleDbType.Int32, System.Data.ParameterDirection.InputOutput));
+                       paramList.Add(SqlHelper.GetOraParam(":p_RELATION_TYPE_NAME", obj.RelTypeName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                       paramList.Add(SqlHelper.GetOraParam(":P_RELATION_TYPE_NAME_ENG", obj.RelTypeNameEng, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                       paramList.Add(SqlHelper.GetOraParam(":P_STATUS", status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                       paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                       paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                       paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                       paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", obj.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                       SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                       paramList.Clear();
+                   }
+               }
+               tran.Commit();
+               return msg;
+           }
+           catch (Exception ex)
+           {
+               tran.Rollback();
+               throw new Exception("Error" + ex.Message);
+           }
+           finally
+           {
+               GetConn.CloseDbConn();
+           }
+
+       }
+
+
+       /// <summary>
+       /// Retrives a list of Relation Type(s)
+       /// </summary>
+       /// <param name="reltypeID"></param>
+       /// <returns>Relation Type or Null if Relation Type does not exist</returns>
+       /// 
+       public List<ATTRelationType> GetRelationType(int? reltypeID)
+       {
+           GetConnection getConn = new GetConnection();
+           OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+           List<ATTRelationType> lst = new List<ATTRelationType>();
+
+           try
+           {
+               string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_RELATION_TYPE";
+
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":p_RELATION_TYPE_ID", reltypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+               // paramList.Add(SqlHelper.GetOraParam(":p_status", "A", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+
+               DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+               foreach (DataRow drow in ds.Tables[0].Rows)
+               {
+                   ATTRelationType obj = new ATTRelationType();
+
+                   obj.RelTypeID = Int32.Parse(drow["RELTYPE_ID"].ToString());
+                   obj.RelTypeName = drow["RELTYPE_NAME"].ToString();
+                   obj.RelTypeNameEng = drow["RELTYPE_NAME_ENG"].ToString();
+                   obj.Status = drow["STATUS"].ToString() == "A" ? true : false;
+                   obj.FromDate = drow["FROM_DATE"].ToString();
+                   obj.ToDate = drow["TO_DATE"].ToString();
+                   obj.Action = "";
+                   lst.Add(obj);
+               }
+
+               return lst;
+           }
+           catch (Exception ex)
+           {
+
+               throw (ex);
+           }
+           finally
+           {
+               getConn.CloseDbConn();
+           }
+       }
+
+
+       /// <summary>
+       /// This method Delete Relation Type
+       /// </summary>
+       /// <param name="reltypeID">reltypeID to be deleted</param>
+       /// <returns>String as a Message about Delete Relation Type</returns>
+       ///
+       public string DeleteRelationType(int? reltypeID)
+       {
+           GetConnection GetConn = new GetConnection();
+           OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+
+
+
+           try
+           {
+               string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_DELETE_RELATION_TYPE";
+
+               List<OracleParameter> ParamList = new List<OracleParameter>();
+               ParamList.Add(SqlHelper.GetOraParam(":p_RELATION_TYPE_ID", reltypeID, OracleDbType.Int32, ParameterDirection.InputOutput));
+
+               SqlHelper.ExecuteNonQuery(conn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+               return "Deleted Successfully.";
+           }
+           catch (Exception ex)
+           {
+               return ex.Message;
+           }
+           finally
+           {
+               conn.Close();
+           }
+       }
+
+
+
+    }
+}

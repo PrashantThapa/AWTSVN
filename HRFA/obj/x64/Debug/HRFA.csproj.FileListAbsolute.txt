@@ -1,0 +1,4 @@
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\obj\x64\Debug\HRFA.csprojAssemblyReference.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\obj\x64\Debug\HRFA.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\obj\x64\Debug\HRFA.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA\obj\x64\Debug\HRFA.pdb

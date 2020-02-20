@@ -1,0 +1,174 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="LeaveType.aspx.cs" MasterPageFile="~/AdminMaster.Master" Inherits="HRFA.Modules.COMMON.LeaveType" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+	   <script type="text/javascript">
+		   $(document).ready(function () {
+			   ValidateSession();
+		   });
+
+	   </script>
+	</asp:Content>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+	
+	<!-- general form elements -->
+	<section class="content">
+		<div class="row pages">
+			<!-- left column -->
+			<div class="col-md-12">
+				<!-- general form elements -->
+				<div class="box box-primary">
+					<div class="box-header with-border">
+						<h3 class="box-title">Leave Type Setup </h3>
+					</div>
+					<!-- /.box-header -->
+					<!-- form start -->
+					<form role="form">
+						<div class="box-body">
+							<div class="row">
+								<div class="col-md-4">
+									<div class="form-group">
+										<label>Leave List</label>
+										<select id="lstLeaveType" multiple class="form-control" style="min-height: 270px; width: 100%;"
+											data-bind="options: LeaveTypes, optionsText: 'LeaveTypeNameNep', optionsValue: 'LeaveTypeID',
+	optionsCaption: '------Select one -------', value: SelectedLeaveType, event: { change: LeaveTypeDetails }">
+										</select>
+									</div>
+								</div>
+								<div class="col-md-7">
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label>Name</label>
+												<input class="form-control" id="txtNameNep" placeholder="Name" oninput="convert_to_unicode(this)" data-bind="value: LeaveTypeNameNep" />
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group">
+												<label>Name(in eng)</label>
+												<input class="form-control" id="txtNameEng" placeholder="Name" data-bind="value: LeaveTypeName" />
+
+											</div>
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label>Gender</label>
+												<select id="slGender" class="form-control select2"
+													data-bind='options: Genders, optionsText: "GenderName",
+	optionsValue: "GenderID", value: Gender,
+	optionsCaption: "---Select one ---"'>
+												</select>
+											</div>
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label>Marital Status</label>
+													<select id="ddlMaritalStatus" class="form-control select2"
+														data-bind='options: MaritalStatuses, optionsText: "MarStatName", optionsValue: $data, value: SelectedEmpMStatus,
+	optionsCaption: "------Select one -------"'>
+													</select>
+												</div>
+											</div>
+										</div>
+
+
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label>Min. Leave Number</label>
+												<input class="form-control" id="txtMinDays" placeholder="Min Leave Number" data-bind="value: MinDays" />
+
+											</div>
+										</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label>Max. Leave Number</label>
+													<input class="form-control" id="txtMaxDays" placeholder="Max. Leave Number" data-bind="value: MaxDays" />
+
+												</div>
+											</div>
+									</div>
+
+									<div class="row wordlong">
+										<div class="col-md-6">
+											<div class="form-group">
+											<input type="checkbox" id="txtIsPayable" data-bind="checked: IsPayable" class="minimal" />&nbsp;                                     Salary Available
+
+											</div>
+										
+											<div class="form-group">
+											<input type="checkbox" id="txtIsHalfDay"  data-bind="checked: IsHalfDayApplicable" class="minimal" />&nbsp;Half Day Leave Available
+													</div>		
+											<div class="form-group">
+											<input type="checkbox" id="txtIsReservable"   data-bind="checked: IsReservable" class="minimal" />&nbsp;Leave can be Accumulate
+											</div>
+											</div>
+										<div class="col-md-6">
+
+											<div class="form-group">
+											<input type="checkbox" id="txtReImershuable"   data-bind="checked: IsReImbushmentable" class="minimal" />&nbsp;Compansation paid for Emergency Resign
+											</div>
+											<div class="form-group">
+											<input type="checkbox" id="txtNeedApproval"   data-bind="checked: IsRecomendable" class="minimal" />&nbsp;Recommendation Required
+											</div>
+											</div>
+										</div>
+									<div class="row wordlong">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label>Required Minimum Service Days</label>
+                        <input  class="form-control" id="txtMinServiceDays" placeholder="Required Minimum Service Days" data-bind="value: MinServiceDaysRequired"/>
+
+											</div>
+										</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label>Maximum Reserve Leave Days</label>
+								 <input  class="form-control" id="txtMaxReservationDays" placeholder="Maximum Reserve Leave Days" data-bind="value: MaxReservableDays"/>
+
+												</div>
+											</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label>Minimum Days for Recommendation</label>
+                        <input  class="form-control" id="txtRecConstDays" placeholder="Minimum Days for Recommendation" data-bind="value: RecomendableConstraintDays"/>
+
+											</div>
+										</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<label>Period That can be Recommended</label>
+                        <input  class="form-control" id="txtRecAdded" placeholder="Period That can be Recommended" data-bind="value: RecomendableConstraintDaysAdded"/>
+
+												</div>
+											</div>
+									</div>
+									
+												<div class="row">
+													<div class="col-md-6">
+														<div class="form-group">
+															<button type="submit" class="btn btn-info" id="btnSave" data-bind="click:SaveLeaveType">Add</button>
+															<button type="submit" class="btn btn-danger" id="btnDelete" data-bind="click:DeleteLeaveType">Delete</button>
+															<button type="submit" class="btn btn-default" id="btnCancel" data-bind="click:CancelLeaveType">Cancel</button>
+														</div>
+													</div>
+												</div>
+
+								</div>
+								</div>
+							</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
+	<script src="../../Scripts/COMMON/LeaveType.js" type="text/javascript"></script>
+</asp:Content>
+
+

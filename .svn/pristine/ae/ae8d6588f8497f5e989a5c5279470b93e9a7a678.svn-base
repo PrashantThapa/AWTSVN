@@ -1,0 +1,1 @@
+﻿<%@ WebHandler Language="C#" CodeBehind="AccountChartHandler.ashx.cs" Class="IDS.Handlers.ACCOUNT.AccountChartHandler" %>

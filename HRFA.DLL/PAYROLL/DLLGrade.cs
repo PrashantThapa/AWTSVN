@@ -1,0 +1,146 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using HRFA.ATT.PAYROLL;
+using HRFA.ATT.COMMON;
+using HRFA.COMMON;
+
+using HRFA.ATT;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer.PAYROLL
+{
+	public class DLLGrade
+	{
+		public string SaveGrade(List<ATTGradeLevel> lst,int? gradeID, OracleTransaction tran)
+		{
+			string SP = "";
+			string msg = "No Data to Save!!!";
+            GetConnection conn = new GetConnection();
+
+            try
+            {
+                foreach (ATTGradeLevel grade in lst)
+                {
+
+                    if (grade.Action == "E")
+                    {
+                        SP = "DCPR_EDIT_GRADES";
+                        msg = "Successfully Updated";
+                    }
+                    else
+                    {
+                        SP = "DCPR_ADD_GRADES";
+                        msg = "Successfully Added ";
+                    }
+
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":P_INS", "INS", OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_LEVEL_ID", grade.LevelID, OracleDbType.Int32, ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":P_GRADE_LEVEL_NAME", grade.GradeLevelName, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_GRADE_AMOUNT", grade.GradeAmount, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", grade.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", grade.EntryDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_GRADE_ID", gradeID, OracleDbType.Int32, ParameterDirection.Input));
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                      }
+				}
+				catch (Exception ex)
+				{
+					tran.Rollback();
+					throw new Exception("Error" + ex.Message);
+				}
+
+			return msg;
+		}
+
+
+		public string DeleteGrade(int? gradeid)
+		{
+
+			GetConnection conn = new GetConnection();
+			OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+			string SP = "";
+			string msg = "";
+
+
+			try
+			{
+				SP = "CPR_DELETE_GRADES";
+				msg = "Record Deleted Successfully";
+
+
+
+				List<OracleParameter> paramList = new List<OracleParameter>();
+				paramList.Add(SqlHelper.GetOraParam(":P_GRADE_ID", gradeid, OracleDbType.Int32, ParameterDirection.InputOutput));
+
+				SqlHelper.ExecuteNonQuery(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+				return msg;
+			}
+
+			catch (Exception ex)
+			{
+
+				throw (ex);
+
+			}
+			finally
+			{
+
+				conn.CloseDbConn();
+			}
+
+		}
+
+		public List<ATTGradeLevel> GetGrade(int? gradeid)
+		{
+			GetConnection conn = new GetConnection();
+			OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+			List<ATTGradeLevel> lst = new List<ATTGradeLevel>();
+
+			try
+			{
+				string SP = "GET_ALL_GRADE_SCALE_SETUP";
+
+				List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_GRADE_ID", gradeid, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+				DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+				foreach (DataRow drow in ds.Tables[0].Rows)
+				{
+                    ATTGradeLevel obj = new ATTGradeLevel();
+
+					obj.LevelID = Int32.Parse(drow["LEVEL_ID"].ToString());
+					obj.GradeLevelName = drow["GRADE_LEVEL_NAME"].ToString();
+					obj.GradeAmount = drow["GRADE_AMOUNT"].ToString();
+					obj.Action = "";
+
+					lst.Add(obj);
+				}
+
+				return lst;
+			}
+			catch (Exception ex)
+			{
+
+				throw (ex);
+			}
+			finally
+			{
+				conn.CloseDbConn();
+			}
+
+		}
+
+
+	}
+}

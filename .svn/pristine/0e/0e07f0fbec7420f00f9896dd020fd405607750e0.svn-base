@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLFAMCategory
+    {
+        public JsonResponse GetCategory(Int16? categoryID)
+        {
+            JsonResponse response = new JsonResponse();
+            List<ATTCategory> lst = new List<ATTCategory>();
+            DLLCategory dllCategory = new DLLCategory();
+            try
+            {
+                lst = dllCategory.GetCategory(categoryID);
+
+                response.ResponseData = lst;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+            return response;
+
+        }
+    }
+}

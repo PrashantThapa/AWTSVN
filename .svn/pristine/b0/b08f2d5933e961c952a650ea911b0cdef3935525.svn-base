@@ -1,0 +1,55 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLSubsidaryAC
+    {
+
+       public JsonResponse SaveSubsidaryAC(List<ATTSubsidaryAC> lstSubsidary)
+       {
+           JsonResponse response = new JsonResponse();
+
+           try
+           {
+               //response.Message = Validate(lstAddType);
+               if (response.Message == "")
+               {
+                   DLLSubsidaryAC dllSubsidary = new DLLSubsidaryAC();
+                   response.Message = dllSubsidary.SaveSubsidaryAC(lstSubsidary);
+                   response.IsSucess = true;
+               }
+           }
+           catch (Exception ex)
+           {
+               response.Message = ex.Message;
+               response.IsSucess = false;
+           }
+           return response;
+       }
+
+       public JsonResponse GetSubsidaryLst(int? officeCode,int? accode )
+       {
+           JsonResponse response = new JsonResponse();
+           List<ATTSubsidaryAC> lst = new List<ATTSubsidaryAC>();
+           try
+           {
+               DLLSubsidaryAC dllsub = new DLLSubsidaryAC();
+               lst = dllsub.GetSubsidaryLst(officeCode,accode );
+               response.ResponseData = lst;
+               response.Message = "Success";
+               response.IsSucess = true;
+           }
+           catch (Exception ex)
+           {
+               response.Message = ex.Message;
+               response.IsSucess = false;
+           }
+
+           return response;
+       }
+
+    }
+}

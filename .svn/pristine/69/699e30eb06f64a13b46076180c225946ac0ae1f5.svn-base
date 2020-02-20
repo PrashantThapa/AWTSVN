@@ -1,0 +1,167 @@
+﻿using System;
+using System.Data;
+using System.Collections.Generic;
+
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLACCEmployee
+
+    {
+        public Int64? SavePeron(ATTPerson obj)
+        {
+             GetConnection conn = new GetConnection();
+                    OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+                    OracleTransaction tran = dbConn.BeginTransaction();
+            try
+            {
+               
+                string msg = "";
+                string sp = "";
+
+                if (obj.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_PERSON";
+                }
+
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>
+                    {
+                        SqlHelper.GetOraParam(":p_PERSON_ID", obj.PID, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput),
+                        SqlHelper.GetOraParam(":p_PERSON_FIRST_NAME", obj.FirstName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_PERSON_MIDDLE_NAME", obj.MiddleName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_PERSON_LAST_NAME", obj.LastName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_PERSON_FIRST_NAME_ENG", obj.FirstNameEn, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_PERSON_MIDDLE_NAME_ENG", obj.MiddleNameEn, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_PERSON_LAST_NAME_ENG", obj.LastNameEn, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_PERSON_DOB", obj.DOB, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_PERSON_GENDER", obj.Gender, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_DS_AGENCY_ID", obj.Agency.DsAgencyID, OracleDbType.Int64, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_DS_ID", obj.DsIDNumber, OracleDbType.Int64, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_PERSON_SSID", obj.PSSID, OracleDbType.Int64, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":p_COUNTRY_CODE", obj.Country.CountryCode, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":P_REL_ID", obj.Religion.ReligionTypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":P_ETH_ID", obj.Ethnicity.EthTypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":P_R_STATUS", 'F', OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                        SqlHelper.GetOraParam(":P_TRAN_NO", null, OracleDbType.Int64, System.Data.ParameterDirection.Input)
+                    };
+                    paramList[0].Size = 16;
+
+
+                    
+
+                    SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                    tran.Commit();
+
+
+                    if (paramList[0].Value.ToString() != null || paramList[0].Value.ToString() != "")
+                    {
+                        obj.PID = int.Parse(paramList[0].Value.ToString());
+                        paramList.Clear();
+                    }
+                    else
+                    {
+                        msg = " Error in Saving Person !!!";
+                        throw new Exception(msg);
+                    }
+                }
+
+                return obj.PID;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+
+        public string SaveEmployee(List<ATTEmployee> lst)
+        {
+            string msg = "No Data To Save!!! ";
+            string SP = "";
+           
+            Int64? PID;
+
+            foreach (ATTEmployee objEmp in lst)
+            {
+
+            //    if (objEmp.Status == true)
+            //    {
+            //        status = "A";
+
+            //    }
+            //    else
+            //    {
+            //        status = "I";
+            //    }
+
+                if (objEmp.Action == "A")
+                {
+                    DLLACCEmployee objDllPerson = new DLLACCEmployee();
+                    PID = objDllPerson.SavePeron(objEmp.Person);
+                    objEmp.Person.PID = PID;
+                    SP = "APR_ADD_ATB_EMPLOYEE";
+                    msg = "Successfully Saved.";
+                }
+
+
+
+
+
+                List<OracleParameter> paramList = new List<OracleParameter>
+                {
+                    SqlHelper.GetOraParam(":P_P_ID", objEmp.Person.PID, OracleDbType.Int64, System.Data.ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_FROM_DATE", objEmp.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_DES_ID", objEmp.Designation.DesTypeID, OracleDbType.Int16, System.Data.ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_TO_DATE", null, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_ENTRY_BY", objEmp.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Date, System.Data.ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_R_STATUS", "I", OracleDbType.Varchar2, System.Data.ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_TRAN_NO", null, OracleDbType.Int64, System.Data.ParameterDirection.Input)
+                };
+
+                GetConnection conn = new GetConnection();
+                OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+                OracleTransaction tran = dbConn.BeginTransaction();
+
+
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                    tran.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tran.Rollback();
+                    throw new Exception("Error" + ex.Message);
+                }
+
+                finally
+                {
+
+                    conn.CloseDbConn();
+                }
+
+            }
+            return msg;
+        }
+
+	}
+
+}
+
+

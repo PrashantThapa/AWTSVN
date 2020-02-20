@@ -1,0 +1,62 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.BLL.PAYROLL;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+
+
+namespace HRFA.Handlers.PIS
+{
+    /// <summary>
+    /// Summary description for EmployeeAttendanceHandler
+    /// </summary>
+    public class EmployeeAttendanceHandler : BaseHandler
+    {
+		/*
+        public object GetEmployeeDetByOffice(int? officeCD, int? CostCenterID)
+        {
+            BLLEmployee bllEmp = new BLLEmployee();
+            JsonResponse response = bllEmp.GetEmployeeDetByOffice(officeCD, CostCenterID);
+            return JsonUtility.Serialize(response);
+        }
+        */
+		public object ShowAttendance(int? OfficeCode, string SymbolNo, string FromDate, string ToDate)
+
+		{
+			BLLShowAttendance bllShowAtt = new BLLShowAttendance();
+			JsonResponse response = bllShowAtt.ShowAttendance(OfficeCode, SymbolNo,FromDate, ToDate);
+			return JsonUtility.Serialize(response);
+		}
+
+		public object GetEmployeeDetBySubmissionNo(Int64? SubmissionNo)
+        {
+            BLLEmployeeAttendance bllEmpAtt = new BLLEmployeeAttendance();
+            JsonResponse response = bllEmpAtt.GetEmployeeDetBySubmissionNo(SubmissionNo);
+            return JsonUtility.Serialize(response);
+        }
+
+        public object GetEmpAttendance(int? officeCD, int? CostCenterID, int? Year, int? MonthID)
+        {
+            BLLEmployeeAttendance bllEmpAtt = new BLLEmployeeAttendance();
+            JsonResponse response = bllEmpAtt.GetEmpAttendance(officeCD, CostCenterID, Year, MonthID);
+            return JsonUtility.Serialize(response);
+        }
+
+
+        public object SaveEmpAttendance(string args)
+        {
+            List<ATTEmpAttendance> EmpAttList = JsonUtility.DeSerialize(args, typeof(List<ATTEmpAttendance>)) as List<ATTEmpAttendance>;
+            BLLEmployeeAttendance bllEmpAtt = new BLLEmployeeAttendance();
+            return JsonUtility.Serialize(bllEmpAtt.SaveEmpAttendance(EmpAttList));
+        }
+
+        public object GetWorkingDays(int? Year, int? MonthID)
+        {
+            BLLEmployeeAttendance bllEmpAtt = new BLLEmployeeAttendance();
+            JsonResponse response =  bllEmpAtt.GetWorkingDays( Year, MonthID);
+            return JsonUtility.Serialize(response); 
+        }
+    }
+}

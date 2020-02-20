@@ -1,0 +1,136 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLDeputationReturn
+    {
+        public string SaveDeputationReturn(ATTEmpDeputationReturn objDeputationReturn, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+
+                if (objDeputationReturn.Action == "A")
+                {
+                    sp = "DCPR_ADD_EMP_DEPUTATION_RETURN";
+                    msg = "Successfully Saved.";
+
+                }
+
+
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", objDeputationReturn.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", objDeputationReturn.EmpID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_DEP_OFFICE_CD", objDeputationReturn.Office.OfficeCode, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_DP_FROM_DATE", objDeputationReturn.DeputationFromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_RETURN_DATE", objDeputationReturn.ReturnDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", objDeputationReturn.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_TO_DATE", objDeputationReturn.ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_REMARKS", objDeputationReturn.Remarks, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objDeputationReturn.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objDeputationReturn.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objDeputationReturn.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                    paramList[0].Size = 16;
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    objDeputationReturn.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+
+                    if (objDeputationReturn.OldSubmissionNo != null)
+                    {
+                        DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                        dllUTV.SaveVerifyLog(tran, objDeputationReturn.EntryBy, objDeputationReturn.OldSubmissionNo, objDeputationReturn.SubmissionNo, appID, modID);
+                    }
+
+                    paramList.Clear();
+                    tran.Commit();
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            //return msg;
+            return msg + "</br> Please Note Your Submission No.</br><b>" + objDeputationReturn.SubmissionNo + "</b>";
+        }
+
+        public ATTEmpDeputationReturn GetDeputationReturn(Int64? submissionNo)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            try
+            {
+                string SP = "DCPR_GET_EMP_DEPUATION_RETURN";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", submissionNo, OracleDbType.Int64, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                ATTEmpDeputationReturn objDeputationReturn = new ATTEmpDeputationReturn();
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow drow = ds.Tables[0].Rows[0];
+                    objDeputationReturn.SubmissionNo = string.IsNullOrEmpty(drow["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                        //Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                    objDeputationReturn.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["EMP_ID"].ToString());
+                        //Int16.Parse(drow["EMP_ID"].ToString());
+                    objDeputationReturn.EmployeeName = drow["EMP_NAME"].ToString();
+                    objDeputationReturn.Office.OfficeCode = string.IsNullOrEmpty(drow["DEP_OFFICE_CD"].ToString()) ? (Int16?)null : Int16.Parse(drow["DEP_OFFICE_CD"].ToString());
+                        //Int16.Parse(drow["DEP_OFFICE_CD"].ToString());
+                    objDeputationReturn.Office.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+                    objDeputationReturn.DeputationFromDate = drow["DP_FROM_DATE"].ToString();
+                    objDeputationReturn.FromDate = drow["FROM_DATE"].ToString();
+                    objDeputationReturn.ToDate = drow["TO_DATE"].ToString();
+                    objDeputationReturn.ReturnDate = drow["RETURN_DATE"].ToString();
+                    objDeputationReturn.Remarks = drow["REMARKS"].ToString();
+                    objDeputationReturn.RStatus = drow["R_STATUS"].ToString();
+                    objDeputationReturn.EntryBy = drow["ENTRY_BY"].ToString();
+                    objDeputationReturn.EntryDate = drow["ENTRY_DATE"].ToString(); ;
+
+                }
+                else
+                {
+                    objDeputationReturn = null;
+                }
+
+                return objDeputationReturn;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+    }
+}

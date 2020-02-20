@@ -1,0 +1,24 @@
+﻿using System;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+namespace HRFA.Handlers.FAMS
+{
+   
+    public class ItemHandler : BaseHandler
+    {
+        public object GetItem(Int16? itemID)
+        {
+            JsonResponse response = new JsonResponse();
+
+            BLLItem bllItem = new BLLItem();
+            response = bllItem.GetItem(itemID);
+
+            return JsonUtility.Serialize(response);
+
+        }
+
+
+       
+    }
+}

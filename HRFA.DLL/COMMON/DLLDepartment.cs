@@ -1,0 +1,111 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLDepartment
+    {
+        public string  SaveDepartmentSetup(ATTDepartment objDepartment)
+        {
+            string msg = "No Data to Save !!!";
+            string sp = "";
+            if (objDepartment.Action == "E")
+            {
+                 sp = "CPR_EDIT_DEPARTMENT";// procedure for update 
+                 msg = "Successfully Updated.";
+            }
+            else {
+                 sp = "CPR_ADD_DEPARTMENT"; // procedure for insert
+                 msg = "Successfully Saved.";
+            }
+            objDepartment.Status = "A";
+            List<OracleParameter> paramList = new List<OracleParameter>();
+            paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CD  ", objDepartment.OfficeCD, OracleDbType.Int32, ParameterDirection.Input));
+            paramList.Add(SqlHelper.GetOraParam(":p_DEPT_ID ", objDepartment.DeptID, OracleDbType.Int32, ParameterDirection.InputOutput));
+            paramList.Add(SqlHelper.GetOraParam(":P_DEPT_DESC", objDepartment.DeptDesc, OracleDbType.Varchar2, ParameterDirection.Input));
+            paramList.Add(SqlHelper.GetOraParam(":p_PARENT_OFF_ID ", objDepartment.ParentOffID, OracleDbType.Int32, ParameterDirection.Input));
+            paramList.Add(SqlHelper.GetOraParam(":P_PARENT_DEPT_ID  ", objDepartment.ParentDeptID, OracleDbType.Int32, ParameterDirection.Input));
+            paramList.Add(SqlHelper.GetOraParam(":P_STATUS  ", objDepartment.Status, OracleDbType.Varchar2, ParameterDirection.Input));
+            paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE ", objDepartment.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+            paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE ", objDepartment.ToDate, OracleDbType.Date, ParameterDirection.Input));
+            paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", objDepartment.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+            paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", objDepartment.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+            OracleTransaction tran = dbConn.BeginTransaction();
+
+            try
+            {
+               SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+               tran.Commit();
+               
+
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                msg = ex.Message;
+                throw new Exception("Error" + ex.Message);
+
+            }
+            finally
+            {
+
+                conn.CloseDbConn();
+            }
+            return msg;
+        }
+
+        public List<ATTDepartment> GetDepartment(int officeCode, int? deptID)
+
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+            List<ATTDepartment> lst = new List<ATTDepartment>();
+
+            try
+            {
+                string SP = "CPR_GET_DEPARTMENT";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", officeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_DEPT_ID", deptID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn,CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTDepartment obj = new ATTDepartment();
+                    obj.OfficeCD = Int32.Parse(drow["OFFICE_CD"].ToString());
+                    obj.DeptID = Int32.Parse(drow["DEPT_ID"].ToString());
+                    obj.DeptDesc = drow["DEPT_DESC"].ToString();
+                    obj.ParentDeptID = string.IsNullOrEmpty(drow["PARENT_DEPT_ID"].ToString())?(int?)null:Int32.Parse(drow["PARENT_DEPT_ID"].ToString());
+              
+                    //obj.FROM_DATE = string.IsNullOrEmpty(drow["FROM_DATE"].ToString()) ? null : drow["FROM_DATE"].ToString();
+                    //obj.Action = "";
+
+                    lst.Add(obj);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+    }
+}

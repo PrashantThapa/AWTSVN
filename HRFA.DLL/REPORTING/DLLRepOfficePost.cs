@@ -1,0 +1,67 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using HRFA.ATT.REPORTING;
+using HRFA.COMMON;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer.REPORTING
+{
+    public class DLLRepOfficePost
+	{
+		public List<ATTRepOfficePost> GetReportPost(Int64 officecd, string SymbolNo)
+		{
+			GetConnection GetConn = new GetConnection();
+			OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+
+			try
+			{
+				//string SP = "RPR_GET_EMPLOYEE_POSTING_DET";
+				string SP = "RPR_GET_EMPLOYEE_POSTING_DET";
+
+
+				List<OracleParameter> paramList = new List<OracleParameter>();
+
+				paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", officecd, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_SYMBOL_NO", SymbolNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+				DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+				List<ATTRepOfficePost> lst = new List<ATTRepOfficePost>();
+
+				foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+				{
+					ATTRepOfficePost obj = new ATTRepOfficePost();
+
+					obj.EMP_ID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int64?)null : Int64.Parse(drow["EMP_ID"].ToString());
+					obj.OFFICE_CD = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int64?)null : Int64.Parse(drow["OFFICE_CD"].ToString());
+					obj.POST_ID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int64?)null : Int64.Parse(drow["POST_ID"].ToString());
+					obj.EMP_NAME = drow["EMP_NAME"].ToString();
+					obj.FROM_DATE = drow["FROM_DATE"].ToString();
+					obj.TO_DATE = drow["TO_DATE"].ToString();
+					obj.POST_DESC = drow["POST_DESC"].ToString();
+					obj.OFFICE_NAME_NEPALI = drow["OFFICE_NAME_NEPALI"].ToString();
+					obj.SYMBOL_NO = drow["SYMBOL_NO"].ToString();
+
+
+
+					lst.Add(obj);
+
+				}
+				return lst;
+			}
+			catch (Exception ex)
+			{
+				return new List<ATTRepOfficePost>();
+
+			}
+			finally
+			{
+				GetConn.CloseDbConn();
+			}
+		}
+
+	}
+}

@@ -1,0 +1,217 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLLeaveType
+    {
+
+        public string SaveLeaveType(ATTLeaveType objLeaveType)
+        {
+            string sp = "";
+            string msg = "No Data To Save !!!";
+
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                if (objLeaveType.Action == "A")
+                {
+                    sp = "CPR_ADD_LEAVE_TYPE";
+                    msg = "Successfully Saved.";
+                }
+                else if (objLeaveType.Action == "E")
+                {
+                    sp = "CPR_EDIT_LEAVE_TYPE";
+                    msg = "Successfully Updated.";
+                }
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_LEAVE_TYPE_ID", objLeaveType.LeaveTypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":p_LEAVE_TYPE_NAME", objLeaveType.LeaveTypeName, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+					paramList.Add(SqlHelper.GetOraParam(":p_LEAVE_TYPE_NAME_NEP", objLeaveType.LeaveTypeNameNep, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ISPAYABLE", objLeaveType.IsPayable, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_RESERVABLE", objLeaveType.IsReservable, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_MAXRESRVABLEDAYS", objLeaveType.MaxReservableDays, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_MINSERVICEDAYS", objLeaveType.MinServiceDaysRequired, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_MINDAYS", objLeaveType.MinDays, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_MAXDAYS", objLeaveType.MaxDays, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ISHALFDAY", objLeaveType.IsHalfDayApplicable, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ISRECOMENDABLE", objLeaveType.IsRecomendable, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_REC_CONSTRAINTDAYS", objLeaveType.RecomendableConstraintDays, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ADDED_REC_DAYS", objLeaveType.RecomendableConstraintDaysAdded, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ISREIMBUSHABLE", objLeaveType.IsReImbushmentable, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_MAX_COUNT_LEAVE", objLeaveType.MaxTermCount, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_CANTAKENWITHOTHER", objLeaveType.CanTakenWithOther, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_GENDER", objLeaveType.Gender, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_STATUS", objLeaveType.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", objLeaveType.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", objLeaveType.ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", objLeaveType.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", objLeaveType.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_MARST_ID ", objLeaveType.MaritalStatus.MarStatID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+
+                   
+                    SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                    paramList.Clear();
+                }
+                tran.Commit();
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                return ex.Message;
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+
+
+        }
+
+		public string DeleteLeaveType(Int32? leavetype)
+		{
+			GetConnection conn = new GetConnection();
+			OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+
+			try
+			{
+				string SP = "CPR_DELETE_LEAVETYPE";
+				List<OracleParameter> ParamList = new List<OracleParameter>();
+				ParamList.Add(SqlHelper.GetOraParam(":p_LEAVE_TYPE_ID", leavetype, OracleDbType.Int32, ParameterDirection.InputOutput));
+				SqlHelper.ExecuteNonQuery(dbConn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+				return "Deleted Successfully!!!";
+
+
+			}
+			catch (Exception ex)
+			{
+
+				return ex.Message;
+
+			}
+			finally
+			{
+
+				conn.CloseDbConn();
+			}
+
+		}
+
+
+		public List<ATTLeaveDetail> GetEmployeeLeaves(int empID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+
+            string SP = "CPR_GET_EMP_LEAVE_DETAIL";
+            List<ATTLeaveDetail> lst = new List<ATTLeaveDetail>();
+
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_EMPID", empID, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTLeaveDetail obj = new ATTLeaveDetail();                   
+                    obj.LeaveTypeID = DBNull.Value.Equals(drow["LEAVE_TYPE_ID"]) ? (Int32?)null : Int32.Parse(drow["LEAVE_TYPE_ID"].ToString());
+                    obj.LeaveTypeName = DBNull.Value.Equals(drow["LEAVE_TYPE_NAME"]) ? string.Empty : drow["LEAVE_TYPE_NAME"].ToString();
+                    obj.LeaveTypeNameNep = DBNull.Value.Equals(drow["LEAVE_TYPE_NAME_NEP"]) ? string.Empty : drow["LEAVE_TYPE_NAME_NEP"].ToString();
+                    obj.TotalLeave = DBNull.Value.Equals(drow["TOTAL_LEAVE"]) ? (Int32?)null : Convert.ToInt32(drow["TOTAL_LEAVE"]);
+                    obj.AvailableLeave = DBNull.Value.Equals(drow["AVAILABLE_LEAVE"]) ? (Int32?)null : Convert.ToInt32(drow["AVAILABLE_LEAVE"]);                
+
+
+                    lst.Add(obj);
+
+                }
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+        //GET LeaveType
+
+        public List<ATTLeaveType> GetLeaveType(Int32? LeaveTypeValues)
+        {
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+
+            string SP = "CPR_GET_LEAVE_TYPE";
+            List<ATTLeaveType> lst = new List<ATTLeaveType>();
+
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":p_LEAVE_TYPE_ID", LeaveTypeValues, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTLeaveType obj = new ATTLeaveType();
+                    obj.MaritalStatus = new ATTMaritalStatus();
+                    obj.LeaveTypeID = DBNull.Value.Equals(drow["LEAVE_TYPE_ID"]) ? (Int32?)null : Int32.Parse(drow["LEAVE_TYPE_ID"].ToString());                       
+                    obj.LeaveTypeName = DBNull.Value.Equals(drow["LEAVE_TYPE_NAME"]) ? string.Empty:drow["LEAVE_TYPE_NAME"].ToString();
+                    obj.LeaveTypeNameNep = DBNull.Value.Equals(drow["LEAVE_TYPE_NAME_NEP"]) ? string.Empty : drow["LEAVE_TYPE_NAME_NEP"].ToString();
+                    obj.IsPayable = DBNull.Value.Equals(drow["ISPAYABLE"]) ? false : Convert.ToBoolean(drow["ISPAYABLE"]);
+                    obj.IsReservable = DBNull.Value.Equals(drow["ISRESERVABLE"]) ? false : Convert.ToBoolean(drow["ISRESERVABLE"]);
+                    obj.MaxReservableDays = DBNull.Value.Equals(drow["MAX_RESERVABLE_DAYS"]) ? (Int32?)null : Convert.ToInt32(drow["MAX_RESERVABLE_DAYS"]);
+                    obj.MinServiceDaysRequired = DBNull.Value.Equals(drow["MIN_SERVICE_DAYS"]) ? (Int32?)null : Convert.ToInt32(drow["MIN_SERVICE_DAYS"]);
+                    obj.MinDays = DBNull.Value.Equals(drow["MIN_DAYS"]) ? (Int32?)null : Convert.ToInt32(drow["MIN_DAYS"]);
+                    obj.IsHalfDayApplicable = DBNull.Value.Equals(drow["HALFDAY_APLLICABLE"]) ? false : Convert.ToBoolean(drow["HALFDAY_APLLICABLE"]);
+                    obj.IsRecomendable = DBNull.Value.Equals(drow["ISRECOMMENDABLE"]) ? false : Convert.ToBoolean(drow["ISRECOMMENDABLE"]);
+                    obj.RecomendableConstraintDays = DBNull.Value.Equals(drow["REC_CONSTRAINTDAYS"]) ? (Int32?)null : Convert.ToInt32(drow["REC_CONSTRAINTDAYS"]);
+                    obj.RecomendableConstraintDaysAdded = DBNull.Value.Equals(drow["ADDED_REC_DAYS"]) ? (Int32?)null : Convert.ToInt32(drow["ADDED_REC_DAYS"]);
+                    obj.IsReImbushmentable = DBNull.Value.Equals(drow["ISREIMBUSHABLE"]) ? false : Convert.ToBoolean(drow["ISREIMBUSHABLE"]);
+                    obj.MaxTermCount = DBNull.Value.Equals(drow["MAX_COUNT_LEAVE"]) ? (Int32?)null : Convert.ToInt32(drow["MAX_COUNT_LEAVE"]);
+                    obj.CanTakenWithOther = DBNull.Value.Equals(drow["CANTAKENWITHOTHER"]) ? false : Convert.ToBoolean(drow["CANTAKENWITHOTHER"]);
+                    obj.Gender = DBNull.Value.Equals(drow["GENDER"]) ? string.Empty:drow["GENDER"].ToString();
+                    obj.MaritalStatus.MarStatName = drow["MARST_NAME"].ToString();
+                    
+
+                    lst.Add(obj);
+
+                }
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        
+        }
+
+    }
+
+}
+ 

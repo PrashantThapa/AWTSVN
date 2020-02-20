@@ -1,0 +1,348 @@
+﻿function Resignation(data) {
+    var self = this;
+    self.SubmissionNo = ko.observable(data.SubmissionNo);
+    self.EmpID = ko.observable(data.EmpID);
+    self.EmpName = ko.observable(data.EmpName);
+    self.ResignLetterDate = ko.observable(data.ResignLetterDate);
+    self.EffectiveDate = ko.observable(data.EffectiveDate);
+    self.ResignationReason = ko.observable(data.ResignationReason);
+    self.FromDate = ko.observable(data.FromDate);
+    self.ToDate = ko.observable(data.ToDate);
+    self.RStatus = ko.observable(data.RStatus);
+    self.EntryBy = ko.observable(data.EntryBY);
+    self.EntryDate = ko.observable(data.EntryDate);
+
+    self.OldSubmissionNo = ko.observable(data.OldSubmissionNo);
+
+}
+
+function ResignationViewModel() {
+    var self = this;
+    self.SubmissionNo = ko.observable();
+    self.EmpID = ko.observable();
+    self.EmpName = ko.observable();
+    self.ResignLetterDate = ko.observable();
+    self.EffectiveDate = ko.observable();
+    self.ResignationReason = ko.observable();
+    self.FromDate = ko.observable();
+    self.ToDate = ko.observable();
+    self.RStatus = ko.observable();
+    self.EntryBy = ko.observable();
+    self.EntryDate = ko.observable();
+
+    self.grdOfficeCode = ko.observable();
+    self.grdEmployeeID = ko.observable();
+    self.grdPostID = ko.observable();
+
+
+    self.grdOfficeName = ko.observable();
+    self.grdEmployeeName = ko.observable();
+    self.grdPostDesc = ko.observable();
+
+    self.EmployeeName = ko.observable();
+
+    self.OfficeCode = ko.observable(); 
+    self.OfficeNameNep = ko.observable();
+
+    self.Days = ko.observable();
+
+    self.OldSubmissionNo = ko.observable();
+
+    self.Validation = function () {
+        var errMsg = "";
+
+//        if (Validate.empty(self.EmpID())) {
+//            errMsg += "कृपया कर्मचारी आईडी भर्नुहोस्!\n";
+//        }
+        if (Validate.empty(self.EmployeeName())) {
+            errMsg += "Please fill employee name!!!\n";
+        }
+
+        if (Validate.empty(self.ResignLetterDate()))
+        {
+            errMsg += "Please fill Resign letter date!!!\n";
+        }
+        if (Validate.empty(self.EffectiveDate())) {
+            errMsg += "Please fill Effective date !!!\n";
+        }
+        if (Validate.empty(self.ResignationReason())) {
+            errMsg += "Please fill reason for resignation!!!\n";
+        }
+        if (errMsg == "") {
+            return true;
+        }
+        else {
+             msg(errMsg,"WARNING");
+            return false;
+        }
+    }
+
+    //Save Resignation
+
+    self.SaveResignation = function () {
+        //        
+        self.SetNepali();
+        if (self.Validation()) {
+
+
+            var resignation = {
+                OldSubmissionNo: self.SubmissionNo(),
+                EmpID: self.EmpID(),
+                ResignLetterDate: self.ResignLetterDate(),
+                EffectiveDate: self.EffectiveDate(),
+                ResignationReason: self.ResignationReason(),
+                FromDate: null,
+                ToDate: null,
+                RStatus: "F",
+                EntryBy: $("#user").text(),
+                EntryDate: null,
+                Action: "A"
+            };
+
+            var url = "/Handlers/PIS/ResignationHandler.ashx";
+            var method = "SaveResignation";
+            var appID = "PIS";
+            var modID = "EMPRES";
+
+            var data = { 'method': method, 'args': JSON.stringify(ko.toJS(resignation)), 'appID': appID, 'modID': modID };
+
+            $.post(url, data,
+                                function (result) {
+                                    var obj = jQuery.parseJSON(result);
+                                    if (obj.IsSucess) {
+                                        msg(obj.Message);
+                                    }
+                                    else {
+                                        msg(obj.Message, "WARNING");
+                                    }
+                                    self.ClearControl();
+                                });
+        }
+    }
+
+            //            $.ajax({
+            //                type: 'GET',
+            //                dataType: "json",
+            //                cache: false,
+            //                url: '../../../Handlers/PIS/ResignationHandler.ashx',
+            //                data: { 'method': 'SaveResignation', 'args': JSON.stringify(row) },
+            //                contentType: "application/json; character=utf-8",
+            //                success: function (result) {
+            //                    if (result.IsSucess) {
+            //                        msg(result.Message);
+            //                        self.ClearControl();
+            ////                        self.GetOffices();
+            //                    }
+            //                    else {
+            //                        msg(result.Message);
+            //                    }
+            //                },
+            //                error: function (err) {
+            //                    msg("Failed error");
+            //                    //console.log(err);
+            //                }
+            //            });
+//        }
+//    }
+
+
+    self.GetResignationBySubNo = function () {
+        
+        self.SubmissionNo(getUrlParamVal('SubmissionNumber'));
+
+        var editable = getUrlParamVal('Editable');
+
+        if (self.SubmissionNo() == null || self.SubmissionNo() == "" || self.SubmissionNo() == undefined) {
+            return;
+        }
+        else {
+            if (editable == 'Y') {
+
+            }
+            else {
+                $('button').hide();
+                $('form').find('input, textarea, select').attr('disabled', 'disabled');
+                $("#Office").hide();
+                $("#divDllOffice").hide();
+//                $("#grdMain").hide();
+            }
+
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                url: '../../Handlers/PIS/ResignationHandler.ashx',
+                data: { 'method': 'GetResignationBySubNo', 'SubmissionNo': self.SubmissionNo() },
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                success: function (result) {
+                    //    console.log(result);
+                    if (result.ResponseData.length > 0) {
+
+                        self.EmpID(result.ResponseData[0].EmpID);
+                        self.EmployeeName(result.ResponseData[0].EmpName);
+
+                        console.log(result.ResponseData[0].EmpName);
+
+                        self.ResignLetterDate(result.ResponseData[0].ResignLetterDate);
+                        self.EffectiveDate(result.ResponseData[0].EffectiveDate);
+                        self.ResignationReason(result.ResponseData[0].ResignationReason);
+
+                        self.grdOfficeCode(result.ResponseData[0].Office.OfficeCode);
+                        self.grdOfficeName(result.ResponseData[0].Office.OfficeNameNep);
+                        
+                        self.grdEmployeeID(result.ResponseData[0].EmpID);
+                        console.log(self.grdEmployeeID());
+                        self.grdEmployeeName(self.EmployeeName());
+                        
+                        self.grdPostID(result.ResponseData[0].Post.PostID);
+                        self.grdPostDesc(result.ResponseData[0].Post.PostDesc);
+
+                        //                    $('button').hide();
+                        //                    $('form').find('input, textarea, select').attr('disabled', 'disabled');
+
+                        //               $("#loader").hide();
+
+                        //                                       $("#Office").hide();
+
+                        //                                 $("#divDllOffice").hide();
+                        // $("#ddlOffice").css("display","none");
+
+                        //           $("#EmpName").hide();
+                        //         $("#txtEmployeeID").hide();
+
+                        //                    $("#grdMain").hide();
+
+                    }
+                    else {
+                        msg("Submission number is not valid");
+                    }
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+
+                }
+            });
+        }
+    }
+    self.GetResignationBySubNo();
+
+    // Date Validation
+
+    self.GetDateDifference = function (date1, date2) {
+        if (date1 != undefined && date2 != undefined) {
+
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                async: false,
+                url: '../../../Handlers/COMMON/DateHandler.ashx',
+                data: { 'method': 'GetDaysDifference', 'date1': date2, 'date2': date1 },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    var days = result.ResponseData;
+                    self.Days(days);
+
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+                }
+            });
+        }
+    }
+
+
+    self.ValidateToDate = function () {
+
+
+        if (self.ResignLetterDate() == "" || self.ResignLetterDate() === undefined) {
+
+            msg("Please fill resign letter date!!!<br>", "FAILURE");
+            // self.ApproveDate('');
+        }
+        if (self.EffectiveDate() == "" || self.EffectiveDate() === undefined) {
+            msg("Please fill effective date!!!<br>", "FAILURE");
+            // self.CancellationToDate('');
+        }
+
+        if (!Validate.empty(self.EffectiveDate()) && !Validate.empty(self.ResignLetterDate())) {
+
+            self.GetDateDifference(self.ResignLetterDate(), self.EffectiveDate());
+            console.log(self.Days());
+
+            if (self.Days() < 0) {
+                msg("Resignation letter date should be greater or equal to effective date!!!");
+                self.EffectiveDate('');
+                self.Days('');
+            }
+        }
+    }
+
+
+
+
+
+
+    self.ClearControl = function () {
+        self.ResignLetterDate("");
+        self.EffectiveDate("");
+        self.ResignationReason("");
+        self.EmpID("");
+        self.EmployeeName("");
+        self.grdOfficeName("");
+        self.grdEmployeeName("");
+        self.grdPostDesc("");
+    }
+
+    self.CancelResignation = function () {
+        self.ClearControl();
+    }
+
+    self.SetNepali = function () {
+        self.ResignationReason($("#txtArea").val());
+    }
+
+//    
+        
+
+//    self.GetOffices = function () {
+
+//        $.ajax({
+//            dataType: "json",
+//            cache: false,
+//            url: '../../../Handlers/CENTRALLOOKUP/OfficeHandler.ashx',
+//            data: { 'method': 'GetAllOffice', 'args': null },
+//            contentType: "application/json; charset=utf-8",
+//            success: function (result) {
+//                var mappedTask = $.map(result.ResponseData, function (item) {
+//                    return new Office(item)
+//                });
+
+//                self.Offices(mappedTask);
+//            },
+//            error: function (err) {
+//                msg(err.status + " - " + err.statusText, "FAILURE");
+//            }
+
+//        });
+//    }
+//    self.GetOffices();
+
+    $('#modalEmpSearch').on('hidden.bs.modal', function () {
+
+        self.EmpID(GEmpID);
+        self.EmployeeName(GEmpName);
+        self.OfficeCode(GOfficeCD);
+        self.grdEmployeeName(GEmpName);
+        self.grdOfficeName(GOfficeName);
+        self.grdPostDesc(GPostDesc);
+    })
+}
+$(document).ready(function () {
+    ValidateSession();
+    ko.applyBindings(new ResignationViewModel(),document.getElementById("ResignationForm"));
+
+})
+
+
+
+

@@ -1,0 +1,16 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public  class ATTGLGroup
+    {
+        public Int32? GroupID { get; set; }
+        public string GroupName { get; set; }
+        public string EntryBy { get; set; }
+        public string EntryDate { get; set; }
+        public string RStatus { get; set; }
+        public Int64? TranNo { get; set; }
+        public string Action { get; set; }
+
+    }
+}

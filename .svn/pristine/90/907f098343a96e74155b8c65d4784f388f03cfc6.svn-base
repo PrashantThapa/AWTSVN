@@ -1,0 +1,66 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+namespace HRFA.Handlers.FAMS
+{
+    /// <summary>
+    /// Summary description for BudgetReleaseHandler
+    /// </summary>
+    public class BudgetReleaseHandler : BaseHandler
+    {
+
+        public object SaveBudgetRelease(string args, string appID, string modID, string releaseDate)
+        {
+            JsonResponse response = new JsonResponse();
+            ATTBudgetRelease objBudgetApprove = (ATTBudgetRelease)JsonUtility.DeSerialize(args, typeof(ATTBudgetRelease));
+            BLLBudgetRelease objBLLBudgetApprove = new BLLBudgetRelease();
+
+            try
+            {
+                response = objBLLBudgetApprove.SaveBudgetRelease(objBudgetApprove, appID,modID, releaseDate);
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return JsonUtility.Serialize(response);
+        }
+
+
+        public object GetBudgetReleaseBySubNo(Int64? SubNo)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLBudgetRelease objBLLPromotion = new BLLBudgetRelease();
+            try
+            {
+                response = objBLLPromotion.GetBudgetReleaseBySubNo(SubNo);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+
+
+        public object GetDetails(Int32? OfficeCD, Int32? CostCenterID, string fiscalyear)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLBudgetRelease objBLLBudgetRelease = new BLLBudgetRelease();
+            try
+            {
+                response = objBLLBudgetRelease.GetDetails(OfficeCD, CostCenterID, fiscalyear);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+    }
+}

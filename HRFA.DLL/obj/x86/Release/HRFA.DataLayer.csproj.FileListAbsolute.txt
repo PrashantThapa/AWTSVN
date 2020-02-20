@@ -1,0 +1,13 @@
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\x86\Release\HRFA.DataLayer.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\x86\Release\HRFA.DataLayer.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\x86\Release\HRFA.ATT.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\x86\Release\HRFA.COMMON.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\x86\Release\Interop.zkemkeeper.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\x86\Release\Newtonsoft.Json.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\x86\Release\HRFA.ATT.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\bin\x86\Release\HRFA.COMMON.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\obj\x86\Release\HRFA.DataLayer.csprojAssemblyReference.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\obj\x86\Release\HRFA.DataLayer.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\obj\x86\Release\HRFA.DataLayer.csproj.CopyComplete
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\obj\x86\Release\HRFA.DataLayer.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.DLL\obj\x86\Release\HRFA.DataLayer.pdb

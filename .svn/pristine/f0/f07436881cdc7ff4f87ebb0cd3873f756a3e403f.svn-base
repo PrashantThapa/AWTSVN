@@ -1,0 +1,43 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+namespace HRFA.Handlers.FAMS
+{
+    public class BlanketPurchaseHandler : BaseHandler
+    {
+        public object SaveBlanketPurchase(string args, string appID, string modID)
+        {
+            JsonResponse response = new JsonResponse();
+
+
+            List<ATTBlanketPurchase> objBlanketPurchase = JsonUtility.DeSerialize(args, typeof(List<ATTBlanketPurchase>)) as List<ATTBlanketPurchase>;
+            BLLBlanketPurchase bllBlanketPurchase = new BLLBlanketPurchase();
+            response = bllBlanketPurchase.SaveBlanketPurchase(objBlanketPurchase,appID,modID);
+
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetBlanketPurchaseBySubmissionNo(Int64? submissionNo)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLBlanketPurchase bllBlanketPurchase = new BLLBlanketPurchase();
+            try
+            {
+                response = bllBlanketPurchase.GetBlanketPurchaseBySubmissionNo(submissionNo);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+
+
+        
+    }
+}

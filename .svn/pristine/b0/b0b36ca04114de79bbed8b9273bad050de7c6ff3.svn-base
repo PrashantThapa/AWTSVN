@@ -1,0 +1,285 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B4E4872E-4169-40FC-85C6-B94FADCE8BF4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HRFA.ATT</RootNamespace>
+    <AssemblyName>HRFA.ATT</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Account\ATTAccountChart.cs" />
+    <Compile Include="Account\ATTAccounts.cs" />
+    <Compile Include="Account\ATTCompany.cs" />
+    <Compile Include="Account\ATTEmployee.cs" />
+    <Compile Include="Account\ATTGetAccounts.cs" />
+    <Compile Include="Account\ATTGLGroup.cs" />
+    <Compile Include="Account\ATTOfficeCompanyAccChart.cs" />
+    <Compile Include="Account\ATTOfficeTran.cs" />
+    <Compile Include="Account\ATTOfficeTranDetail.cs" />
+    <Compile Include="Account\ATTSchedule.cs" />
+    <Compile Include="Account\ATTSubsidaryAC.cs" />
+    <Compile Include="Account\ATTVoucherGroup.cs" />
+    <Compile Include="ALMS\ATTAttendence.cs" />
+    <Compile Include="ALMS\ATTAttendenceDownload.cs" />
+    <Compile Include="ALMS\ATTBalanceLeaveType.cs" />
+    <Compile Include="ALMS\ATTDeviceRegistration.cs" />
+    <Compile Include="ALMS\ATTHolidays.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTAddressType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTAppointmentType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTBank.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTBankAccount.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTBFICapital.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTCategory.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTContactType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTCostCenter.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTCountry.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTDesignation.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTDistrict.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTDocumentType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTDsAgency.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTEmployerType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTEmploymentType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTEthinicity.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTFiscalYear.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTLanguage.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTLiteracyType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTLoanType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTMaritalStatus.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTMarkingType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTMedicalAtt.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTOffice.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTPosition.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTPost.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTProvince.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTProduct.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTPromotionType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTQualification.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTRelationType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTReligionType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTRetirmentType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTServiceType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTSkillType.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTState.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTTaxCat.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTVDC.cs" />
+    <Compile Include="CENTRALLOOKUP\BankPremium.cs" />
+    <Compile Include="CENTRALLOOKUP\ATTOvertimeSetup.cs" />
+    <Compile Include="COMMON\ATTDate.cs" />
+    <Compile Include="COMMON\ATTDepartment.cs" />
+    <Compile Include="COMMON\ATTEmployer.cs" />
+    <Compile Include="COMMON\ATTExtraAllowance.cs" />
+    <Compile Include="COMMON\ATTGrade.cs" />
+    <Compile Include="COMMON\ATTGradeUnit.cs" />
+    <Compile Include="COMMON\ATTLeaveDetail.cs" />
+    <Compile Include="COMMON\ATTLeaveType.cs" />
+    <Compile Include="COMMON\ATTLevel.cs" />
+    <Compile Include="COMMON\ATTOfficePost.cs" />
+    <Compile Include="COMMON\ATTOfficePostDarbandi.cs" />
+    <Compile Include="COMMON\ATTPeriodType.cs" />
+    <Compile Include="COMMON\ATTPortalLogin.cs" />
+    <Compile Include="COMMON\ATTPost.cs" />
+    <Compile Include="COMMON\ATTPostWiseLeaveType.cs" />
+    <Compile Include="COMMON\ATTSamuha.cs" />
+    <Compile Include="COMMON\ATTSewa.cs" />
+    <Compile Include="COMMON\ATTShift.cs" />
+    <Compile Include="COMMON\ATTSubmission.cs" />
+    <Compile Include="COMMON\ATTUpaSamuha.cs" />
+    <Compile Include="FAMS\ATTBlanketPurchase.cs" />
+    <Compile Include="FAMS\ATTBudgetApprove.cs" />
+    <Compile Include="FAMS\ATTBudgetItem.cs" />
+    <Compile Include="FAMS\ATTBudgetRelease.cs" />
+    <Compile Include="FAMS\ATTBudgetRequest.cs" />
+    <Compile Include="FAMS\ATTBudgetTransfer.cs" />
+    <Compile Include="FAMS\ATTFAMSCategory.cs" />
+    <Compile Include="FAMS\ATTEmpSalarySheet.cs" />
+    <Compile Include="FAMS\ATTItem.cs" />
+    <Compile Include="FAMS\ATTJob.cs" />
+    <Compile Include="FAMS\ATTPurchaseOrder.cs" />
+    <Compile Include="FAMS\ATTType.cs" />
+    <Compile Include="FAMS\ATTUnit.cs" />
+    <Compile Include="FAMS\ATTVendor.cs" />
+    <Compile Include="PAYROLL\ATTAllowance.cs" />
+    <Compile Include="PAYROLL\ATTEmpGrade.cs" />
+    <Compile Include="PAYROLL\ATTEmpGradeLoan.cs" />
+    <Compile Include="PAYROLL\ATTEmpSalaryItem.cs" />
+    <Compile Include="PAYROLL\ATTEmpSalaryItemRate.cs" />
+    <Compile Include="PAYROLL\ATTEmpSalaryPayment.cs" />
+    <Compile Include="PAYROLL\ATTFuncAmount.cs" />
+    <Compile Include="PAYROLL\ATTFunction.cs" />
+    <Compile Include="PAYROLL\ATTGrades.cs" />
+    <Compile Include="PAYROLL\ATTGradeScaleSetup.cs" />
+    <Compile Include="PAYROLL\ATTGradeScaleSetupDdl.cs" />
+    <Compile Include="PAYROLL\ATTLoan.cs" />
+    <Compile Include="PAYROLL\ATTMode.cs" />
+    <Compile Include="PAYROLL\ATTPayrollEmployeeSalaryRep.cs" />
+    <Compile Include="PAYROLL\ATTPayrollEmpSalaryPayment.cs" />
+    <Compile Include="PAYROLL\ATTPayrollSalarySheet.cs" />
+    <Compile Include="PAYROLL\ATTPayrollSalarySheetAdjustment.cs" />
+    <Compile Include="PAYROLL\ATTPostWiseSalaryItem.cs" />
+    <Compile Include="PAYROLL\ATTSalaryItem.cs" />
+    <Compile Include="PAYROLL\ATTSalaryItemGL.cs" />
+    <Compile Include="PAYROLL\ATTSalaryParameter.cs" />
+    <Compile Include="PAYROLL\ATTShowAttendance.cs" />
+    <Compile Include="PAYROLL\ATTTiming.cs" />
+    <Compile Include="PERSON\ATTAddress.cs" />
+    <Compile Include="PERSON\ATTDependent.cs" />
+    <Compile Include="PERSON\ATTPerson.cs" />
+    <Compile Include="PERSON\ATTPersonAddress.cs" />
+    <Compile Include="PERSON\ATTPersonContact.cs" />
+    <Compile Include="PERSON\ATTPersonContPri.cs" />
+    <Compile Include="PERSON\ATTPersonDependent.cs" />
+    <Compile Include="PERSON\ATTPersonDoc.cs" />
+    <Compile Include="PERSON\ATTPersonLanguage.cs" />
+    <Compile Include="PERSON\ATTPersonNominee.cs" />
+    <Compile Include="PERSON\ATTPersonQualification.cs" />
+    <Compile Include="PIS\ATTAppointment.cs" />
+    <Compile Include="PIS\ATTAppraisal.cs" />
+    <Compile Include="PIS\ATTAppraisalCategory.cs" />
+    <Compile Include="PIS\ATTAward.cs" />
+    <Compile Include="PIS\ATTContributor.cs" />
+    <Compile Include="PIS\ATTContributorLogin.cs" />
+    <Compile Include="PIS\ATTDeputation.cs" />
+    <Compile Include="PIS\ATTEmpAddress.cs" />
+    <Compile Include="PIS\ATTEmpAttendance.cs" />
+    <Compile Include="PIS\ATTEmpConfirmation.cs" />
+    <Compile Include="PIS\ATTEmpContact.cs" />
+    <Compile Include="PIS\ATTEmpContactPerson.cs" />
+    <Compile Include="PIS\ATTEmpContactPririoty.cs" />
+    <Compile Include="PIS\ATTEmpDeptCostAssign.cs" />
+    <Compile Include="PIS\ATTEmpDeputationReturn.cs" />
+    <Compile Include="PIS\ATTEmpDocument.cs" />
+    <Compile Include="PIS\ATTEmpExperience.cs" />
+    <Compile Include="PIS\ATTEmpInsurance.cs" />
+    <Compile Include="PIS\ATTEmpLeaveApplication.cs" />
+    <Compile Include="PIS\ATTEmployee.cs" />
+    <Compile Include="PIS\ATTEmployeeAll.cs" />
+    <Compile Include="PIS\ATTEmpSalary.cs" />
+    <Compile Include="PIS\ATTGetDepartmentList.cs" />
+    <Compile Include="PIS\ATTPISEmployee.cs" />
+    <Compile Include="PIS\ATTEmployeeDevice.cs" />
+    <Compile Include="PIS\ATTEmployeeRawana.cs" />
+    <Compile Include="PIS\ATTEmployeeTransfer.cs" />
+    <Compile Include="PIS\ATTEmpMedicalCondition.cs" />
+    <Compile Include="PIS\ATTEmpPosting.cs" />
+    <Compile Include="PIS\ATTEmpTraining.cs" />
+    <Compile Include="PIS\ATTLeaveApprovedRecommend.cs" />
+    <Compile Include="PIS\ATTLeaveCancellation.cs" />
+    <Compile Include="PIS\ATTPromotion.cs" />
+    <Compile Include="PIS\ATTPunishment.cs" />
+    <Compile Include="PIS\ATTResignation.cs" />
+    <Compile Include="PIS\ATTRetirement.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="REPORTING\ATTRepAttendence.cs" />
+    <Compile Include="REPORTING\ATTRepEmployeeDetail.cs" />
+    <Compile Include="REPORTING\ATTRepEmployeeDetails.cs" />
+    <Compile Include="REPORTING\ATTRepEmployeePostHistory.cs" />
+    <Compile Include="REPORTING\ATTRepHoliday.cs" />
+    <Compile Include="REPORTING\ATTRepLeave.cs" />
+    <Compile Include="REPORTING\ATTRepLeaveDetail.cs" />
+    <Compile Include="REPORTING\ATTRepOfficeEmployeeInfoReport.cs" />
+    <Compile Include="REPORTING\ATTRepOfficePost.cs" />
+    <Compile Include="REPORTING\ATTRepOfficePostReport.cs" />
+    <Compile Include="REPORTING\ATTRepPayRoll.cs" />
+    <Compile Include="REPORTING\ATTRepPaySlip.cs" />
+    <Compile Include="REPORTING\ATTRepShiftSchedule.cs" />
+    <Compile Include="REPORTING\ATTRepShiftWise.cs" />
+    <Compile Include="REPORTING\ATTRepShiftWiseInfo.cs" />
+    <Compile Include="SECURITY\ATTApplication.cs" />
+    <Compile Include="SECURITY\ATTApplicationRole.cs" />
+    <Compile Include="SECURITY\ATTMenu.cs" />
+    <Compile Include="SECURITY\ATTModuleFunction.cs" />
+    <Compile Include="SECURITY\ATTOfficeUser.cs" />
+    <Compile Include="SECURITY\ATTRole.cs" />
+    <Compile Include="SECURITY\ATTRoleModuleFunction.cs" />
+    <Compile Include="SECURITY\ATTRoleModuleFunctionNew.cs" />
+    <Compile Include="SECURITY\ATTRoleModuleFunctions.cs" />
+    <Compile Include="SECURITY\ATTUser.cs" />
+    <Compile Include="SECURITY\ATTUserDesignation.cs" />
+    <Compile Include="SECURITY\ATTUserDesignationLoad.cs" />
+    <Compile Include="SECURITY\ATTUserRoleAppModule.cs" />
+    <Compile Include="SECURITY\ATTUserStatus.cs" />
+    <Compile Include="SECURITY\GenericUser.cs" />
+    <Compile Include="VERIFICATION\ATTVERApplication.cs" />
+    <Compile Include="VERIFICATION\ATTModule.cs" />
+    <Compile Include="VERIFICATION\ATTModuleVerification.cs" />
+    <Compile Include="VERIFICATION\ATTTranAuthentication.cs" />
+    <Compile Include="VERIFICATION\ATTUserTranVerification.cs" />
+    <Compile Include="VERIFICATION\ATTUserVerificationModule.cs" />
+    <Compile Include="VERIFICATION\ATTVerificationModule.cs" />
+    <Compile Include="WFMS\ATTDeptWiseShift.cs" />
+    <Compile Include="WFMS\ATTEmployeeShiftAssignment.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,0 +1,56 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLApplication
+    {
+        public List<ATTApplication> GetAllApplication()
+        {
+            string SP = "CPR_GET_APPLICATION";
+            List<ATTApplication> lst = new List<ATTApplication>();
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+            try
+            {
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_APPLICATION_ID", "", OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                    {
+                        ATTApplication obj = new ATTApplication();
+                        obj.ApplicationID = drow["APPLICATION_ID"].ToString();
+                        obj.ApplicationDescription = drow["APPLICATION_DESCRIPTION"].ToString();
+                        obj.OrderCode = string.IsNullOrEmpty(drow["ORDER_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["ORDER_CODE"].ToString());
+                        lst.Add(obj);
+                    }
+                }
+                return lst;
+
+            }
+            catch (Exception )
+            {
+
+                return new List<ATTApplication>();
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+        
+        }
+
+       
+    }
+}

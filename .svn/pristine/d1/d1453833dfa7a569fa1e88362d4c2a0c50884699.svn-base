@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+
+namespace HRFA.BLL
+{
+    public class BLLType
+    {
+        public JsonResponse GetType(Int16? typeID)
+        {
+            JsonResponse response = new JsonResponse();
+            List<ATTType> lst = new List<ATTType>();
+            DLLType dllType = new DLLType();
+            try
+            {
+                lst = dllType.GetType(typeID);
+
+                response.ResponseData = lst;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+            return response;
+
+        }
+    }
+}

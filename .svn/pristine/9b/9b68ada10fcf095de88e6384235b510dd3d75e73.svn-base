@@ -1,0 +1,141 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLBlanketPurchase
+    {
+        public string SaveBlanketPurchase(List<ATTBlanketPurchase> lst, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+            Int64? submissionNo = null;
+            Int64? oldSubmissionNo = null;
+            string entryBy = "";
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                foreach (ATTBlanketPurchase objBlanketPurchase in lst)
+                {
+                    if (objBlanketPurchase.Action == "E")
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_EDIT_BLANKET_PURCHASE";
+                        msg = "Successfully Updated.";
+                    }
+                    else if (objBlanketPurchase.Action == "A")
+                    {
+                        sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_BLANKET_PURCHASE";
+                        msg = "Successfully Saved.";
+
+                    }
+
+
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+
+                        paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", submissionNo, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                        paramList.Add(SqlHelper.GetOraParam(":p_VENDORS_ID", objBlanketPurchase.Vendor.VendorID, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_AGREEMENT_YEAR", objBlanketPurchase.AgreementYear, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_AGREEMENT_DATE", objBlanketPurchase.AgreementDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ITEM_ID", objBlanketPurchase.Item.ItemID, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_QTY", objBlanketPurchase.Quantity, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_UNIT_ID", objBlanketPurchase.Unit.UnitID, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_UNIT_PRICE", objBlanketPurchase.UnitPrice, OracleDbType.Double, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", objBlanketPurchase.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_TO_DATE", objBlanketPurchase.ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objBlanketPurchase.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objBlanketPurchase.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objBlanketPurchase.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_QTY_RECIEVED", objBlanketPurchase.QuantityRecieved, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                        paramList[0].Size = 16;
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                        submissionNo = Int64.Parse(paramList[0].Value.ToString());
+                        oldSubmissionNo = objBlanketPurchase.OldSubmissionNo;
+                        entryBy = objBlanketPurchase.EntryBy;
+                        paramList.Clear();
+
+
+                    }
+                }
+                if (oldSubmissionNo != null)
+                {
+                    DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                    dllUTV.SaveVerifyLog(tran, entryBy, oldSubmissionNo, submissionNo, appID, modID);
+                }
+                tran.Commit();
+            }
+            catch (Exception ex)
+            {
+
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            return msg + "</br> Please Note Your Submission No.</br><b>" + submissionNo + "</b>";
+        }
+
+        public List<ATTBlanketPurchase> GetBlanketPurchaseBySubmissionNo(Int64? submissionNo)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            List<ATTBlanketPurchase> lstBlanketPurchase = new List<ATTBlanketPurchase>();
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_BLANKET_PURCHASE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", submissionNo, OracleDbType.Int64, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTBlanketPurchase objBlanketPurchase = new ATTBlanketPurchase();
+                    objBlanketPurchase.Vendor.VendorID = string.IsNullOrEmpty(drow["VENDORS_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["VENDORS_ID"].ToString());
+                    objBlanketPurchase.Vendor.VendorName = drow["VENDORS_NAME"].ToString();
+                    objBlanketPurchase.AgreementYear = drow["AGREEMENT_YEAR"].ToString();
+                    objBlanketPurchase.AgreementDate = drow["AGREEMENT_DATE"].ToString();
+                    objBlanketPurchase.Item.ItemID = string.IsNullOrEmpty(drow["ITEM_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["ITEM_ID"].ToString());
+                    objBlanketPurchase.Item.ItemDesc = drow["ITEM_DESC"].ToString();
+                    objBlanketPurchase.Quantity = string.IsNullOrEmpty(drow["QTY"].ToString()) ? (Int16?)null : Int16.Parse(drow["QTY"].ToString());
+                    objBlanketPurchase.Unit.UnitID = Int16.Parse(drow["UNIT_ID"].ToString());
+                    objBlanketPurchase.Unit.UnitDesc = drow["UNIT_DESC"].ToString();
+                    objBlanketPurchase.UnitPrice = string.IsNullOrEmpty(drow["UNIT_PRICE"].ToString()) ? (Double?)null : Double.Parse(drow["UNIT_PRICE"].ToString());
+                   
+                    lstBlanketPurchase.Add(objBlanketPurchase);
+                }
+
+                return lstBlanketPurchase;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+    }
+}

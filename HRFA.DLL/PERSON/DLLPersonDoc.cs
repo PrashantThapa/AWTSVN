@@ -1,0 +1,210 @@
+﻿using System;
+using System.Data;
+using System.Collections.Generic;
+
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLPersonDoc
+    {
+        public bool SavePersonDocs(List<ATTPersonDoc> lst, Int64? PID, string entryBy, OracleTransaction tran)
+        {
+            try
+            {
+                string sp = "";
+
+                foreach (ATTPersonDoc obj in lst)
+                {
+
+                    if (obj.Action == "E")
+                    {
+						sp = "CPR_EDIT_PERSON_DOCUMENT";
+
+                    }
+                    else if (obj.Action == "A")
+                    {
+                        sp = "CPR_ADD_PERSON_DOCUMENT";
+                    }
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+
+                        paramList.Add(SqlHelper.GetOraParam(":p_P_ID", PID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_DOC_ID", obj.DocType.TypeID, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ISSUE_NO",obj.IssueNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ISSUE_DATE", obj.IssueDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ISSUE_PLACE", obj.IssuePlace, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY",entryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));  
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Date, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", "F", OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                        paramList.Clear();
+
+                    }
+                    else
+                    {
+                        throw new Exception("Error in Saving Person Document !!!");
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+
+
+        public List<ATTPersonDoc> GetPersonDocs(Int64? ID, Int32? seqNo, OracleConnection conn, bool isDirty = false)
+        {
+            List<ATTPersonDoc> lst = new List<ATTPersonDoc>();
+
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                string sp = "CPR_GET_PERSON_DOCUMENT";
+
+                if (isDirty)
+                {
+                    sp = "DCPR_GET_PERSON_DOCUMENT";                   
+                }
+                
+                
+
+                paramList.Add(SqlHelper.GetOraParam(":p_ID", ID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_SEQNO", seqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    foreach (DataRow dr in ((DataTable)ds.Tables[0]).Rows)
+                    {
+                        
+                        ATTPersonDoc obj = new ATTPersonDoc();
+                        
+                        if (isDirty)
+                        {
+                            obj.Person.SubmissionNo = string.IsNullOrEmpty(dr["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(dr["SUBMISSION_NO"].ToString());
+                            obj.Person.SeqNo = string.IsNullOrEmpty(dr["SEQ_NO"].ToString()) ? (Int32?)null : Int32.Parse(dr["SEQ_NO"].ToString());
+                        }
+                        else
+                        {
+                            obj.Person.PID = string.IsNullOrEmpty(dr["P_ID"].ToString()) ? (Int64?)null : Int64.Parse(dr["P_ID"].ToString());
+                        }
+
+                        obj.DocType.TypeID = string.IsNullOrEmpty(dr["DOC_ID"].ToString()) ? (Int32?)null : Int32.Parse(dr["DOC_ID"].ToString());
+                        obj.DocType.TypeName = dr["DTYPE_NAME"].ToString();
+                        obj.DocType.TypeNameEng = dr["DTYPE_NAME_ENG"].ToString();
+                        obj.FromDate = dr["FROM_DATE"].ToString();
+                        obj.IssueNo = dr["ISSUE_NO"].ToString();
+                        obj.IssueDate = dr["ISSUE_DATE"].ToString();
+                        obj.IssueBy = dr["ISSUE_PLACE"].ToString();
+                        obj.EntryBy = dr["ENTRY_BY"].ToString();
+                        obj.Status = dr["R_STAUS"].ToString();
+
+                        byte[] FileByte = dr["DOCFILE"] == DBNull.Value ? null : (byte[])dr["DOCFILE"];
+
+                        if (FileByte == null)
+                            obj.DocFile = null;
+                        else
+                        {
+
+                            //if (FileByte.Length > 0)
+                            // {
+                            char[] chars = new char[FileByte.Length / sizeof(char)];
+                            System.Buffer.BlockCopy(FileByte, 0, chars, 0, FileByte.Length);
+                            obj.DocFile = new string(chars);
+                            //}
+                        }
+                                                                                             
+
+                        lst.Add(obj);
+                        
+                    }
+                    
+                }
+
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw(ex);
+            }
+        }
+
+        #region Dirty
+        public bool SaveDirtyPersonDocs(List<ATTPersonDoc> lst, Int64? submissionNo,Int32? seqNo, string entryBy, OracleTransaction tran)
+        {
+            try
+            {
+                string sp = "";
+
+                foreach (ATTPersonDoc obj in lst)
+                {
+
+                    if (obj.Action == "E")
+                    {
+                        sp = "DCPR_EDIT_PERSON_DOCUMENT";
+
+                    }
+                    else if (obj.Action == "A")
+                    {
+                        sp = "DCPR_ADD_PERSON_DOCUMENT";
+                    }
+                   
+                    if (sp != "")
+                    {
+                        byte[] bytes;
+                        
+                        if (obj.DocFile == null || obj.DocFile == "")
+                            bytes = null ;
+                        else 
+                        {
+                            bytes = new byte[obj.DocFile.Length * sizeof(char)];
+                            System.Buffer.BlockCopy(obj.DocFile.ToCharArray(), 0, bytes, 0, bytes.Length);
+                        }                        
+
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+
+                        paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", submissionNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_SEQ_NO",seqNo, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_DOCUMENT_ID", obj.DocType.TypeID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ISSUE_NO", obj.IssueNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ISSUE_DATE", obj.IssueDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":p_ISSUE_PLACE", obj.IssueBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", entryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Date, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", obj.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_DOCFILE", bytes, OracleDbType.Blob, System.Data.ParameterDirection.Input));
+
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                        paramList.Clear();
+
+                    }
+                   
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in Saving Person Document !!!" + ex.Message);
+                throw (ex);
+            }
+        }
+        #endregion
+    }
+}

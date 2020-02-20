@@ -1,0 +1,194 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLCategory
+    {
+        /// <summary>
+        /// This method Save/Update Category
+        /// </summary>
+        /// <param name="lst"></param>
+        /// <returns>String as a Message about Save/Update Category</returns>
+        public string SaveCategory(List<ATTCategory> lst)
+        {
+            string SP = "";
+            string msg = "No Data to Save!!!";
+            string status = "";
+
+            foreach (ATTCategory obj in lst)
+            {
+                if (obj.Status == true)
+                {
+                    status = "A";
+                }
+                else
+                {
+                    status = "I";
+                }
+
+                if (obj.Action == "E")
+                {
+                    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_BFI_CATEGORY";
+                    msg = "Successfully Updated";
+                }
+                else
+                {
+                    SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_ADD_BFI_CATEGORY";
+                    msg = "Successfully Added ";
+                }
+
+                
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_BFICAT_ID", obj.CategoryID, OracleDbType.Int32, ParameterDirection.InputOutput));
+                paramList.Add(SqlHelper.GetOraParam(":P_BFICAT_NAME", obj.CategoryName, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_BFICAT_NAME_ENG", obj.CategoryNameEnglish, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_STATUS", status, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", obj.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", obj.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", obj.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+
+                GetConnection conn = new GetConnection();
+                OracleConnection dbConn = conn.GetDbConn();
+                OracleTransaction tran = dbConn.BeginTransaction();
+
+
+                try
+                {
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                    tran.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tran.Rollback();
+                    throw new Exception("Error" + ex.Message);
+                }
+
+                finally
+                {
+
+                    dbConn.Close();
+                }
+
+            }
+            return msg;
+        }
+
+
+        /// <summary>
+        /// Retrives a list of Category(s)
+        /// </summary>
+        /// <param name="categoryid"></param>
+        /// <returns>Category or Null if Category does not exist</returns>
+        public List<ATTCategory> GetCategory(int? categoryid)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn();
+
+            List<ATTCategory> lst = new List<ATTCategory>();
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_BFI_CATEGORY";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_BFICAT_ID", categoryid, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                foreach (DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTCategory obj = new ATTCategory();
+
+                    obj.CategoryID = Int32.Parse(drow["BFI_CAT_ID"].ToString());
+                    obj.CategoryName = drow["BFI_CAT_NAME"].ToString();
+                    obj.CategoryNameEnglish = drow["BFI_CAT_NAME_ENG"].ToString();
+                    if (drow["STATUS"].ToString() == "A")
+                    {
+                        obj.Status = true;
+                    }
+                    else
+                    {
+                        obj.Status = false;
+                    }
+                    obj.FromDate = drow["FROM_DATE"].ToString();
+                    obj.Action = "";
+
+                    lst.Add(obj);
+                }
+
+                return lst;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                dbConn.Close();
+            }
+
+        }
+
+        /// <summary>
+        ///  This method Delete Category
+        /// </summary>
+        /// <param name="categoryid">categoryid to be deleted</param>
+        /// <returns>String as a Message about Delete Category</returns>
+        
+         
+        public string DeleteCategory(int? categoryid)
+        {
+
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn();
+
+            string SP = "";
+            string msg = "";
+
+
+            try
+            {
+                SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_DEL_BFI_CATEGORY";
+                msg = "Record Deleted Successfully";
+
+
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_BFICAT_ID", categoryid, OracleDbType.Int32, ParameterDirection.InputOutput));
+
+                paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", null, OracleDbType.Varchar2, ParameterDirection.Input));
+
+
+                SqlHelper.ExecuteNonQuery(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                return msg;
+            }
+
+            catch (Exception ex)
+            {
+
+                throw (ex);
+
+            }
+            finally
+            {
+
+                dbConn.Close();
+            }
+
+        }
+
+    }
+}

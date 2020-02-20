@@ -1,0 +1,29 @@
+﻿using System;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+namespace HRFA.Handlers.PAYROLL
+{
+    /// <summary>
+    /// Summary description for EmpSalaryItemRateHandler
+    /// </summary>
+    public class EmpSalaryItemRateHandler : BaseHandler
+    {
+        public object GetEmpSalaryItemRate(Int32? EmpID)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLEmpSalaryItemRate objBLLEmpSalaryRate = new BLLEmpSalaryItemRate();
+
+            try
+            {
+                response = objBLLEmpSalaryRate.GetEmpSalaryItemRate(EmpID);
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return JsonUtility.Serialize(response);
+        }
+    }
+}

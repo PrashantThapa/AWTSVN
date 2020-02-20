@@ -1,0 +1,71 @@
+﻿<%@ Page Title="" Language="C#" AutoEventWireup="true"
+    CodeBehind="CashFlowGroupRpt.aspx.cs" Inherits="SOSYS.Modules.ACCOUNT.REPORT.CashFlowGroupRpt" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <div class="wrapper">
+        <div class="col-lg-8">
+            <fieldset class="col-lg-12">
+                <legend>Cash Flow Group Report</legend>
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-lg-2">
+                            Office</div>
+                        <div class="col-lg-5">
+                            <div class="input-group">
+                                <input type="text" class="txtbox col-lg-3 input-sm" id="txtOfficeCode" data-bind="value:OfficeCode"
+                                    disabled />
+                                <input type="text" name="txtOffice" id="txtOffice" class="col-lg-9 input-sm " disabled
+                                    data-bind="value:OfficeName" placeholder="Search" />
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown"
+                                        data-bind="click:function(){$('#officeCodeListGridView').modal('show')}"">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-2">
+                            From Date</div>
+                        <div class="col-lg-2">
+                            <input type="text" class="form-control input-sm nepaliDate" placeholder="YYYY.MM.DD"
+                                style="width: 80%;" data-bind="value:FromDate"/>
+                        </div>
+                        <div class="col-lg-2">
+                            To Date
+                        </div>
+                        <div class="col-lg-2">
+                            <input type="text" class="form-control input-sm nepaliDate" placeholder="YYYY.MM.DD"
+                                style="width: 80%" data-bind="value:ToDate"/>
+                        </div>
+                    </div>
+                    <div class="form-group" style="float: right;">
+                        <div class="col-lg-12">
+                            <input type="button" class="btn icon-print" value="VIEW" data-bind="click:print" />
+                            <input type="button" class="btn icon-cancel" value="Cancel" data-bind="click:reset" />
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div id="officeCodeListGridView" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" style="width: 500px;">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;</button>
+                    <h5 class="modal-title" id="H2">
+                        Office List</h5>
+                </div>
+                <div class="modal-body small">
+                    <div data-bind="simpleGrid: officeCodeListGridView,simpleGridTemplate:'ko_simpleGrid_grid_search',showPagerTemplate:false ">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/Modules/ACCOUNTS/REPORT/CashFlowGroupRptViewModel.js" type="text/javascript"></script>
+</asp:Content>

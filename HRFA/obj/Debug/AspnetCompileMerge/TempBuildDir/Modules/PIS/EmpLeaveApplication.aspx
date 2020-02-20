@@ -1,0 +1,224 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AdminMaster.Master" AutoEventWireup="true" CodeBehind="EmpLeaveApplication.aspx.cs" Inherits="HRFA.Modules.PIS.EmpLeaveApplication" %>
+
+<%@ Register Src="../../Modules/PIS/EmployeeSearchControl.ascx" TagPrefix="WebUserControl"
+    TagName="EmployeeSearch" %>
+									   
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+</asp:Content>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+	<!-- general form elements -->
+
+<WebUserControl:EmployeeSearch ID="EmployeeControl" runat="server" />
+
+	<section class="content" id="EmpLeaveApplication">
+		<div class="row pages">
+			<!-- left column -->
+			<div class="col-md-12">
+				<!-- general form elements -->
+				<div class="box box-primary">
+					<div class="box-header with-border">
+						<h3 class="box-title">Employee Leave Application </h3>
+					</div>
+					<!-- /.box-header -->
+					<!-- form start -->
+					<form role="form" runat="server" id="Form1">
+						<div class="box-body">
+							<div class="row">
+								<div class="col-md-5">
+									<div class="form-group">
+										<label>Employee Name<span class="red">*</span> </label>
+									    <input type="text" id="txtEmployeeID" data-bind="value:EmployeeName" class='required form-control' disabled />
+									</div>
+
+								</div>
+								<div class="col-md-1">
+									<div class="form-group">
+										<button type="button" id="btnSearch" class="btn btn-warning wordlong" data-toggle="modal" data-target="#modalEmpSearch" data-thissource="employee">
+                                Search</button>
+									</div>
+								</div>
+								<!-- /.row -->
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Application Date<span class="red">*</span>  </label>
+										 <input type="text" id="txtApplicationDate" placeholder="YYYY.MM.DD"
+                            data-bind="value:ApplicationDate" class='required form-control' 
+                            onkeypress="return isNumberKey(event)"
+                            onblur="return valFutureDate(this,'N',true);"
+                            <%--onkeypress="UnicodeKeyPress(event,this);" 
+                            onkeyup="UnicodeKeyUp(event,this);" 
+                            onchange="UnicodeChange(event,this);" 
+                            onfocus="UnicodeFocus(event,this);"--%>
+                             />
+									</div>
+								</div>
+								
+								
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Leave Type <span class="red">*</span></label>
+										<select id="ddlLeaveType" class="form-control select2"
+															data-bind='options: LeaveTypes, optionsText: "LeaveTypeNameNep",
+                            optionsValue: "LeaveTypeID", value:SelectedLeaveType, 
+                            optionsCaption:"------ Select one -------",event: { change: LeaveTypeChangeEvent }'></select>
+									</div>
+									</div>
+															<%--<div class="row">
+
+								<button id="btnUpdate" class="btn btn-info" data-bind="click: UpdateEmpShift">
+                            Update Emp Shift</button>
+
+								</div>--%>
+								</div>
+
+														<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Leave Start Date<span class="red">*</span>  </label>
+										  <input type="text" id="txtFromDate" placeholder="YYYY.MM.DD"
+                            data-bind="value:AppFromDate, event: { blur: DisplayNoofDays}" class='required form-control' 
+                            onkeypress="return isNumberKey(event)"
+                            onblur="return valFutureDate(this,'N',true);"
+                            <%--onkeypress="UnicodeKeyPress(event,this);" 
+                            onkeyup="UnicodeKeyUp(event,this);" 
+                            onchange="UnicodeChange(event,this);" 
+                            onfocus="UnicodeFocus(event,this);"--%>
+                             />
+									</div>
+								</div>
+								
+								
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Leave End Date <span class="red">*</span></label>
+										 <input type="text" id="txtToDate" placeholder="YYYY.MM.DD"
+                            data-bind="value:AppToDate, event: { blur: DisplayNoofDays}" class='required form-control' 
+                            onkeypress="return isNumberKey(event)"
+                            onblur="return valFutureDate(this,'N',true);"
+                            <%--onkeypress="UnicodeKeyPress(event,this);" 
+                            onkeyup="UnicodeKeyUp(event,this);" 
+                            onchange="UnicodeChange(event,this);" 
+                            onfocus="UnicodeFocus(event,this);"--%>
+                             />
+									</div>
+									</div>
+															<%--<div class="row">
+
+								<button id="btnUpdate" class="btn btn-info" data-bind="click: UpdateEmpShift">
+                            Update Emp Shift</button>
+
+								</div>--%>
+								</div>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Total Days<span class="red">*</span>  </label>
+										  <input type="text" id="txtNoofDays" 
+                            data-bind="value:AppNoOfDays, event: { blur: IsNoofDays}" onkeypress=" return isNumberKey(event);"  class='required form-control' 
+                            
+                             />
+									</div>
+								</div>
+								
+								
+								<div class="col-md-6">
+										<div class="form-group wordlong">
+											<input type="radio" id="inlineCheckbox1" data-bind="checkedValue: false, 
+                                           checked:IsFullDay" class="minimal" />&nbsp;Full Day
+											<input type="radio" id="inlineCheckbox2" data-bind="checkedValue: true, 
+                                           checked:IsHalfDay" class="minimal" />&nbsp;Half Day                                      
+										</div>
+									</div>
+								
+															<%--<div class="row">
+
+								<button id="btnUpdate" class="btn btn-info" data-bind="click: UpdateEmpShift">
+                            Update Emp Shift</button>
+
+								</div>--%>
+								</div>
+							<div class="row">
+													<div class="col-md-12">
+														<div class="form-group">
+<label> Leave Reason</label>
+                      <textarea id="txtLeaveReason" data-bind="value:LeaveReason" class='required form-control' 
+            <%--                            onkeypress="UnicodeKeyPress(event,this);" 
+                                        onkeyup="UnicodeKeyUp(event,this);" 
+                                        onchange="UnicodeChange(event,this);" 
+                                        onfocus="UnicodeFocus(event,this);" --%>
+                                        oninput="convert_to_unicode(this)"
+                                        ></textarea>												</div>
+													</div>
+												</div>
+
+							<div class="row">
+								<div class="col-md-5">
+									<div class="form-group">
+										<label>Approved/Recommended By<span class="red">*</span> </label>
+                    <input type="text" id="txtForwardToName" data-bind="value:ForwardToName" class='required form-control' disabled />
+									</div>
+
+								</div>
+								<div class="col-md-1">
+									<div class="form-group">
+										<button type="button" id="btnForwardEmpSearch" class="btn btn-warning wordlong" data-toggle="modal" data-target="#modalEmpSearch" data-thissource="forwardedto">Search</button>
+									</div>
+								</div>
+								<!-- /.row -->
+							</div>
+							
+							<div class="row">
+													<div class="col-md-6">
+														<div class="form-group">
+															<button class="btn btn-info" data-bind="click: SaveApplication">Submit</button>
+															<button class="btn btn-default" data-bind="click: ClearApplication"/>Cancel</button>
+														</div>
+													</div>
+												</div>
+							<div class="row">
+
+								<div class="col-md-12">
+									<table data-bind="visible: true" border="0" class="table table-bordered table-striped">
+									                      <thead>
+	
+										<tr>
+                            <th>
+                                Leave Type
+                            </th>
+                            <th>
+                                Total Leave Days
+                            </th>
+                            <th>
+                                Total Leave Left
+                            </th>
+                         
+                        </tr>
+															  </thead>
+                        <tbody data-bind="foreach:EmployeeLeaveDetails">
+                        <tr>
+                            <td><span data-bind="text:LeaveTypeNameNep" ></span></td>
+                            <td><span data-bind="text:TotalLeave"></span></td>
+                            <td><span data-bind="text:AvailableLeave"></span></td>                    
+                        </tr>
+                    </tbody>
+									</table>
+									</div>
+								</div>
+
+								
+
+																			
+							
+
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+    <script src="../../Scripts/PIS/EmpLeaveApplication.js" type="text/javascript"></script>
+	</asp:Content>
+

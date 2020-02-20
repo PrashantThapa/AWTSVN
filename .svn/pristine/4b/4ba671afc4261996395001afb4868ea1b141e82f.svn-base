@@ -1,0 +1,356 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLBudgetTransfer
+    {
+       public string SaveBudgetTransferDetail(ATTBudgetTransfer objBudgetItem, string appID, string modID)
+       {
+           string sp1 = "";
+           string sp2 = "";
+           string msg = "No Data To Save !!!";
+
+           GetConnection GetConn = new GetConnection();
+           OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+           OracleTransaction tran = conn.BeginTransaction();
+
+           try
+           {
+               if (objBudgetItem.Action == "A")
+               {
+                   sp1 = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_BUDGET_TRANSFER_HEAD";
+                   sp2 = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_BUDGET_TRANSFER_DET";
+                   msg = "Successfully Saved.";
+               }
+               else if (objBudgetItem.Action == "E")
+               {
+                   sp1 = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_EDIT_BUDGET_TRANSFER_HEAD";
+                   sp2 = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_EDIT_BUDGET_TRANSFER_DET";
+                   objBudgetItem.SubmissionNo = objBudgetItem.OldSubmissionNo;
+                   msg = "Successfully Updated.";
+               }
+
+               if (sp1 != "" && sp2 != "")
+               {
+
+                   List<OracleParameter> paramList1 = new List<OracleParameter>();
+
+                   paramList1.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", objBudgetItem.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                   paramList1.Add(SqlHelper.GetOraParam(":p_TRAN_NO", objBudgetItem.TransferNo, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                   paramList1.Add(SqlHelper.GetOraParam(":p_R_STATUS", objBudgetItem.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList1.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objBudgetItem.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList1.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objBudgetItem.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList1.Add(SqlHelper.GetOraParam(":p_FISCAL_YR", objBudgetItem.FiscalYear, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                   paramList1[0].Size = 20;
+                   paramList1[1].Size = 20;
+                   SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp1, paramList1.ToArray());
+                   objBudgetItem.SubmissionNo = Int64.Parse(paramList1[0].Value.ToString());
+                   if (objBudgetItem.Action == "A")
+                   {
+                       objBudgetItem.TransferNo = Int64.Parse(paramList1[1].Value.ToString());
+                   }
+
+                   List<OracleParameter> paramList = new List<OracleParameter>();
+
+                   paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", objBudgetItem.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                   paramList.Add(SqlHelper.GetOraParam(":p_TRAN_NO", objBudgetItem.TransferNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_TRAN_SEQ", objBudgetItem.TransferSeq, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_TRAN_DATE", objBudgetItem.TransferDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CD", objBudgetItem.FromOffice.OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_COSTCENTER_ID", objBudgetItem.FromCostCenter.CostCenterID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_REQUEST_DATE", objBudgetItem.FromRequestDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                   paramList.Add(SqlHelper.GetOraParam(":p_BI_ID", objBudgetItem.FromBudgetID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+
+                   
+                   paramList.Add(SqlHelper.GetOraParam(":p_JOB_ID", objBudgetItem.FromJobID, OracleDbType.Int16,System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_TO_OFFICE_CD", objBudgetItem.ToOffice.OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_TO_COSTCENTER_ID", objBudgetItem.ToCostCenter.CostCenterID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+
+                   paramList.Add(SqlHelper.GetOraParam(":p_TO_REQUEST_DATE", objBudgetItem.ToRequestDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_TO_BI_ID", objBudgetItem.ToBudgetID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_TO_JOB_ID", objBudgetItem.ToJobID, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_TRANSFER_AMT", objBudgetItem.TransferAmount, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_REMARKS", objBudgetItem.Remarks, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objBudgetItem.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objBudgetItem.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objBudgetItem.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                   paramList[0].Size = 20;
+
+                   SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp2, paramList.ToArray());
+                   objBudgetItem.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+
+                   //if (objBudgetItem.OldSubmissionNo != null)
+                   //{
+                   //    DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                   //    dllUTV.SaveVerifyLog(tran, objBudgetItem.EntryBy, objBudgetItem.OldSubmissionNo, objBudgetItem.SubmissionNo, appID, modID);
+
+                   //}                 
+
+                   paramList.Clear();
+               }
+               tran.Commit();
+               if (objBudgetItem.Action == "A")
+               {
+                   msg += "</br> Please Note Your Submission No.</br><b>" + objBudgetItem.SubmissionNo + "</b>";
+               }
+              
+               return msg;
+               
+           }
+           catch (Exception ex)
+           {
+               tran.Rollback();
+               throw ex;
+           }
+           finally
+           {
+               GetConn.CloseDbConn();
+           }
+       }
+
+       public List<ATTBudgetRelease> GetDetails(Int32? OfficeCD, Int32? CostCenterID, string fiscalyear)
+       {
+           string SP = "";
+           GetConnection getConn = new GetConnection();
+           OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+           try
+           {
+               SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_BUDGET_FOR_TRANSFER";
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", OfficeCD, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", CostCenterID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_FISCAL_YR", fiscalyear, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+               DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+               List<ATTBudgetRelease> lstATT = new List<ATTBudgetRelease>();
+
+               foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+               {
+                   ATTBudgetRelease objATT = new ATTBudgetRelease();
+
+                   objATT.CostCenter = new ATTCostCenter();
+                   objATT.Office = new ATTOffice();
+                   objATT.BudgetItem = new ATTBudgetItem();
+                   objATT.Job = new ATTJob();
+                   objATT.FiscalYear = new ATTFiscalYear();
+                   objATT.Office.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_CD"].ToString());
+                   objATT.Office.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+                   objATT.CostCenter.CostCenterID = string.IsNullOrEmpty(drow["COSTCENTER_ID"].ToString()) ? (Int64?)null : Int64.Parse(drow["COSTCENTER_ID"].ToString());
+                   objATT.CostCenter.CostCenterName = drow["COSTCENTER_NAME"].ToString();
+                   objATT.Job.JobID = string.IsNullOrEmpty(drow["JOB_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["JOB_ID"].ToString());
+                   objATT.BudgetItem.BudgetItemID = Convert.ToInt64(drow["BI_ID"].ToString());
+                   objATT.BudgetItem.BudgetItemEng = drow["BI_DESC"].ToString();
+                   objATT.ApproveAmount = string.IsNullOrEmpty(drow["approved_amt"].ToString()) ? (double?)null : double.Parse(drow["approved_amt"].ToString());
+                   objATT.ApproveDate = drow["approved_DATE"].ToString();
+                   objATT.FiscalYear.FiscalYearName = drow["FISCAL_YR"].ToString();
+                   objATT.AccountChart.AccCode = string.IsNullOrEmpty(drow["BI_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["BI_ID"].ToString());
+                   objATT.AccountChart.AccName = drow["BI_DESC"].ToString();
+                   objATT.RequestDate = drow["REQUEST_DATE"].ToString();
+                   lstATT.Add(objATT);
+
+
+               }
+               paramList.Clear();
+               return lstATT;
+
+
+           }
+           catch (Exception ex)
+           {
+               throw (ex);
+           }
+           finally
+           {
+               getConn.CloseDbConn();
+           }
+
+
+       }
+
+       public List<ATTBudgetRelease> GetBudgetItem(Int32? OfficeCD, Int32? CostCenterID)
+       {
+           string SP = "";
+           GetConnection getConn = new GetConnection();
+           OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+           try
+           {
+               SP = "APR_GET_CHART_OFACC";
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", OfficeCD, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", CostCenterID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+               DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+               List<ATTBudgetRelease> lstATT = new List<ATTBudgetRelease>();
+
+               foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+               {
+                   ATTBudgetRelease objATT = new ATTBudgetRelease();
+
+                   objATT.BudgetItem = new ATTBudgetItem();
+                   
+                   objATT.BudgetItem.BudgetItemID = Convert.ToInt64(drow["AC_CODE"].ToString());
+                   objATT.BudgetItem.BudgetItemEng = drow["AC_NAME"].ToString();
+                 
+                   lstATT.Add(objATT);
+
+
+               }
+               paramList.Clear();
+               return lstATT;
+
+
+           }
+           catch (Exception ex)
+           {
+               throw (ex);
+           }
+           finally
+           {
+               getConn.CloseDbConn();
+           }
+
+
+       }
+
+
+       public ATTBudgetTransfer GetBudgetTransfer(ATTBudgetTransfer objTransfer)
+       {
+           string SP = "";
+           GetConnection getConn = new GetConnection();
+           OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+           try
+           {
+               SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_TRANSFER_BUDGET";
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":P_FISCAL_YR", objTransfer.FiscalYear, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", objTransfer.FromOffice.OfficeCode, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", objTransfer.FromCostCenter.CostCenterID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_BI_ID", objTransfer.FromBudgetItem.BudgetItemID, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+               DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+               ATTBudgetTransfer objATT = new ATTBudgetTransfer();
+               objATT.ToOffice = new ATTOffice();
+               objATT.ToCostCenter = new ATTCostCenter();
+               objATT.ToBudgetItem = new ATTBudgetItem();
+
+               if (ds.Tables[0].Rows.Count > 0)
+               {
+                   DataRow drow = ds.Tables[0].Rows[0];
+
+                   objATT.SubmissionNo = string.IsNullOrEmpty(drow["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                   objATT.ToOffice.OfficeCode = string.IsNullOrEmpty(drow["TO_OFFICE_CD"].ToString()) ? (Int32?)null : Int32.Parse(drow["TO_OFFICE_CD"].ToString());
+                   objATT.ToCostCenter.CostCenterID = string.IsNullOrEmpty(drow["TO_COSTCENTER_ID"].ToString()) ? (Int64?)null : Int64.Parse(drow["TO_COSTCENTER_ID"].ToString());
+                   objATT.ToBudgetItem.BudgetItemID = string.IsNullOrEmpty(drow["TO_BI_ID"].ToString()) ? (Int64?)null : Int64.Parse(drow["TO_BI_ID"].ToString());
+                   objATT.TransferAmount = string.IsNullOrEmpty(drow["TRANSFER_AMT"].ToString()) ? (Int64?)null : Int64.Parse(drow["TRANSFER_AMT"].ToString());
+                   objATT.TransferNo = string.IsNullOrEmpty(drow["TRAN_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["TRAN_NO"].ToString());
+                   objATT.Remarks = drow["REMARKS"].ToString();
+                   objATT.TransferDate = drow["TRAN_DATE"].ToString();
+               }
+                return objATT;
+
+           }
+           catch (Exception ex)
+           {
+               throw (ex);
+           }
+           finally
+           {
+               getConn.CloseDbConn();
+           }
+
+
+       }
+
+       public ATTBudgetTransfer GetBudgetTransferBySubNo(Int64? SubNo)
+       {
+           string SP = "";
+           GetConnection getConn = new GetConnection();
+           OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+           try
+           {
+               SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_BUDGET_TRANSFER";
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", SubNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+               paramList[0].Size = 20;
+               DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+               ATTBudgetTransfer objATT = new ATTBudgetTransfer();
+
+               if (ds.Tables[0].Rows.Count > 0)
+               {
+                   DataRow drow = ds.Tables[0].Rows[0];
+
+                   objATT.FromCostCenter = new ATTCostCenter();
+                   objATT.ToCostCenter = new ATTCostCenter();
+
+                   objATT.FromOffice = new ATTOffice();
+                   objATT.ToOffice = new ATTOffice();
+
+                   objATT.FromBudgetItem= new ATTBudgetItem();
+                   objATT.ToBudgetItem = new ATTBudgetItem();
+
+                   objATT.FromJob = new ATTJob();
+                   objATT.ToJob = new ATTJob();
+
+                   objATT.SubmissionNo = string.IsNullOrEmpty(drow["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                   objATT.TransferNo = string.IsNullOrEmpty(drow["TRAN_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["TRAN_NO"].ToString());
+                   //objATT.TransferSeq = string.IsNullOrEmpty(drow["TRAN_SEQ"].ToString()) ? (Int16?)null : Int16.Parse(drow["TRAN_SEQ"].ToString());
+                   objATT.TransferDate = drow["TRAN_DATE"].ToString();
+
+                   objATT.FromOffice.OfficeCode = string.IsNullOrEmpty(drow["FROM_OFFICE_CD"].ToString()) ? (Int32?)null : Int32.Parse(drow["FROM_OFFICE_CD"].ToString());
+                   objATT.FromCostCenter.CostCenterID = string.IsNullOrEmpty(drow["FROM_COSTCENTER_ID"].ToString()) ? (Int64?)null : Int64.Parse(drow["FROM_COSTCENTER_ID"].ToString());
+                  // objATT.FromRequestDate = drow["FROM_REQUEST_DATE"].ToString();
+                   objATT.FromBudgetID = string.IsNullOrEmpty(drow["FROM_BI_ID"].ToString()) ? (Int64?)null : Int64.Parse(drow["FROM_BI_ID"].ToString());
+                   objATT.FromJobID = string.IsNullOrEmpty(drow["FROM_JOB_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["FROM_JOB_ID"].ToString());
+                   objATT.FromBudgetItem.BudgetItemName = drow["FROM_BI_DESC"].ToString();
+                   objATT.ToBudgetItem.BudgetItemID = string.IsNullOrEmpty(drow["TO_BI_ID"].ToString()) ? (Int64?)null : Int64.Parse(drow["TO_BI_ID"].ToString());
+                   objATT.ToCostCenter.CostCenterID = string.IsNullOrEmpty(drow["TO_COSTCENTER_ID"].ToString()) ? (Int64?)null : Int64.Parse(drow["TO_COSTCENTER_ID"].ToString());
+                   objATT.ToJobID = string.IsNullOrEmpty(drow["TO_JOB_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["TO_JOB_ID"].ToString());
+
+                   objATT.ToOffice.OfficeCode = string.IsNullOrEmpty(drow["TO_OFFICE_CD"].ToString()) ? (Int32?)null : Int32.Parse(drow["TO_OFFICE_CD"].ToString());
+
+   //                objATT.ToRequestDate = drow["TO_REQUEST_DATE"].ToString();
+                   objATT.FiscalYear = drow["FISCAL_YR"].ToString();
+                   objATT.ApproveAmount = string.IsNullOrEmpty(drow["APPROVED_AMT"].ToString()) ? (Int64?)null : Int64.Parse(drow["APPROVED_AMT"].ToString());
+                   objATT.TransferAmount = string.IsNullOrEmpty(drow["TRANSFER_AMT"].ToString()) ? (Int64?)null : Int64.Parse(drow["TRANSFER_AMT"].ToString());
+
+                   objATT.Remarks = drow["REMARKS"].ToString();
+
+               }
+               paramList.Clear();
+               return objATT;
+
+
+           }
+           catch (Exception ex)
+           {
+               throw (ex);
+           }
+           finally
+           {
+               getConn.CloseDbConn();
+           }
+
+       }
+
+    }
+}

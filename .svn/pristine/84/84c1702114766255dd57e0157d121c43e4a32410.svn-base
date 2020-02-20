@@ -1,0 +1,29 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTCompany
+    {
+
+        private ATTOffice _Office;
+        public ATTOffice Office
+        {
+            get { return _Office; }
+            set { _Office = value; }
+        }
+        //public Int32? OfficeCode { get; set; }//officeID
+        public Int32? CompanyID { get; set; }
+        public string CompanyName { get; set; }
+        public string CompanyNameEng { get; set; }
+        public string EntryBy { get; set; }
+        public string EntryDate { get; set; }
+        public string RStatus { get; set; }
+        public Int64? TranNo { get; set; }
+        public string Action { get; set; }
+        public ATTCompany()
+        {
+            _Office = new ATTOffice();
+        }
+
+    }
+}

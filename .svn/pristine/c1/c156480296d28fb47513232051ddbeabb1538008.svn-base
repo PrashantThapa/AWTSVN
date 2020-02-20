@@ -1,0 +1,59 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLBudgetApprove
+    {
+        public JsonResponse SaveBudgetApprove(ATTBudgetApprove objBudgetRelease, string appID, string modID, string date)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLBudgetApprove objDll = new DLLBudgetApprove();
+            try
+            {
+                response.Message = objDll.SaveBudgetApprove(objBudgetRelease, appID, modID, date);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public JsonResponse GetBudgetApproveBySubNo(Int64? SubNo)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLBudgetApprove objDll = new DLLBudgetApprove();
+            try
+            {
+                response.ResponseData = objDll.GetBudgetApproveBySubNo(SubNo);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        public JsonResponse GetDetails(Int32? OfficeCD, Int32? CostCenterID, string fiscalyear, string incomeType)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLBudgetApprove objDll = new DLLBudgetApprove();
+            try
+            {
+                response.ResponseData = objDll.GetDetails(OfficeCD, CostCenterID, fiscalyear, incomeType);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+    }
+}

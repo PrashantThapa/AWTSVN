@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT.REPORTING;
+using HRFA.COMMON;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer.REPORTING
+{
+    public class DLLRepShiftWiseInfo
+	{
+		public List<ATTRepShiftWise> GetShiftWiseReport(Int64 officecd, Int64 deptid)
+		{
+			GetConnection GetConn = new GetConnection();
+			OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+
+			try
+			{
+				string SP = "RPR_SHIFTWISE_EMPLOYEE";
+
+				List<OracleParameter> paramList = new List<OracleParameter>();
+
+				paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", officecd, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_DEPT_ID", deptid, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+				DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+				List<ATTRepShiftWise> lst = new List<ATTRepShiftWise>();
+
+				foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+				{
+					ATTRepShiftWise obj = new ATTRepShiftWise();
+
+					obj.OFFICE_CD = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int64?)null : Int64.Parse(drow["OFFICE_CD"].ToString());
+					obj.DEPT_ID = string.IsNullOrEmpty(drow["DEPT_ID"].ToString()) ? (Int64?)null : Int64.Parse(drow["DEPT_ID"].ToString());
+					obj.OFFICE_NAME_NEPALI = drow["OFFICE_NAME_NEPALI"].ToString();
+					obj.DEPT_DESC = drow["DEPT_DESC"].ToString();
+					obj.SHIFT_NAME = drow["SHIFT_NAME"].ToString();
+					obj.SHIFT_TIMING = drow["SHIFT_TIMING"].ToString();
+					obj.EMP_NAME = drow["EMP_NAME"].ToString();
+										lst.Add(obj);
+
+				}
+				return lst;
+			}
+			catch (Exception ex)
+			{
+				return new List<ATTRepShiftWise>();
+
+			}
+			finally
+			{
+				GetConn.CloseDbConn();
+			}
+		}
+
+	}
+}

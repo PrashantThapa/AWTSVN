@@ -1,0 +1,51 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTOfficeCompanyAccChart
+    {
+
+       private ATTCompany _Company ;
+        public ATTCompany Company
+        {
+            get { return _Company; }
+            set { _Company = value; }
+        }
+
+       // public Int32? OfficeID { get; set; }
+        //public Int32? CompanyID { get; set; }
+        private ATTAccountChart _AccountChart ;
+        public ATTAccountChart AccountChart
+        {
+            get { return _AccountChart; }
+            set { _AccountChart = value; }
+        }
+        public string Selected { get; set; }
+        public string FromDate { get; set; }
+        public string ToDate { get; set; }
+        public string EntryBy { get; set; }
+        public string EntryDate { get; set; }
+        public string Rstatus { get; set; }
+        public Int64? TranNo { get; set; }
+        public string Action { get; set; }
+        public Int16? Level { get; set; }
+
+       // public ATTVoucherGroup VoucherGroup { get; set; }
+
+
+        private ATTVoucherGroup _VoucherGroup;
+        public ATTVoucherGroup VoucherGroup
+        {
+            get { return _VoucherGroup; }
+            set { _VoucherGroup = value; }
+        }
+
+        public ATTOfficeCompanyAccChart()
+        {
+            _Company = new ATTCompany();
+            _AccountChart = new ATTAccountChart();
+            _VoucherGroup = new ATTVoucherGroup();
+        }
+
+    }
+}

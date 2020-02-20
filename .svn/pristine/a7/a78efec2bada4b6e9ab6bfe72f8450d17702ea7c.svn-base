@@ -1,0 +1,18 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTAccounts
+    {
+        public string AccountID { get; set; }//ATBaccounts
+        public string AccountName { get; set; }
+        public string AccountDate { get; set; }
+        public string AccountStatus { get; set; }
+        public string SourceTypes { get; set; }
+        public Int64? SourceID { get; set; }
+        public string EntryBy { get; set; }
+        public string EntryDate { get; set; }
+        public string RStatus { get; set; }
+        public Int64? TranNo { get; set; }
+    }
+}

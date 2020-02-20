@@ -1,0 +1,32 @@
+﻿namespace HRFA.ATT
+{
+    public class ATTEmployee
+    {
+        public int PID { get; set; }
+        public string FromDate { get; set; }
+        public string ToDate { get; set; }
+        public string EntryBy { get; set; }
+        public string EntryDatee { get; set; }
+        public bool Status { get; set; }
+        public string Action { get; set; }
+        private ATTDesignation _Designation;
+        public ATTDesignation Designation
+        {
+            get { return _Designation; }
+            set { _Designation = value; }
+        }
+        private ATTPerson _Person;
+        public ATTPerson Person
+        {
+            get { return _Person; }
+            set { _Person = value; }
+        }
+        public ATTEmployee()
+        {
+            _Designation = new ATTDesignation();
+            _Person = new ATTPerson();
+        }
+
+    }
+}
+

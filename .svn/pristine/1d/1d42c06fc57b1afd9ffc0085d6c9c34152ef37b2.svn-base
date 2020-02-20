@@ -1,0 +1,70 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+namespace HRFA.Handlers.FAMS
+{
+    /// <summary>
+    /// Summary description for BudgetApproveHandler
+    /// </summary>
+    public class BudgetApproveHandler: BaseHandler
+    {
+
+        public object SaveBudgetApprove(string args, string appID, string modID,string date)
+        {
+            JsonResponse response = new JsonResponse();
+           // List<ATTBudgetApprove> objBudgetApprove = JsonUtility.DeSerialize(args, typeof(List<ATTBudgetApprove>)) as List<ATTBudgetApprove>;
+
+
+            ATTBudgetApprove objBudgetApprove = JsonUtility.DeSerialize(args, typeof(ATTBudgetApprove)) as ATTBudgetApprove;
+           
+            
+            BLLBudgetApprove objBLLBudgetApprove = new BLLBudgetApprove();
+
+            try
+            {
+                response = objBLLBudgetApprove.SaveBudgetApprove(objBudgetApprove, appID, modID, date);
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return JsonUtility.Serialize(response);
+        }
+
+        
+        public object GetBudgetApproveBySubNo(Int64? SubNo)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLBudgetApprove objBLLPromotion = new BLLBudgetApprove();
+            try
+            {
+                response = objBLLPromotion.GetBudgetApproveBySubNo(SubNo);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+       
+        public object GetDetails(Int32? OfficeCD, Int32? CostCenterID, string fiscalyear,string incomeType)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLBudgetApprove objBLLBudgetApprove = new BLLBudgetApprove();
+            try
+            {
+                response = objBLLBudgetApprove.GetDetails(OfficeCD, CostCenterID, fiscalyear, incomeType);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+    }
+}

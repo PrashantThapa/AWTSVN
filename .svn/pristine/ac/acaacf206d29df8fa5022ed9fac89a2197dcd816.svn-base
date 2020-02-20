@@ -1,0 +1,47 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTOfficeTranDetail
+    {
+
+        public Int64? TranNo { get; set; }
+        private ATTOfficeCompanyAccChart _OfficeCompanyAccChart ;
+        public ATTOfficeCompanyAccChart OfficeCompanyAccChart
+        {
+            get { return _OfficeCompanyAccChart; }
+            set { _OfficeCompanyAccChart = value; }
+        }
+
+       // public Int64? AcCode { get; set; }
+        public string AcNo { get; set; }//ATBaccounts
+        private ATTAccounts _Accounts ;
+        public ATTAccounts Accounts
+        {
+            get { return _Accounts; }
+            set { _Accounts = value; }
+        }
+        public string DrCr { get; set; }
+        public string Description { get; set; }
+        public double? Amount { get; set; }
+        public Int32? TranSeqNo { get; set; }
+        public string EntryBY { get; set; }
+        public string EntryDate { get; set; }
+        public string Rstatus { get; set; }
+        public string Action { get; set; }
+
+        public double? Dr { get; set; }
+        public double? Cr { get; set; }
+
+        //public Int32? OfficeID { get; set; } these comes from OfficeCompanyAccChart
+       // public Int32? CompanyID { get; set; }
+       //public string FromDate { get; set; }
+
+        public ATTOfficeTranDetail()
+        {
+            _OfficeCompanyAccChart = new ATTOfficeCompanyAccChart();
+            _Accounts = new ATTAccounts();
+        }
+
+    }
+}

@@ -1,0 +1,422 @@
+﻿
+function Office(data) {
+    var self = this;
+    if (data != undefined) {
+        self.OfficeCode = ko.observable(data.OfficeCode);
+        self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+    }
+}
+
+var ParentGL = function (data) {
+    var self = this;
+    self.AccCode = ko.observable(data.AccCode);
+    self.AccName = ko.observable(data.AccName);
+    self.GroupID = ko.observable(data.GroupID);
+    self.PaACCode = ko.observable(data.PaACCode);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.TranNo = ko.observable(data.TranNo);
+    self.HeadTran = ko.observable(data.HeadTran);
+    self.Balance = ko.observable(data.Balance);
+    self.GlCode = ko.observable(data.GlCode);
+    self.ACNameEng = ko.observable(data.ACNameEng);
+    self.Action = ko.observable(data.Action);
+}
+
+function SubsidaryAC(data) {
+    var self = this;
+    self.AccCode = ko.observable(data.AccCode);
+    self.AccName = ko.observable(data.AccName);
+    self.ACNo = ko.observable(data.ACNo);
+    self.ACName = ko.observable(data.ACName);
+    self.GLGroup = ko.observable(data.GLGroup);
+
+    self.FromDate = ko.observable(data.FromDate);
+    self.ToDate = ko.observable(data.ToDate);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.RStatus = ko.observable(data.RStatus);
+    self.Action = ko.observable(data.Action);
+
+    self.Office = ko.observable(data.Office);
+
+//    self.OfficeCode = ko.observable(data.OfficeCode);
+//    self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+}
+
+
+function SubsidaryACViewModel() {
+    var self = this;
+    self.AccCode = ko.observable();
+    self.AccName = ko.observable();
+    self.ACNo = ko.observable();
+    self.ACName = ko.observable();
+    self.GLGroup = ko.observable();
+
+    self.FromDate = ko.observable();
+    self.ToDate = ko.observable();
+    var entryBy = $("#user").text();
+    self.EntryDate = ko.observable();
+    self.RStatus = ko.observable();
+    self.Action = ko.observable();
+
+    self.SelectedParentGL = ko.observable();
+    self.ParentGL_Array = ko.observableArray([]);
+
+    self.OfficeCode = ko.observable();
+    self.OfficeNameNep = ko.observable();
+
+    self.SelectedOffice = ko.observable();
+    self.Offices = ko.observableArray([]);
+
+    self.selectedItem = ko.observable();
+
+    self.SubsidaryLst = ko.observableArray([]);
+
+    // Get Device Registration according to office
+
+    self.GetSubsidary = function () {
+        if (self.SelectedOffice() == undefined || self.SelectedOffice() == null) {
+            self.ACName("");
+            self.ACNo("");
+            self.SelectedOffice("");
+            self.SubsidaryLst("");
+        }
+        else {
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                url: '/Handlers/ACCOUNT/SubsidaryACHandler.ashx',
+
+                data: { 'method': 'GetSubsidaryLst',  'officeCode': ko.toJS(self.SelectedOffice()).OfficeCode,'accode': ko.toJS(self.SelectedParentGL()).AccCode },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    if (result.ResponseData != null) {
+                        var mappedTask = $.map(result.ResponseData, function (item) {
+                            return new SubsidaryAC(item)
+                        });
+
+                        self.SubsidaryLst(mappedTask);
+                    }
+
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+
+                }
+            });
+        }
+
+    }
+
+    self.EditGL = function (device) {
+
+
+        for (var i = 0; i < self.Offices().length; i++) {
+
+            if (device.Office().OfficeCode == ko.toJS(self.Offices())[i].OfficeCode) {
+                
+                self.SelectedOffice(self.Offices()[i]);
+            }
+        }
+
+        for (var i = 0; i < self.ParentGL_Array().length; i++) {
+            if (device.AccName() == self.ParentGL_Array()[i].AccName()) {
+               self.SelectedParentGL(self.ParentGL_Array()[i]);
+            }
+        }
+
+        self.ACNo(device.ACNo());
+        self.ACName(device.ACName());
+
+        self.RStatus(device.RStatus);
+
+        $('#ddlParentGL').prop("disabled", true);
+        $('#lstOffice').prop("disabled", true);
+        $('#ACCNo').prop("disabled", true);
+        
+        if (device.Action() == "A") {
+            self.Action("A");
+        }
+        else {
+            self.Action("E");
+        }
+
+        self.selectedItem(device);
+
+
+
+        var btnAdd = $("button.icon-add");
+        btnAdd.removeClass("icon-add").addClass("icon-ok");
+        btnAdd.text("Update");
+
+    }
+
+
+    self.AddSubsidary = function () {
+        var errMsg = "";
+        var add = self.selectedItem();
+
+        if (add) {
+
+            if (self.Validation()) {
+
+                var OfficeArray = {
+                    OfficeCode: self.SelectedOffice().OfficeCode,
+                    OfficeNameNep: self.SelectedOffice().OfficeNameNep
+                }
+                var action = self.Action() == "A" ? "A" : "E";
+
+                add.AccName(ko.toJS(self.SelectedParentGL()).AccName);
+                add.Office(OfficeArray);
+                add.ACNo(self.ACNo());
+                add.ACName(self.ACName());
+                add.Action(action);
+                add.RStatus("I");
+
+                var btnAdd = $("button.icon-ok");
+                btnAdd.removeClass("icon-ok").addClass("icon-add");
+                btnAdd.text("Add");
+                self.ACNo('');
+                self.ACName('');
+                $('#ACCNo').prop("disabled", false);
+                self.selectedItem(null);
+
+                //             self.ClearControls();
+
+            }
+        }
+        else {
+            if (self.Validation()) {
+
+                OfficeArray = {
+                    OfficeCode: self.SelectedOffice().OfficeCode,
+                    OfficeNameNep: self.SelectedOffice().OfficeNameNep
+                }
+
+                add = {
+                    AccCode: ko.toJS(self.SelectedParentGL()).AccCode,
+                    AccName: ko.toJS(self.SelectedParentGL()).AccName,
+                    Office: OfficeArray,
+                    ACNo: self.ACNo(),
+                    ACName: self.ACName(),
+
+                    FromDate: self.FromDate(),
+                    ToDate: self.ToDate(),
+                    EntryBy: entryBy,
+                    EntryDate: self.EntryDate(),
+                    RStatus: "I",
+                    Action: "A"
+                };
+
+                self.SubsidaryLst.push(new SubsidaryAC(add));
+
+                var btnAdd = $("button.icon-ok");
+                btnAdd.removeClass("icon-ok").addClass("icon-add");
+                btnAdd.text("Add");
+                self.ACName('');
+                self.ACNo('');
+                self.selectedItem(null);
+            }
+        }
+        $('#txtACName').focus();
+    }
+
+    self.GetOffice = function () {
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../Handlers/CENTRALLOOKUP/OfficeHandler.ashx',
+            data: { 'method': 'GetAllOffice' },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var mappedTask = $.map(result.ResponseData, function (item) {
+
+                    return new Office(item)
+                });
+
+                self.Offices(mappedTask);
+
+
+
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+
+    }
+    self.GetOffice();
+
+    self.GetParentGL = function () {
+
+        $.ajax({
+            type: 'GET',
+            async: false,
+            dataType: "json",
+            url: '/Handlers/ACCOUNT/AccountChartHandler.ashx',
+            data: { 'method': 'GetAccountChartSubsideryGL', 'accCode': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+
+                var mappedTasks = $.map(data.ResponseData, function (item) {
+                    return new ParentGL(item)
+                });
+                self.ParentGL_Array(mappedTasks);
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+            }
+        });
+    };
+    self.GetParentGL();
+
+    //--------------------------------------------------------------
+    //NB: To Save
+    //--------------------------------------------------------------
+
+    self.SaveSubsidaryAC = function () {
+        //changed by bibek
+        if (self.SubsidaryLst().length != 0) {
+            waitMsg("Saving");
+            waitMsg.show();
+
+            var jsonData = FilteredJson(ko.toJS(self.SubsidaryLst));
+
+            url = '../../Handlers/ACCOUNT/SubsidaryACHandler.ashx';
+            data = { 'method': 'SaveSubsidaryAC', 'args': JSON.stringify(jsonData) };
+            $.post(url, data, result => {
+                var obj = jQuery.parseJSON(result);
+                if (obj.IsSucess) {
+                    msg(obj.Message);
+                    self.ClearControl();
+                }
+                else {
+                    msg(obj.Message, "WARNING");
+                }
+            });
+        }
+        //Changed by Bibek
+        else {
+            msg('Please enter Subsidiary Account Information');
+        }
+    };
+//    self.SaveSubsidaryAC = function () {
+//        //    
+//        //        self.SetNepali();
+//        if (self.Validation()) {
+
+//            var office = {
+//                OfficeCode: $("#offcode").text()
+//            }
+
+//            var glcode =
+//             ko.toJS(self.SelectedParentGL).AccCode;
+
+//            var row = {
+//                Office: office,
+//                AccCode: glcode,
+//                ACNo: self.ACNo(),
+//                ACName: self.ACName(),
+//                RStatus: "I",
+//                FromDate: null,
+//                ToDate: null,
+//                EntryBy: $("#user").text(),
+//                EntryDate: null,
+//                Action: "A"
+//            };
+
+//            $.ajax({
+//                type: 'GET',
+//                dataType: "json",
+//                cache: false,
+//                url: '../../../Handlers/ACCOUNT/SubsidaryACHandler.ashx',
+//                data: { 'method': 'SaveSubsidaryAC', 'args': JSON.stringify(row) },
+//                contentType: "application/json; character=utf-8",
+
+//                success: function (result) {
+
+
+//                    if (result.IsSucess) {
+//                        msg(result.Message);
+//                        self.ClearControl();
+//                    }
+//                    else {
+//                        msg(result.Message);
+//                    }
+//                },
+//                error: function (err) {
+//                    msg("Failed error");
+
+//                }
+//            });
+
+
+
+//        }
+//    }
+
+    self.Validation = function () {
+        var errMsg = "";
+        if (Validate.empty(self.SelectedParentGL())) {
+            errMsg += "कृपया GL Code भर्नुहोस् !!!\n";
+        }
+        if (Validate.empty(self.SelectedOffice())) {
+            errMsg += "कृपया Office छान्नुहोस् !!!\n";
+        }
+
+        if (Validate.empty(self.ACNo())) {
+            errMsg += "कृपया AC No. भर्नुहोस् !!!\n";
+        }
+        if (Validate.empty(self.ACName())) {
+            errMsg += "कृपया AC Name भर्नुहोस् !!!\n";
+        }
+
+        if (errMsg === "") {
+            return true;
+        }
+        else {
+             msg(errMsg,"WARNING");
+            return false;
+        }
+    }
+
+
+    //Clear Control
+
+    self.ClearSubsidaryAC = function () {
+//        self.SetNepali();
+        self.ACName("");
+        self.ACNo("");
+        self.SelectedOffice("");
+        self.SubsidaryLst("");
+
+        $('#ddlParentGL').prop("disabled", false);
+        $('#lstOffice').prop("disabled", false);
+        $('#ACCNo').prop("disabled", false);
+    }
+
+    self.ClearControl = function () {
+        self.SelectedParentGL("");
+        self.ACName("");
+        self.ACNo("");
+        self.SelectedOffice("");
+        self.SubsidaryLst("");
+
+        $('#ddlParentGL').prop("disabled", false);
+        $('#lstOffice').prop("disabled", false);
+        $('#ACCNo').prop("disabled", false);
+
+    }
+
+}
+
+$(document).ready(function () {
+    ValidateSession();
+    ko.applyBindings(new SubsidaryACViewModel());
+});

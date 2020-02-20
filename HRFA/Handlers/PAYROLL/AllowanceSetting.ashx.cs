@@ -1,0 +1,68 @@
+﻿using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+using System;
+using System.Collections.Generic;
+
+namespace HRFA.Handlers.PAYROLL
+{
+    /// <summary>
+    /// Summary description for AllowanceSetting
+    /// </summary>
+    public class AllowanceSetting : BaseHandler
+    {
+        public object SaveAllowanceSetting(string args, string appID, string modID)
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTAllowance> objAllowances = JsonUtility.DeSerialize(args, typeof(List<ATTAllowance>)) as List<ATTAllowance>;
+
+            BLLAllowance objBLLAllowance = new BLLAllowance();
+
+            try
+            {
+                response = objBLLAllowance.SaveAllowance(objAllowances, appID, modID);
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+
+            return JsonUtility.Serialize(response);
+        }
+
+        public Object LoadMonthlyAllowance(string empID,string fiscalYear)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLAllowance objBLLAllowance = new BLLAllowance();
+
+            try
+            {
+                response = objBLLAllowance.LoadMonthlyAllowance(empID, fiscalYear);
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return JsonUtility.Serialize(response);
+        }
+        public Object LoadYearlyAllowance(string fiscalYear)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLAllowance objBLLAllowance = new BLLAllowance();
+
+            try
+            {
+                response = objBLLAllowance.LoadYearlyAllowance(fiscalYear);
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return JsonUtility.Serialize(response);
+        }
+    }
+}

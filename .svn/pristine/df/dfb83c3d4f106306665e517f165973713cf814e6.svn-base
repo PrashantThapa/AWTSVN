@@ -1,0 +1,125 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLSubsidaryAC
+    {
+       public string SaveSubsidaryAC(List<ATTSubsidaryAC> lst)
+       {
+           string SP = "";
+           string msg = "No Data to Save!!!";
+           
+               GetConnection conn = new GetConnection();
+               OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+               OracleTransaction tran = dbConn.BeginTransaction();
+               try
+               {
+
+                   foreach (ATTSubsidaryAC objSubAC in lst)
+                   {
+
+                       if (objSubAC.Action == "E")
+                       {
+                           SP = "APR_EDIT_OFF_SUBACCT";
+                           msg = "Successfully Updated";
+                       }
+                       else if (objSubAC.Action=="A")
+                       {
+                           SP = "APR_ADD_OFF_SUBACCT";
+                           msg = "Successfully Saved ";
+                       }
+
+                       if (SP != "")
+                       {
+                           List<OracleParameter> paramList = new List<OracleParameter>();
+                           //objSalaryItem.SalaryItems.SalaryItemID,
+                           paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_ID", objSubAC.Office.OfficeCode, OracleDbType.Int32, ParameterDirection.Input));
+                           paramList.Add(SqlHelper.GetOraParam(":P_AC_CODE", objSubAC.AccCode, OracleDbType.Int64, ParameterDirection.Input));
+                           paramList.Add(SqlHelper.GetOraParam(":P_ACCNO", objSubAC.ACNo, OracleDbType.Varchar2, ParameterDirection.Input));
+                           paramList.Add(SqlHelper.GetOraParam(":P_ACCNAME", objSubAC.ACName, OracleDbType.Varchar2, ParameterDirection.Input));
+                           paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", objSubAC.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                           paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", objSubAC.ToDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                           paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", objSubAC.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                           paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", objSubAC.EntryDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                           paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", objSubAC.RStatus, OracleDbType.Varchar2, ParameterDirection.Input));
+
+
+
+                           //paramList[0].Size = 50;
+                           SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+                       }
+                   }
+                   tran.Commit();}
+               catch (Exception ex)
+               {
+                   tran.Rollback();
+                   throw new Exception("Error" + ex.Message);
+               }
+               finally
+               {
+                   conn.CloseDbConn();
+               }
+
+
+           return msg;
+       }
+       
+
+       public List<ATTSubsidaryAC> GetSubsidaryLst( int? officeCode,int? accode)
+       {
+           GetConnection conn = new GetConnection();
+           OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+           List<ATTSubsidaryAC> lst = new List<ATTSubsidaryAC>();
+
+           try
+           {
+               string SP = "APR_GET_OFF_SUBACCT";
+
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", officeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_AC_CODE", accode, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+               DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+               foreach (DataRow drow in ds.Tables[0].Rows)
+               {
+                   ATTSubsidaryAC obj = new ATTSubsidaryAC();
+
+                   obj.Office = new ATTOffice();
+
+                   obj.Office.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_ID"].ToString());
+
+                   obj.Office.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+
+                   obj.AccCode = Int64.Parse(drow["AC_CODE"].ToString());
+
+                   obj.AccName = drow["AC_NAME"].ToString();
+
+                   obj.ACNo = drow["ACCNO"].ToString();
+                   obj.ACName = drow["ACCNAME"].ToString();
+
+
+                   lst.Add(obj);
+               }
+
+               return lst;
+           }
+           catch (Exception ex)
+           {
+
+               throw (ex);
+           }
+           finally
+           {
+               conn.CloseDbConn();
+           }
+
+       }
+    }
+}

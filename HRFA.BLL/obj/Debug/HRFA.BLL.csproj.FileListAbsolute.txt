@@ -1,0 +1,137 @@
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\bin\Debug\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\bin\Debug\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\bin\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\bin\Debug\HRFA.COMMON.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\bin\Debug\HRFA.DataLayer.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\bin\Debug\Interop.zkemkeeper.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\bin\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\bin\Debug\HRFA.COMMON.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\bin\Debug\HRFA.DataLayer.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CopyComplete
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\KUKLHR\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\bin\Debug\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\bin\Debug\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\bin\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\bin\Debug\HRFA.COMMON.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\bin\Debug\HRFA.DataLayer.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\bin\Debug\Interop.zkemkeeper.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\bin\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\bin\Debug\HRFA.COMMON.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\bin\Debug\HRFA.DataLayer.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CopyComplete
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTHR_1_17_2019\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.COMMON.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.DataLayer.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\Interop.zkemkeeper.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.COMMON.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.DataLayer.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CopyComplete
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\AWTPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.COMMON.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.DataLayer.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\Interop.zkemkeeper.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.COMMON.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\bin\Debug\HRFA.DataLayer.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CopyComplete
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLProject\HRFA.BLL\obj\Debug\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\bin\Debug\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\bin\Debug\HRFA.BLL.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\bin\Debug\HRFA.ATT.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\bin\Debug\HRFA.COMMON.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\bin\Debug\HRFA.DataLayer.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\bin\Debug\Interop.zkemkeeper.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\bin\Debug\HRFA.ATT.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\bin\Debug\HRFA.COMMON.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\bin\Debug\HRFA.DataLayer.pdb
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\obj\Debug\HRFA.BLL.csprojAssemblyReference.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CoreCompileInputs.cache
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CopyComplete
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\obj\Debug\HRFA.BLL.dll
+C:\Users\Prashant Thapa\Desktop\project\New folder\KUKLHR\AWTHR\KUKLPROJECT_01_20_2019_latest\KUKLproject\HumarResourceManagement\AWTproject\HRFA.BLL\obj\Debug\HRFA.BLL.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\bin\Debug\HRFA.BLL.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\bin\Debug\HRFA.BLL.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\bin\Debug\HRFA.ATT.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\bin\Debug\HRFA.COMMON.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\bin\Debug\HRFA.DataLayer.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\bin\Debug\Oracle.DataAccess.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\bin\Debug\Interop.zkemkeeper.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\bin\Debug\HRFA.ATT.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\bin\Debug\HRFA.COMMON.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\bin\Debug\HRFA.DataLayer.pdb
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\obj\Debug\HRFA.BLL.csprojAssemblyReference.cache
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CoreCompileInputs.cache
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CopyComplete
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\obj\Debug\HRFA.BLL.dll
+C:\Users\Printer-2\Desktop\HR Application\AWTproject\HRFA.BLL\obj\Debug\HRFA.BLL.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\bin\Debug\HRFA.BLL.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\bin\Debug\HRFA.BLL.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\bin\Debug\HRFA.ATT.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\bin\Debug\HRFA.COMMON.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\bin\Debug\HRFA.DataLayer.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\bin\Debug\Newtonsoft.Json.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\bin\Debug\Interop.zkemkeeper.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\bin\Debug\HRFA.ATT.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\bin\Debug\HRFA.COMMON.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\bin\Debug\HRFA.DataLayer.pdb
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\obj\Debug\HRFA.BLL.csprojAssemblyReference.cache
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CoreCompileInputs.cache
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CopyComplete
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\obj\Debug\HRFA.BLL.dll
+D:\Projects\AccessWorldNet\HRFA\HRFA.BLL\obj\Debug\HRFA.BLL.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.BLL.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.BLL.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.ATT.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.COMMON.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.DataLayer.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\Oracle.ManagedDataAccess.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\Interop.zkemkeeper.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.ATT.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.COMMON.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.DataLayer.pdb
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\obj\Debug\HRFA.BLL.csprojAssemblyReference.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\obj\Debug\HRFA.BLL.csproj.CopyComplete
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\obj\Debug\HRFA.BLL.dll
+C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.BLL\obj\Debug\HRFA.BLL.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.BLL.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.BLL.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.ATT.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.COMMON.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.DataLayer.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\Oracle.ManagedDataAccess.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\Newtonsoft.Json.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\Interop.zkemkeeper.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.ATT.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.COMMON.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\HRFA.DataLayer.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\bin\Debug\Newtonsoft.Json.xml
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\obj\Debug\HRFA.BLL.csprojResolveAssemblyReference.cache
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\obj\Debug\HRFA.BLL.dll
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.BLL\obj\Debug\HRFA.BLL.pdb

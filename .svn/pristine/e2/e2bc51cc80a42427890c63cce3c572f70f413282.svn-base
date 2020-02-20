@@ -1,0 +1,236 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AdminMaster.Master" AutoEventWireup="true"
+    CodeBehind="OfficeTransaction.aspx.cs" Inherits="IDS.Modules.ACCOUNTS.OfficeTransaction" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+    <style>
+        select
+        {
+            padding: 5px;
+        }
+    </style>
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <div class="container wrapper">
+        <div class="col-md-12">
+            <h3 class=" margin-top-15 margin-left-25">
+                Voucher Entry</h3>
+            <form class="form-horizontal" role="form">
+            <div class="row margin-bottom-15" id="divSubNo">
+                <div class="col-md-12">
+                    Submission Number : &nbsp;&nbsp;<span data-bind="text: SubmissionNo" />
+                </div>
+            </div>
+            <div class="row margin-bottom-15">
+                <div class="col-md-3">
+                    Office Name <span class="mandatory">*</span> &nbsp;&nbsp;<span id="OfficeNameNep" />
+                    <span id="OfficeID" />
+                </div>
+                <div class="col-md-6">
+                    Cost Center <span class="mandatory">*</span> &nbsp;&nbsp;<span id="CompanyName" />
+                    <span id="CompanyID" />
+                </div>
+            </div>
+           
+            <div class="row">
+                <div class="col-md-2">
+                    Voucher Date <span class="mandatory">*</span></div>
+                <div class="col-md-3">
+                    <input type="text" id="txtDate" data-bind="value:TranDate" class='required form-control bod-picker'
+                        onkeypress="return isNumberKey(event)" onblur="return valFutureDate(this,'Y',true);"
+                        placeholder="YYYY.MM.DD" onfocus="UnicodeFocus(event,this);" onpaste="return true" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    Voucher Type <span class="mandatory">*</span>
+                </div>
+                <div class="col-md-3">
+                    <div class="dropdown" style="margin-left: 0px; width: 100%;">
+                        <select id="ddlVoucherType" class="dropdown-select" data-bind='options:VoucherTypes,
+                         optionsText: "VoucherTypeName", optionsValue: $data,value:SelectedVoucherType,
+                          optionsCaption:"------छान्नुहोस्-------", event:{change:GetACChartWithOfficeCostcenter}'>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    Voucher No <span class="mandatory">*</span>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" id="txtVoucherNo" class="form-control" data-bind="value:VoucherNo" /></div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    Narration <span class="mandatory">*</span>
+                </div>
+                <div class="col-md-6">
+                    <textarea id="textNarration" class="form-control" data-bind="value:Narration"></textarea>
+                </div>
+            </div>
+            <div class="row margin-top-15" style="border-top: 1px #ccc solid; padding-top: 15px;">
+                <div class="col-md-2">
+                    GL Code <span class="mandatory">*</span></div>
+                <div id="ddlGLSubsidary" class="col-md-2 margin-left-15">
+                    Subsidary Acc. <span class="mandatory">*</span>
+                </div>
+                <div class="col-md-1" style="display: none;">
+                    Account<span class="mandatory">*</span>
+                </div>
+                <div class="col-md-2 margin-left-15">
+                    Description
+                </div>
+                <div class="col-md-2 margin-left-15">
+                    Dr.<span class="mandatory">*</span></div>
+                <div class="col-md-2 margin-left-15">
+                    Cr.<span class="mandatory">*</span></div>
+                <div class="col-md-1 margin-left-15">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 dropdown">
+                    <select id="ddlGlCode" class="dropdown-select" data-bind='options: GlCodeList, 
+                                                optionsText: "AccName",
+                                                optionsValue: $data,
+                                                value: SelectedGlCode,
+                                                optionsCaption: "छान्नुहोस्", event:{ change:GetGLCodeSubsidary } '>
+                    </select>
+                </div>
+                <div id="ddlGLSubsidarys" class="dropdown col-md-2">
+                    <select id="Select1" class="dropdown-select" data-bind='options: GLCodeSubsidarysLst, 
+                                                    optionsText: "AccName",
+                                                    optionsValue:$data,
+                                                    value:SelectedGLCodeSubsidary, 
+                                                    optionsCaption:"------छान्नुहोस्-------"'>
+                    </select>
+                </div>
+                <div class="col-md-2" style="display: none;">
+                    <div class="dropdown">
+                        <select id="Select2" class="dropdown-select" data-bind='options: AccountNumbserList,
+                                                optionsText: "AccNameNep", 
+                                                optionsValue:$data,
+                                                value:SelectedAcNo, 
+                                                optionsCaption:"------छान्नुहोस्-------"'>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <%--<textarea id="Text1" data-bind="value:Description" class=" form-control"></textarea>--%>
+                     <input type="text" id="Text1" data-bind="value:Description" class=" form-control" />
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="Text2" data-bind="value:Dr, disable:Cr" onkeypress="return isNumberKey(event)"
+                        class=" form-control" />
+                </div>
+                <div class="col-md-2">
+                    <input type="text" id="Text4" data-bind="value:Cr, disable:Dr" onkeypress="return isNumberKey(event)"
+                        class=" form-control" /></div>
+                <div class="col-md-1">
+                    <button type="submit" style="display: block;" id="Button2" class="btn btn-primary pull-right"
+                        data-bind="click:AddVoucher">
+                        Add</button>
+                </div>
+            </div>
+            
+        
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-fixed-header resizable" id="tblVoucherDet"
+                        width="100%">
+                        <thead>
+                            <tr>
+                                <th>
+                                    SN.
+                                </th>
+                                <th>
+                                    GL Code
+                                </th>
+                                <th id="GLCodeSubsidary">
+                                    Subsidary Account No.
+                                </th>
+                                <th>
+                                    Description
+                                </th>
+                                <th style="display: none; width: 0px;">
+                                    Account
+                                </th>
+                                <th style="display: none; width: 0px;">
+                                    Amount
+                                </th>
+                                <th>
+                                    Dr.Amount
+                                </th>
+                                <th>
+                                    Cr.Amount
+                                </th>
+                                <th class="editDeleteSection">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: OfficeTranDetail">
+                            <tr>
+                                <td>
+                                    <span data-bind="text: ($index()+1)"></span>
+                                </td>
+                                <td style="display: none; width: 0px;">
+                                    <span data-bind="text:OfficeCompanyAccChart().AccountChart.AccCode"></span>
+                                </td>
+                                <td>
+                                    <span data-bind="text: Accounts().AccNameNep"></span>
+                                </td>
+                                <td>
+                                    <span data-bind="text: AccName"></span>
+                                </td>
+                                <td style="display: none; width: 0px;">
+                                    <span data-bind="text: Amount()"></span>
+                                </td>
+                                <td>
+                                    <span data-bind="text: Description()"></span>
+                                </td>
+                                <td>
+                                    <span data-bind="text: Dr()"></span>
+                                </td>
+                                <td>
+                                    <span data-bind="text: Cr()"></span>
+                                </td>
+                                <td class="editDeleteSection">
+                                    <a href='#' id="EditVoucherInfoBtn" class="glyphicon glyphicon-edit" title="Edit"
+                                        data-bind="click:$root.EditVoucherInfo" style="visibility: hidden;"></a><a href='#'
+                                            id="DeleteVoucherInfoBtn" class="glyphicon glyphicon-trash" title="Delete" data-bind="click:$root.DeleteVoucherInfo">
+                                        </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-2">
+                    </div>
+                    <div class="col-md-2" style="text-align: right; margin-left: 25px;">
+                        Total Dr. <span id="totalDr" /><span data-bind="text: totalDr()"></span>
+                    </div>
+                    <div class="col-md-2" style="text-align: right; margin-left: 15px;">
+                        Total Cr. <span id="totalCr" /><span data-bind="text: totalCr()"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 pull-right">
+                <button id="btnSubmit" class="btn btn-primary" data-bind="click:SubmitOfficeTran">
+                    Submit</button>
+                <button id="btnCancel" class="btn btn-primary" data-bind="click: ClearSubmitControls">
+                    Cancel</button>
+            </div>
+            <div class="col-md-9">
+            </div>
+        </div>
+        </form>
+    </div>
+    </div>
+    <script src="../../Scripts/ACCOUNT/OfficeTransaction.js" type="text/javascript"></script>
+</asp:Content>

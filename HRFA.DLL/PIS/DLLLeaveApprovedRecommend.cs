@@ -1,0 +1,120 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLLeaveApprovedRecommend
+    {
+
+        public string SaveLeaveApprovedRecommend(ATTLeaveApprovedRecommend objLAR)
+        {
+            string SP = "";
+            
+            string msg = "";
+            
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+            OracleTransaction tran = dbConn.BeginTransaction();
+            try
+            {
+                if (objLAR.Action == "A")
+                {
+                    if (objLAR.Status == "I")
+                        SP = "CPR_ADD_LEAVE_APPROVAL";
+                    else if (objLAR.Status == "V" || objLAR.Status == "R")
+                    {
+                        SP = "CPR_EDIT_LEAVE_APPROVAL";
+                        msg = "Successfully Saved.";
+                    }
+                }
+                if (SP != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", objLAR.EmpID, OracleDbType.Int32, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_LTYPE_ID", objLAR.LeaveTypeID, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_APP_DATE", objLAR.ApplicationDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_SEQ_NO", objLAR.SeqNo, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_APP_FROM_DATE", objLAR.FromDate, OracleDbType.Varchar2, ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":p_APP_TO_DATE", objLAR.ToDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_APP_NO_OF_DAYS", objLAR.NoOfDays, OracleDbType.Double, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_APP_STATUS", objLAR.Status, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objLAR.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objLAR.EntryDate, OracleDbType.Date, ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_APPROVED_TO", objLAR.ForwardedToID, OracleDbType.Varchar2, ParameterDirection.Input));
+                    
+                    
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+                    
+                }
+                tran.Commit();
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                throw new Exception("Error" + ex.Message);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+
+
+
+        }
+
+        public List<ATTLeaveApprovedRecommend> GetLeaveApprovedRecommend(Int32? empID, string userID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            //string UserName = getConn.LoginUser.DatabaseAccessUserName;
+            
+            try
+            {
+                string SP = "CPR_GET_UNAPP_LEAVE_BYEMPID";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_EMP_ID", empID, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_USER_ID", userID, OracleDbType.Varchar2, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn,CommandType.StoredProcedure, SP, paramList.ToArray());
+                List<ATTLeaveApprovedRecommend> lstLeaveApprovedRecommend = new List<ATTLeaveApprovedRecommend>();
+
+				foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTLeaveApprovedRecommend objLeaveApprovedRecommend = new ATTLeaveApprovedRecommend();
+                  
+                    objLeaveApprovedRecommend.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString());
+                    objLeaveApprovedRecommend.EmpName = drow["EMP_NAME"].ToString();
+                    objLeaveApprovedRecommend.LeaveTypeID = string.IsNullOrEmpty(drow["L_TYPE_ID"].ToString()) ? (Int64?)null : Int64.Parse(drow["L_TYPE_ID"].ToString()); 
+                    objLeaveApprovedRecommend.ApplicationDate = drow["APP_DATE"].ToString();
+                    //objLeaveApprovedRecommend.SeqNo = string.IsNullOrEmpty(drow["SEQ_NO"].ToString()) ? (double?)null : double.Parse(drow["SEQ_NO"].ToString()); 
+                    objLeaveApprovedRecommend.FromDate = drow["APP_FROM_DATE"].ToString();
+                    objLeaveApprovedRecommend.ToDate = drow["APP_TO_DATE"].ToString();
+                    objLeaveApprovedRecommend.NoOfDays = string.IsNullOrEmpty(drow["APP_NO_OF_DAYS"].ToString()) ? (double?)null : double.Parse(drow["APP_NO_OF_DAYS"].ToString()); 
+                    objLeaveApprovedRecommend.Status = drow["APP_STATUS"].ToString();
+                    objLeaveApprovedRecommend.ForwardedToID = string.IsNullOrEmpty(drow["FORWARDED_TO"].ToString()) ? (Int64?)null : Int64.Parse(drow["FORWARDED_TO"].ToString());
+                    lstLeaveApprovedRecommend.Add(objLeaveApprovedRecommend); 
+                }
+                return lstLeaveApprovedRecommend;
+                
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+    }
+}

@@ -1,0 +1,208 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEmpSalaryPayment
+    {
+        public List<ATTEmpSalaryPayment> GetEmpPayableAmount(Int32? officeCode, Int32? costCenter, Int32? year, Int32? monthId)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_PAYABLE_AMOUNT";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CD", officeCode, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_SAL_YEAR", year, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_SAL_MONTH", monthId, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER", costCenter, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTEmpSalaryPayment> lstEmpSalaryPayment = new List<ATTEmpSalaryPayment>();
+
+                
+                foreach(DataRow drow in ds.Tables[0].Rows)
+                {
+                    ATTEmpSalaryPayment objEmpSalaryPayment = new ATTEmpSalaryPayment();
+                    objEmpSalaryPayment.Office.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_CD"].ToString());
+                    objEmpSalaryPayment.Office.OfficeNameNep =drow["OFFICE_NAME_NEPALI"].ToString();
+                    objEmpSalaryPayment.SalaryYear = string.IsNullOrEmpty(drow["SAL_YEAR"].ToString()) ? (Int32?)null : Int32.Parse(drow["SAL_YEAR"].ToString());
+                    objEmpSalaryPayment.SalaryMonth = string.IsNullOrEmpty(drow["SAL_MONTH"].ToString()) ? (Int32?)null : Int32.Parse(drow["SAL_MONTH"].ToString());
+                    objEmpSalaryPayment.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString());
+                    objEmpSalaryPayment.EmployeeName = drow["EMP_NAME"].ToString();
+                    objEmpSalaryPayment.PayableAmount =( string.IsNullOrEmpty(drow["ADDITION_AMT"].ToString()) ? (Double?)null : Double.Parse(drow["ADDITION_AMT"].ToString())) - (string.IsNullOrEmpty(drow["DEDUCTION_AMT"].ToString()) ? (Double?)null : Double.Parse(drow["DEDUCTION_AMT"].ToString()));
+                    // objEmpSalaryPayment.CostCenter.CostCenterID = string.IsNullOrEmpty(drow["COSTCENTER_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["COSTCENTER_ID"].ToString());
+                    // objEmpSalaryPayment.CostCenter.CostCenterName = drow["COSTCENTER_NAME"].ToString();
+                    lstEmpSalaryPayment.Add(objEmpSalaryPayment);
+                }
+                
+                return lstEmpSalaryPayment;
+
+                
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+
+        public string SaveEmpSalaryPayment(ATTEmpSalaryPayment objEmpSalaryPayment, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                if (objEmpSalaryPayment.Action == "E")
+                {
+                    msg = "Successfully Edited.";
+                }
+                else if (objEmpSalaryPayment.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_EMP_SAL_PAYMENT";
+                    msg = "Successfully Saved.";
+
+                }
+                
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", objEmpSalaryPayment.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CD", objEmpSalaryPayment.Office.OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_SAL_YEAR", objEmpSalaryPayment.SalaryYear, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_SAL_MONTH", objEmpSalaryPayment.SalaryMonth, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_TOTAL_AMOUNT", objEmpSalaryPayment.TotalPayableAmount, OracleDbType.Double, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PAY_TYPE", objEmpSalaryPayment.PaymentType, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_BANK_ID", objEmpSalaryPayment.Bank.BankID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_BANK_ACCT", objEmpSalaryPayment.BankAccount.AccountNo, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PAY_DATE", objEmpSalaryPayment.PayableDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objEmpSalaryPayment.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objEmpSalaryPayment.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objEmpSalaryPayment.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_COSTCENTER_ID", objEmpSalaryPayment.CostCenter.CostCenterID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+
+                    paramList[0].Size = 16;
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    objEmpSalaryPayment.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+
+                    DLLEmpSalaryPaymentDet dllEmpSalaryPaymentDet = new DLLEmpSalaryPaymentDet();                    
+                    dllEmpSalaryPaymentDet.SaveEmpSalaryPaymentDetail(tran, objEmpSalaryPayment, objEmpSalaryPayment.SubmissionNo);
+
+                    if (objEmpSalaryPayment.OldSubmissionNo != null)
+                    {
+                        DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                        dllUTV.SaveVerifyLog(tran, objEmpSalaryPayment.EntryBy, objEmpSalaryPayment.OldSubmissionNo, objEmpSalaryPayment.SubmissionNo, appID, modID);
+                    }
+                    
+                    paramList.Clear();
+                    tran.Commit();
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            return msg + "</br> Please Note Your Submission No.</br><br>" + objEmpSalaryPayment.SubmissionNo + "</br>";
+        }
+
+
+        public ATTEmpSalaryPayment GetEmpSalaryPayment(Int64? submissionNo)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_EMP_SALARY_PAYMENT";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", submissionNo, OracleDbType.Int64, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+
+                ATTEmpSalaryPayment objEmpSalaryPayment = new ATTEmpSalaryPayment();
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+
+                    DataRow dr = ds.Tables[0].Rows[0];
+                    objEmpSalaryPayment.SubmissionNo = string.IsNullOrEmpty(dr["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(dr["SUBMISSION_NO"].ToString());
+                    objEmpSalaryPayment.Office.OfficeCode = string.IsNullOrEmpty(dr["OFFICE_CD"].ToString()) ? (Int32?)null : Int32.Parse(dr["OFFICE_CD"].ToString());
+                    objEmpSalaryPayment.SalaryYear = string.IsNullOrEmpty(dr["SAL_YEAR"].ToString()) ? (Int32?)null : Int32.Parse(dr["SAL_YEAR"].ToString());
+                    objEmpSalaryPayment.CostCenter.CostCenterID = string.IsNullOrEmpty(dr["COSTCENTER_ID"].ToString()) ? (Int32?)null : Int32.Parse(dr["COSTCENTER_ID"].ToString());
+                    objEmpSalaryPayment.SalaryMonth = string.IsNullOrEmpty(dr["SAL_MONTH"].ToString()) ? (Int32?)null : Int32.Parse(dr["SAL_MONTH"].ToString());
+                    objEmpSalaryPayment.TotalPayableAmount = string.IsNullOrEmpty(dr["TOTAL_AMOUNT"].ToString()) ? (Double?)null : Double.Parse(dr["TOTAL_AMOUNT"].ToString());
+                    objEmpSalaryPayment.PaymentType = dr["PAY_TYPE"].ToString();
+                    objEmpSalaryPayment.Bank.BankID = string.IsNullOrEmpty(dr["BANK_ID"].ToString()) ? (Int32?)null : Int32.Parse(dr["BANK_ID"].ToString());
+                    objEmpSalaryPayment.BankAccount.AccountNo = dr["BANK_ACCT"].ToString();
+                    objEmpSalaryPayment.PayableDate = dr["PAY_DATE"].ToString();
+
+                    List<ATTEmpSalaryPayment> lst = objEmpSalaryPayment.EmpPayableAmounts;
+
+                    foreach (DataRow drow in ds.Tables[0].Rows)
+                    {
+                        ATTEmpSalaryPayment obj = new ATTEmpSalaryPayment();
+                        obj.SalaryYear = string.IsNullOrEmpty(drow["SAL_YEAR"].ToString()) ? (Int32?)null : Int32.Parse(drow["SAL_YEAR"].ToString());
+                        obj.SalaryMonth = string.IsNullOrEmpty(drow["SAL_MONTH"].ToString()) ? (Int32?)null : Int32.Parse(drow["SAL_MONTH"].ToString());
+                        obj.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["SAL_MONTH"].ToString());
+                        obj.EmployeeName = drow["EMP_NAME"].ToString();
+                        obj.PayableAmount = string.IsNullOrEmpty(drow["PAYABLE_AMOUNT"].ToString()) ? (Double?)null : Double.Parse(drow["PAYABLE_AMOUNT"].ToString());
+                        lst.Add(obj);
+                    }
+                }
+                else
+                {
+                    objEmpSalaryPayment = null;
+                }
+                return objEmpSalaryPayment;
+
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+
+    }
+    
+}

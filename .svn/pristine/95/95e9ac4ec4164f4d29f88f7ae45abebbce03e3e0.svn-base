@@ -1,0 +1,128 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+
+
+namespace HRFA.DataLayer
+{
+    public class DLLResignation
+    {
+       public string SaveResignation(ATTResignation objResignation, string appID, string modID)
+       {
+           string sp = "";
+           string msg = "No Data To Save !!!";
+
+           GetConnection GetConn = new GetConnection();
+           OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+           OracleTransaction tran = conn.BeginTransaction();
+
+           try
+           {
+               if (objResignation.Action == "A")
+               {
+                   sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_RESIGNATION";
+                   msg = "Successfully Saved.";
+               }
+               //else if (objOffice.Action == "E")
+               //{
+               //    sp = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_EDIT_OFFICES";
+               //    msg = "पद सफलतापूर्वक अद्यावधिक भयो!!";
+               //}
+
+               if (sp != "")
+               {
+                   List<OracleParameter> paramList = new List<OracleParameter>();
+
+                   paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", null, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                   paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", objResignation.EmpID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_RESIGN_LETTER_DATE", objResignation.ResignLetterDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_EFFECTIVE_DATE", objResignation.EffectiveDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_RESIGNATION_REASON", objResignation.ResignationReason, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", objResignation.FromDate, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+
+                   paramList.Add(SqlHelper.GetOraParam(":ToDate", objResignation.ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":RStatus", objResignation.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":EntryBY", objResignation.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":EntryDate", objResignation.EntryDate, OracleDbType.Date, System.Data.ParameterDirection.Input));
+
+                   paramList[0].Size = 20;
+
+                   SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                   objResignation.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+
+                   if (objResignation.OldSubmissionNo != null)
+                   {
+                       DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                       dllUTV.SaveVerifyLog(tran, objResignation.EntryBy, objResignation.OldSubmissionNo, objResignation.SubmissionNo, appID, modID);
+
+                   }
+
+                   paramList.Clear();
+               }
+               tran.Commit();
+               return msg + "</br> Please Note Your Submission No.</br><b>" + objResignation.SubmissionNo + "</b>";	
+               //return msg;
+           }
+           catch (Exception ex)
+           {
+               tran.Rollback();
+               return ex.Message;
+           }
+           finally
+           {
+               GetConn.CloseDbConn();
+           }
+       }
+
+       public List<ATTResignation> GetResignationBySubNo(Int64? SubmissionNo)
+       {
+           GetConnection getConn = new GetConnection();
+           OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+           string SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_RESIGNATION";
+           List<ATTResignation> lst = new List<ATTResignation>();           
+
+           try
+           {
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", SubmissionNo, OracleDbType.Int64, ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":p_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+               DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+               foreach (DataRow drow in ds.Tables[0].Rows)
+               {
+                   ATTResignation obj = new ATTResignation();
+
+                   obj.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString());
+                       //Convert.ToInt16(drow["EMP_ID"].ToString());
+                   obj.EmpName = drow["EMP_NAME"].ToString();
+
+                   obj.Office.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int16?)null : Int16.Parse(drow["OFFICE_CD"].ToString());
+                   obj.Office.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+
+                   obj.Post.PostID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_ID"].ToString());
+                   obj.Post.PostDesc = drow["POST_DESC"].ToString();
+
+                   obj.ResignLetterDate = drow["RESIGN_LETTER_DATE"].ToString();
+                   obj.EffectiveDate = drow["EFFECTIVE_DATE"].ToString();
+                   obj.ResignationReason = drow["RESIGNATION_REASON"].ToString();
+                   
+                   lst.Add(obj);
+               }
+               return lst;
+           }
+           catch (Exception ex)
+           {
+               throw (ex);
+           }
+           finally
+           {
+               getConn.CloseDbConn();
+           }
+
+       }
+    }
+}

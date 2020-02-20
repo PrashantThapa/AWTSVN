@@ -1,0 +1,127 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+
+namespace HRFA.Handlers.FAMS
+{
+    /// <summary>
+    /// Summary description for BudgetRequestHandler
+    /// </summary>
+    public class BudgetRequestHandler : BaseHandler
+    {
+        public object ChangeCostCenter(Int32? OfficeCD, Int32? CostCenterID, string fiscalyear,string incomeType)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLBudgetRequest objBLLBudgetRequest = new BLLBudgetRequest();
+            try
+            {
+                response = objBLLBudgetRequest.ChangeCostCenter(OfficeCD, CostCenterID, fiscalyear, incomeType);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+
+        public object SaveBudgetRequest(string args, string appID, string modID, string date)
+        {
+            JsonResponse response = new JsonResponse();
+            ATTBudgetRequest objBudgetRequest = JsonUtility.DeSerialize(args, typeof(ATTBudgetRequest)) as ATTBudgetRequest;
+            BLLBudgetRequest objBLLBudgetRequest = new BLLBudgetRequest();
+
+            try
+            {
+                response = objBLLBudgetRequest.SaveBudgetRequest(objBudgetRequest, appID, modID, date);
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return JsonUtility.Serialize(response);
+        }
+
+        public object GetCostCenter(Int32? OfficeCD)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLBudgetRequest objBLLBudgetRequest = new BLLBudgetRequest();
+            try
+            {
+                response = objBLLBudgetRequest.GetCostCenter(OfficeCD);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+        public object GetBudgetRequestBySubNo(Int64? SubNo)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLBudgetRequest objBLLPromotion = new BLLBudgetRequest();
+            try
+            {
+                response = objBLLPromotion.GetBudgetRequestBySubNo(SubNo);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+        
+        //public object GetBudgetItem()
+        //{
+        //    JsonResponse response = new JsonResponse();
+        //    BLLBudgetRequest objBLLBudgetRequest = new BLLBudgetRequest();
+        //    try
+        //    {
+        //        response = objBLLBudgetRequest.GetBudgetItem();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        response.Message = ex.Message;
+        //        response.IsSucess = false;
+        //    }
+        //    return JsonUtility.Serialize(response);
+        //}
+
+        
+        public object GetJob()
+        {
+            JsonResponse response = new JsonResponse();
+            BLLBudgetRequest objBLLBudgetRequest = new BLLBudgetRequest();
+            try
+            {
+                response = objBLLBudgetRequest.GetJob();
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+        //public object GetBudgetItemLst()
+        //{
+        //    JsonResponse response = new JsonResponse();
+        //    BLLBudgetRequest objBLLBudgetRequest = new BLLBudgetRequest();
+        //    try
+        //    {
+        //        response = objBLLBudgetRequest.GetBudgetItemLst();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        response.Message = ex.Message;
+        //        response.IsSucess = false;
+        //    }
+        //    return JsonUtility.Serialize(response);
+        //}
+    }
+}

@@ -1,0 +1,130 @@
+﻿
+var glStatementModel = function (item) {
+    var self = this;
+    item = item || {};
+    self.FromDate = ko.observable(item.FromDate || nepaliDate);
+    self.ToDate = ko.observable(item.ToDate || nepaliDate);
+    self.AccountNumber = ko.observable(item.AccountNumber || '');
+    self.AccountName = ko.observable(item.AccountName || '');
+    self.IsSummGl = ko.observable(item.IsSummGl || '0');
+    self.GlID = ko.observable(item.GlID || '0');
+    self.GLcode = ko.observable(item.GLcode || '');
+    self.GLName = ko.observable(item.GLName || '');
+    self.OpeningBalance = ko.observable(item.OpeningBalance || '0');
+    self.Balance = ko.observable(item.Balance || '');
+};
+
+var gLSearchCriteria = function (item) {
+	var self = this;
+	item = item || {};
+	self.GlID = ko.observable(item.GlID || '0');
+	self.AccountNumber = ko.observable(item.AccountNumber || '');
+	self.FromDate = ko.observable(item.FromDate || '');
+	self.ToDate = ko.observable(item.ToDate || '');
+};
+var glStatementMainViewModel = function () {
+    var self = this;
+    SOSYS.init(self);
+    self.glStatement = ko.observable(new glStatementModel());
+    self.groupLedgers = ko.observableArray([]);
+    self.accounts = ko.observable([]);
+    var paths = '/Handlers/ACCOUNT/Report/GLStatementHandler.ashx';
+    self.fromDateChange = function (data) {
+        if (data.ToDate() !== "" || data.ToDate() !== undefined) {
+            if (data.FromDate() > data.ToDate()) {
+                self.glStatement().FromDate('');
+            }
+
+        }
+
+    };
+
+    self.toDateChange = function (data) {
+
+        if (data.FromDate() !== "" || data.FromDate() !== undefined) {
+            if (data.FromDate() > data.ToDate()) {
+                self.glStatement().ToDate('');
+            }
+
+        }
+    };
+
+    self.dateChange = function (data) {
+
+        //if (data.ToDate() !== undefined || data.ToDate() !== '') {
+
+        //}
+
+    };
+    self.gridViewSearchModel = new ko.simpleGrid.viewModel({
+        url: paths,
+        method: 'GetGroupLedgerName',
+        columns: [
+                    { headerText: "GL Code", rowText: "GLcode" },
+                    { headerText: "GL Name", rowText: "GLName" }
+                ],
+        pageSize: 5
+    });
+
+    self.gridViewSearchModel.selectData = function (item) {
+        self.glStatement(new glStatementModel({ GlID: item.GlID, GLcode: item.GLcode, GLName: item.GLName, IsSummGl: item.IsSummGl }));
+        if (item.IsSummGl === 1) {
+            getAccDetails(item.GlID); //When IsSumGl is true then we need to show its subledger accounts in corresponding dropdown
+
+        }
+        self.gridViewSearchModel.searchField("");
+    };
+    //---------------------------------------- ----------------------------------------------------------------
+    //NB: Listing Account Details
+    //--------------------------------------------------------------------------------------------------------
+    function getAccDetails(item) {
+        $.ajax({
+            url: paths,
+            type: 'GET',
+
+            data: { method: 'GetAccDetails', GlID: item },
+            success: function (result) {
+                result = jQuery.parseJSON(result);
+                var abc = ko.utils.arrayMap(result.ResponseData, function (item) {
+                    return new glStatementModel({
+                        AccountNumber: item.AccountNumber,
+                        AccountName: item.AccountName
+                    });
+                });
+                self.accounts([]);
+                self.accounts(abc);
+                console.log(ko.toJS(self.accounts()));
+            },
+            error: function (a, b, c) {
+                alert("error");
+            }
+        });
+    }
+
+    self.gridViewModel = new ko.simpleGrid.viewModel({
+        url: paths,
+        method: 'GetGLStatementPagination',
+        pageSize: 5
+    });
+    
+
+
+
+    self.showglstatement = function () {
+        if ((self.glStatement().GlID() || '') !== '' && (self.glStatement().FromDate() || '') !== '' && (self.glStatement().ToDate() || '') !== '') {
+            //            if (self.glStatement().IsSummGl() == 1) {
+            //                if ((self.glStatement().AccountNumber() || '') == '') {
+            //                    SOSYS.message(self, 'Please Select Account Name.');
+            //                    return;
+            //                }
+            //            }
+            console.log(self.glStatement().ToDate());
+            self.gridViewModel.searchField({ GLID: self.glStatement().GlID() || '0', AccountNumber: self.glStatement().AccountNumber() || '', FromDate: self.glStatement().FromDate() || '0', ToDate: self.glStatement().ToDate() || '0' });
+        }
+    };
+};
+
+$(document).ready(function () {
+    ko.applyBindings(new glStatementMainViewModel());
+    ValidateSession();
+});

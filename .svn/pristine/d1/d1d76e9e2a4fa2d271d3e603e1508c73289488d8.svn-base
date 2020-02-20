@@ -1,0 +1,1091 @@
+﻿/*********************************************************************************
+Copyright © HRFA PCS System  2016
+*********************************************************************************
+Project              : Copyright © HRFA PCS System  2016  
+File                 :OfficeTransaction.js 
+Description          :This Page contain the Office Transaction Knockout JS Code
+*********************************************************************************
+<Name>                                          <Date>         
+shanjeev kr Sah                              2015.10.15
+shanjeev007@gmail.com                                                            
+*********************************************************************************/
+function OfficeCompanyAccChart(data) {
+    var self = this;
+    self.Company = ko.observable(data.Company);
+    self.AccountChart = ko.observable(data.AccountChart);
+    self.AccName = ko.observable(data.AccountChart.AccName);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.FromDate = ko.observable(data.FromDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.ToDate = ko.observable(data.ToDate);
+    self.TranNo = ko.observable(data.TranNo);
+    self.Action = ko.observable(data.Action);
+    self.Selected = ko.observable(data.Selected);
+    self.HaveSubs = ko.observable(data.HaveSubs);
+}
+function OfficeCompanyAccChartSub(data) {
+    var self = this;
+    self.AccCode = ko.observable(data.AccountChart.AcNo);
+    self.AccName = ko.observable(data.AccountChart.AccName);
+
+}
+
+function Company(data) 
+    {
+        var self = this;
+        self.Office = ko.observable(data.Office);
+        self.CompanyID = ko.observable(data.CompanyID);
+        self.CompanyName = ko.observable(data.CompanyName);
+        self.CompanyNameEng = ko.observable(data.CompanyNameEng);
+        self.EntryBy = ko.observable(data.EntryBy);
+        self.EntryDate = ko.observable(data.EntryDate);
+        self.RStatus = ko.observable(data.RStatus);
+        self.TranNo = ko.observable(data.TranNo);
+        self.Action = ko.observable(data.Action);
+    }
+function CostCenter(data) {
+    var self = this;
+    if (data != undefined) {
+        self.OfficeCode = ko.observable(data.OfficeCode);
+        self.CostCenterID = ko.observable(data.CostCenterID);
+        self.CostCenterName = ko.observable(data.CostCenterName);
+        self.CostCenterNameEng = ko.observable(data.CostCenterNameEng);
+
+        self.Status = ko.observable(data.Status);
+        self.FromDate = ko.observable(data.FromDate);
+        self.ToDate = ko.observable(data.ToDate);
+        self.EntryBy = ko.observable(data.EntryBy);
+        self.EntryDate = ko.observable(data.EntryDate);
+        self.Action = ko.observable(data.Action);
+    }
+}
+
+
+function Office(data) {
+    var self = this;
+    self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+    self.OfficeCode = ko.observable(data.OfficeCode);
+}
+
+function AccountChart(data) {
+    var self = this;
+    self.AccCode = ko.observable(data.AccCode);
+    self.AccName = ko.observable(data.AccName);
+    self.GLGroup = ko.observable(data.GLGroup);
+    self.PaACCode = ko.observable(data.PaACCode);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.TranNo = ko.observable(data.TranNo);
+    self.HeadTran = ko.observable(data.HeadTran);
+    self.Balance = ko.observable(data.Balance);
+    self.GlCode = ko.observable(data.GlCode);
+    self.ACNameEng = ko.observable(data.ACNameEng);
+    self.Action = ko.observable(data.Action);
+    self.HaveSubs = ko.observable(data.HaveSubs);
+
+}
+
+function GLGroup(data) {
+    var self = this;
+    self.GroupID = ko.observable(data.GroupID);
+    self.GroupName = ko.observable(data.GroupName);
+
+}
+
+/*********************Structure Begin ******************************************/
+
+function GetAccounts(data) {
+    var self = this;
+    self.AccountID = ko.observable(data.AccountID);
+    self.AccNameNep = ko.observable(data.AccNameNep);
+    self.AccNameEng = ko.observable(data.AccNameEng);
+}
+
+function Accounts(data) {
+    var self = this;
+    AccountID = ko.observable(data.AccountID);
+    AccountDate = ko.observable(data.AccountDate);
+    AccountStatus = ko.observable(data.AccountStatus);
+    SourceTypes = ko.observable(data.SourceTypes);
+    SourceID = ko.observable(data.SourceID);
+    EntryBy = ko.observable(data.EntryBy);
+    EntryDate = ko.observable(data.EntryDate);
+    RStatus = ko.observable(data.RStatus);
+    TranNo = ko.observable(data.TranNo);
+};
+
+function OfficeTranDetail(data) {
+    var self = this;
+    self.TranNo = ko.observable(data.TranNo);
+    self.OfficeCompanyAccChart = ko.observable(data.OfficeCompanyAccChart);
+    self.AcNo = ko.observable(data.AcNo);
+    self.AccName = ko.observable(data.AccName);
+    self.Accounts = ko.observable(data.Accounts);
+    self.DrCr = ko.observable(data.DrCr);
+    self.Dr = ko.observable(data.Dr);
+    self.Cr = ko.observable(data.Cr);
+    self.Description = ko.observable(data.Description);
+    self.Amount = ko.observable(data.Amount);
+    self.TranSeqNo = ko.observable(data.TranSeqNo);
+    self.EntryBY = ko.observable(data.EntryBY);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.Action = ko.observable(data.Action);
+};
+
+function OfficeTransaction(data) {
+    var self = this;
+    self.TranNo = ko.observable(data.TranNo);
+    self.TranDate = ko.observable(data.TranDate);
+    self.VoucherType = ko.observable(data.VoucherType);
+    self.VoucherNo = ko.observable(data.VoucherNo);
+    self.TotDr = ko.observable(data.TotDr);
+    self.TotCr = ko.observable(data.TotCr);
+    self.Office = ko.observable(data.Office);
+    self.EntryBY = ko.observable(data.EntryBY);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.Action = ko.observable(data.Action);
+    self.Narration = ko.observable(data.Narration);
+    self.OfficeTranDetail = ko.observableArray(data.OfficeTranDetail);
+
+
+};
+///*********************Structure End ******************************************/
+
+
+/*********************View Model Begin ******************************************/
+function OfficeTransactionViewModel() {
+    var self = this;
+    self.TranNo = ko.observable();
+    self.TranDate = ko.observable();
+
+    self.VoucherTypes = ko.observableArray([{ 'VoucherTypeName': 'Journal Voucher', 'VoucherTypeID': 'JV' }, { 'VoucherTypeName': 'Cash Voucher', 'VoucherTypeID': 'C' }, { 'VoucherTypeName': 'Bank Voucher', 'VoucherTypeID': 'B'}]);
+    self.SelectedVoucherType = ko.observable();
+
+    self.VoucherNo = ko.observable();
+    self.TotDr = ko.observable();
+    self.TotCr = ko.observable();
+    self.Office = ko.observable();
+    self.EntryBY = ko.observable();
+    self.EntryDate = ko.observable();
+    self.Rstatus = ko.observable();
+    self.Action = ko.observable();
+    self.OfficeTranDetail = ko.observableArray([]);
+    self.Action = ko.observable();
+    self.Narration = ko.observable();
+
+
+    /**********For grid data Tran details ****/
+    self.SelectedGlCode = ko.observable();
+    self.GlCodeList = ko.observableArray([]);
+    self.GlCodeListBorC = ko.observableArray([]);
+
+    self.AccountNumbserList = ko.observableArray([]);
+    self.SelectedAcNo = ko.observable();
+
+    self.Dr = ko.observable();
+    self.Cr = ko.observable();
+    self.Description = ko.observable();
+    self.CompanyArray = ko.observableArray([]);
+    self.SelectedCompany = ko.observable();
+
+    // cost center
+    self.OfficeCode = ko.observable();
+    self.CostCenterID = ko.observable();
+    self.CostCenterName = ko.observable();
+    self.CostCenterNameEng = ko.observable();
+    self.CostCenters = ko.observableArray([]);
+    self.SelectedCostCenter = ko.observable();
+    self.ParentOffID = ko.observable();
+    self.ParentCostCenterID = ko.observable();
+    self.ParentID = ko.observable();
+    self.OfficeName = ko.observable();
+    self.Offices = ko.observableArray([]);
+    self.SelectedOffice = ko.observable();
+    self.OfficeArray = ko.observableArray([]);
+
+    self.OfficeTranDetail = ko.observableArray([]);
+    self.selectedItem = ko.observable();
+
+    self.GLCodeSubsidarysLst = ko.observableArray([]);
+    self.SelectedGLCodeSubsidary = ko.observable();
+
+    self.HaveSubs = ko.observable();
+    self.SubmissionNo = ko.observable();
+
+
+    var CompanyNames = getUrlParamVal('CompanyName');
+
+    var values = CompanyNames.split('.');
+
+    var OfficeID = values[0];
+
+    var OfficeNameNep = values[1];
+    var CompanyID = values[2];
+    var CompanyName = values[3];
+    $("#OfficeID").text(OfficeID);
+    $("#OfficeNameNep").text(OfficeNameNep);
+    $("#CompanyID").text(CompanyID);
+    $("#CompanyName").text(CompanyName);
+
+    $("#ddlGLSubsidary").hide();
+    $("#ddlGLSubsidarys").hide();
+    $("#divSubNo").hide();
+
+    //Get GL code with subsidary
+
+    self.GetGLCodeSubsidary = function () {
+
+        if (self.SelectedGlCode() == undefined) {
+            self.SelectedGLCodeSubsidary("");
+            $("#ddlGLSubsidary").hide();
+            $("#ddlGLSubsidarys").hide();
+        }
+
+        else {
+
+            if (ko.toJS(self.SelectedGlCode).HaveSubs == "Y") {
+
+                $("#ddlGLSubsidary").show()
+                $("#ddlGLSubsidarys").show()
+                $.ajax({
+
+                    type: 'GET',
+                    async: false,
+                    dataType: "json",
+                    url: '/Handlers/ACCOUNT/OfficeCompanyAccChartHandler.ashx',
+                    data: { 'method': 'GetGLCodewithSubsidary', 'OfficeID': OfficeID, 'AccCode': ko.toJS(self.SelectedGlCode).AccCode },
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        var mappedTasks = $.map(data.ResponseData, function (item) {
+                            return new OfficeCompanyAccChartSub(item)
+                        });
+                        self.GLCodeSubsidarysLst(mappedTasks);
+                    },
+                    error: function (err) {
+                        msg(err.status + " - " + err.statusText, "FAILURE");
+                    }
+                });
+            }
+
+            else {
+                $("#ddlGLSubsidary").hide()
+                $("#ddlGLSubsidarys").hide()
+                self.GLCodeSubsidarysLst("")
+            }
+        }
+    }
+
+    /*Start budget check */
+
+
+    self.ValidateBudgetAmount = function () {
+        var errMessage = "";
+        var fiscalyear = GetFyscalYear(self.TranDate());
+        var officeID = OfficeID;
+        var costcenterID = CompanyID;
+        var accCode = self.SelectedGlCode().AccCode
+        var amount = null;
+
+
+        if (self.Dr() == null || self.Dr() == "" || self.Dr() == 'undefined') {
+
+            amount = self.Cr();
+        }
+        else {
+
+            amount = self.Dr();
+        }
+
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/ACCOUNT/OfficeTranHandler.ashx',
+            data: { 'method': 'ValidateBudgetAmount', 'fiscalYr': fiscalyear, 'officeID': officeID, 'costCenterID': costcenterID, 'accCode': accCode, 'amount': amount },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                // if (!result.IsSucess) {
+
+                errMessage = result.Message;
+                // }
+
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+            }
+        });
+
+        if (errMessage != "OK") {
+            msg(errMessage, "WARNING", "Warning");
+            return true;
+        }
+        else {
+
+            return true;
+        }
+    };
+
+    /*End budget check */
+
+
+    self.GetOffice = function () {
+        waitMsg("Loading");
+        waitMsg.show();
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/CENTRALLOOKUP/OfficeHandler.ashx',
+            data: { 'method': 'GetAllOffice', 'args': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new Office(item)
+
+                });
+                self.OfficeArray(mappedTask);
+
+                waitMsg.hide();
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+
+    };
+
+    //#endregion
+    /* Begin Get cost center ***/
+
+
+    /* Begin Get cost center ***/
+
+    self.GetCostCenter = function () {
+        var OfficeCD = ko.toJS(self.SelectedOffice).OfficeCode;
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            url: '/Handlers/FAMS/CostCenterHandler.ashx',
+
+            data: { 'method': 'GetCostCenter', 'officeCode': OfficeCD, 'CostCenterID': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new CostCenter(item)
+                });
+
+                self.CostCenters(mappedTask);
+
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+
+    }
+
+    self.GetOffice();
+
+
+    /* End Get cost center*/
+
+    /**********For grid data Tran details ****/
+
+
+    /*********************Grid ADD Button  Begin ******************************************/
+
+    self.AddVoucher = function () {
+
+        var Voucherdet = self.selectedItem();
+        if (Voucherdet != undefined) {
+            // NB: edit  Case
+            if (self.ValidationVoucher()) {
+                // var action = self.Action() == "A" ? "A" : "E";
+                Voucherdet.TranNo(self.TranNo());
+                Voucherdet.Description(self.Description());
+                Voucherdet.Dr(self.Dr());
+                Voucherdet.Cr(self.Cr());
+                // clear out the selected voucher
+                self.selectedItem(null);
+
+                var btnAdd = $("button.icon-ok");
+                btnAdd.removeClass("icon-ok").addClass("icon-add");
+                btnAdd.text("Add");
+                //self.ClearVoucherControls();
+            }
+        }
+
+        else {
+
+            // NB: New Add Case
+            var CompanyName = getUrlParamVal('CompanyName');
+            var values = CompanyName.split('.');
+            var OfficeID = values[0];
+            var OfficeNameNep = values[1];
+            var CompanyID = values[2];
+            var CompanyName = values[3];
+
+            if (self.ValidationVoucher()) {
+
+                if (self.ValidateBudgetAmount()) {
+                    var off =
+            {
+                OfficeCode: OfficeID
+            };
+                    var compID = {
+                        CompanyID: Company.CompanyID
+
+                    };
+
+                    var com = {
+                        Office: off,
+                        // CompanyID: self.SelectedCompany().CompanyID
+                        CompanyID: CompanyID
+                    };
+                    var AccountCharts =
+                    {
+                        // GlCode: self.SelectedGlCode().GlCode
+                        AccCode: self.SelectedGlCode().AccCode,
+                        FromDate: self.SelectedGlCode().FromDate
+                    };
+
+                    var OfficeCompanyAccCharts =
+                    {
+                        Company: com,
+                        AccountChart: AccountCharts
+                    };
+
+                    var drcr = "";
+                    if (self.Dr() == null || self.Dr() == "" || self.Dr() == 'undefined') {
+                        drcr = 'Cr';
+                        self.Amount = self.Cr();
+                    }
+                    else {
+                        drcr = 'Dr';
+                        self.Amount = self.Dr();
+                    }
+
+                    var accounts = {
+                        AccountID: 0,
+                        AccNameNep: self.SelectedGlCode().AccName,
+                        AccNameEng: self.SelectedGlCode().AccNameEng
+                    }
+
+                    var subName;
+                    var acno;
+                    if (ko.toJS(self.SelectedGlCode).HaveSubs == "Y") {
+                        subName = ko.toJS(self.SelectedGLCodeSubsidary()).AccName;
+                        acno = ko.toJS(self.SelectedGLCodeSubsidary()).AccCode
+                    }
+                    else {
+                        subName = "";
+                        acno = null
+                    }
+
+
+                    var VoucherDet = {
+                        TranNo: self.TranNo(),
+                        OfficeCompanyAccChart: OfficeCompanyAccCharts, //class
+                        AcNo: acno, // ko.toJS(self.SelectedAcNo()).AccountID,
+                        Accounts: accounts,
+                        AccName: subName,
+                        DrCr: drcr,
+                        Description: self.Description(),
+                        Amount: self.Amount,
+                        Dr: self.Dr(),
+                        Cr: self.Cr(),
+                        TranSeqNo: null,
+                        EntryBY: $("#user").text(),
+                        EntryDate: null,
+                        Rstatus: "F",
+                        Action: "A"
+                    };
+
+                    // check to see that the VoucherDet doesn't already exist in our list
+                    if (self.OfficeTranDetail.indexOf(VoucherDet) > -1) {
+                        return;
+                    }
+
+                    self.OfficeTranDetail.push(new OfficeTranDetail(VoucherDet));
+
+                    var btnAdd = $("button.icon-ok");
+                    btnAdd.removeClass("icon-ok").addClass("icon-add");
+                    btnAdd.text("Add");
+                    self.ClearVoucherControls();
+
+                }
+            }
+        }
+
+    };
+
+    /*********************Grid ADD Button  End ******************************************/
+    /********************* Begin Edit grid **********************************************/
+
+    //--------------------------------------------------------------
+    //NB: To Edit Grid Data
+    //--------------------------------------------------------------
+    self.EditVoucherInfo = function (vouch) {
+        self.TranNo(vouch.TranNo());
+        self.Description(vouch.Description());
+        self.Dr(vouch.Dr());
+        self.Cr(vouch.Cr());
+        self.EntryBY($("#user").text());
+        self.EntryDate(null);
+        // console.log("voucher>>>", ko.toJS(vouch));
+        var acIndex = 0;
+        for (var i = 0; i < self.AccountNumbserList().length; i++) {
+
+            if (ko.toJS(self.AccountNumbserList()[i].AcNo) == ko.toJS(vouch.AcNo)) {
+                acIndex = i;
+
+            }
+
+        }
+        var GLIndex = 0;
+        for (var i = 0; i < self.GlCodeList().length; i++) {
+
+            if (ko.toJS(self.GlCodeList()[i].GlCode) == ko.toJS(vouch.OfficeCompanyAccChart().AccountChart.AccCode)) {
+                GLIndex = i;
+
+            }
+
+        }
+
+        self.SelectedGlCode(self.GlCodeList()[GLIndex]);
+
+        var GLSubsidaryIndex = 0;
+        for (var i = 0; i < GLCodeSubsidarysLst().lenght; i++) {
+            if (ko.toJS(self.GLCodeSubsidarysLst()[i].AccCode == ko.toJS(vouch.Accounts().AccNameNep))) {
+                GLSubsidaryIndex = i;
+            }
+        }
+
+        self.SelectedGLCodeSubsidary(self.GLCodeSubsidarysLst()[GLSubsidaryIndex]);
+
+        //self.SelectedAcNo(self.AccountNumbserList()[acIndex]);
+        self.Rstatus("F");
+        self.Action("A");
+        self.selectedItem(vouch);
+        var btnAdd = $("button.icon-add");
+        btnAdd.removeClass("icon-add").addClass("icon-ok");
+        btnAdd.text("Update");
+    };
+
+    /* ************************* End Edit grid ******************************************/
+
+    /* ************************* Begin Delete grid ******************************************/
+    self.DeleteVoucherInfo = function (vouch) {
+
+        Confirm('Are you sure to Delete?', 'Confirmation Dialog', function (r) {
+            if (r) {
+                waitMsg("Deleting");
+                waitMsg.show();
+                self.OfficeTranDetail.remove(vouch);
+            }
+
+        });
+    };
+
+    /* ************************* End Delete grid ******************************************/
+
+    /*********************Submit Begin *****************************************************/
+    self.SubmitOfficeTran = function () {
+
+        if (self.ValidationSubmit()) {
+            var CompanyNames = getUrlParamVal('CompanyName');
+            var values = CompanyNames.split('.');
+            var OfficeID = values[0];
+
+            var offcode =
+            {
+                OfficeCode: OfficeID
+            };
+
+            if (self.OfficeTranDetail().length >= 1) {
+
+                Confirm('एकपटक Submit गरिसकेपछि अर्को पटक विवरण फेरि परिवर्तन गर्न पइने छैन। \n के तपाई Submit गर्न चाहनुहन्छ ?', 'Confirmation Dialog', function (r) {
+                    if (r) {
+                        var OfficeTran =
+                  {
+                      TranNo: null,
+                      TranDate: self.TranDate(),
+                      VoucherType: self.SelectedVoucherType().VoucherTypeID,
+                      VoucherNo: self.VoucherNo(),
+                      TotDr: 0,
+                      TotCr: 0,
+                      Office: offcode,
+                      EntryBY: $("#user").text(),
+                      EntryDate: null,
+                      Rstatus: "F",
+                      Action: "A",
+                      Narration: self.Narration(),
+                      OfficeTranDetail: self.OfficeTranDetail()
+                  }
+
+                        method = 'SaveOfficeTran';
+                        var url = "/Handlers/ACCOUNT/OfficeTranHandler.ashx";
+
+                        var data = { 'method': method, 'args': JSON.stringify(ko.toJS(OfficeTran)) };
+                        $.post(url, data,
+                                                function (result) {
+                                                    waitMsg.hide();
+                                                    var obj = jQuery.parseJSON(result);
+                                                    msg(obj.Message);
+                                                 if (obj.IsSucess) {
+                                                      //  self.ClearSubmitControls();
+                                                    }
+                                                })
+                    }
+                })
+            }
+        }
+    }
+    /*********************Submit End ************************************************************/
+
+
+    /*********************Clear Submit controls Begin *******************************************/
+    self.ClearSubmitControls = function () {
+        self.SelectedGLCodeSubsidary("");
+        $("#ddlGLSubsidary").hide();
+        $("#ddlGLSubsidarys").hide();
+        self.SelectedGlCode(null);
+        self.SelectedCompany(null);
+        self.SelectedVoucherType(null);
+        self.TranDate("");
+        self.VoucherNo("");
+        self.Narration("");
+        self.OfficeTranDetail([]);
+        var btnAddVoucherDet = $("button.icon-ok");
+        btnAddVoucherDet.removeClass("icon-ok").addClass("icon-add");
+        btnAddVoucherDet.text("Add");
+    };
+
+    /*********************Clear Submit controls End ******************************************/
+
+    /*********************Clear controls Begin **********************************************/
+    self.ClearVoucherControls = function () {
+        //        self.SelectedGLCodeSubsidary("");
+        //        $("#ddlGLSubsidary").hide();
+        //        $("#ddlGLSubsidarys").hide();
+
+        self.SelectedGlCode(null);
+        //self.SelectedAcNo(null);
+        self.Dr("");
+        self.Cr("");
+        self.Description("");
+        var btnAddVoucherDet = $("button.icon-ok");
+        btnAddVoucherDet.removeClass("icon-ok").addClass("icon-add");
+        btnAddVoucherDet.text("Add");
+    };
+
+    /*********************Clear controls End ******************************************/
+
+    self.GetACChartWithOfficeCostcenter = function () {
+        if (self.SelectedVoucherType() == null || self.SelectedVoucherType() == undefined) {
+            self.GlCodeList([]);
+        }
+        else {
+            $.ajax({
+                dataType: "json",
+                cache: false,
+                async: false,
+                url: '../../../Handlers/Account/OfficeCompanyAccChartHandler.ashx',
+                data: { 'method': 'GetOfficeComanyAcchart', 'OfficeID': OfficeID, 'companyID': CompanyID, 'P_all': 'N', 'token': $("#token").text(), 'VType': ko.toJS(self.SelectedVoucherType()).VoucherTypeID },
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    waitMsg.hide();
+                    if (result.IsSucess) {
+                        self.GlCodeList([]);
+                        for (var i = 0; i < result.ResponseData.length; i++) {
+                            self.GlCodeList.push(result.ResponseData[i].AccountChart);
+                        }
+                    }
+                    else {
+                        msg(result.Message, "WARNING");
+                    }
+                },
+                error: function (err) {
+                    waitMsg.hide();
+                    msg(err.status + " - " + err.statusText, "FAILURE");
+
+                }
+            });
+        }
+    }
+
+
+
+    /*********************Begin GetACChart******************************************/
+    //    self.GetACChart = function () {
+
+    //        waitMsg("Loading");
+    //        waitMsg.show();
+    //        if (self.SelectedCompany() != undefined) {
+
+    //            var CID = ko.toJS(self.SelectedCompany()).CompanyID;
+
+    //            var CompanyName = getUrlParamVal('CompanyName');
+    //            var values = CompanyName.split('.');
+    //            var CompanyID = values[2];
+    //            var OfficeID = values[0];
+    //           
+    //            }
+    //        $.ajax({
+    //            dataType: "json",
+    //            cache: false,
+    //            async: false,
+    //            url: '../../../Handlers/Account/OfficeCompanyAccChartHandler.ashx',
+    //            data: { 'method': 'GetOfficeComanyAcchart', 'OfficeID': OfficeID, 'companyID': CompanyID,'P_all':'N', 'token': $("#token").text() },
+    //            contentType: "application/json; charset=utf-8",
+    //            success: function (result) {
+    //                waitMsg.hide();
+    //                if (result.IsSucess) {
+
+    //                   // console.log("offcode by sk>>>>", $("#offcode").text());
+    //                    for (var i = 0; i < result.ResponseData.length; i++) {
+    //                        self.GlCodeList.push(result.ResponseData[i].AccountChart);
+    //                    }
+    //                }
+    //                else {
+    //                    msg(result.Message, "WARNING");
+    //                }
+    //            },
+    //            error: function (err) {
+    //                waitMsg.hide();
+    //                msg(err.status + " - " + err.statusText, "FAILURE");
+
+    //            }
+    //        });
+    //    }
+
+    //    self.GetACChartBorC = function () {
+
+    //        waitMsg("Loading");
+    //        waitMsg.show();
+    //        if (self.SelectedCompany() != undefined) {
+
+    //            var btype = ko.toJS(self.SelectedVoucherType()).VoucherTypeID; 
+    //           
+    //            var CompanyName = getUrlParamVal('CompanyName');
+    //            var values = CompanyName.split('.');
+    //            var CompanyID = values[2];
+    //            var OfficeID = values[0];
+
+    //        }
+    //        $.ajax({
+    //            dataType: "json",
+    //            cache: false,
+    //            async: false,
+    //            url: '../../../Handlers/Account/OfficeCompanyAccChartHandler.ashx',
+    //            data: { 'method': 'GetOfficeComanyAcchartBorC', 'OfficeID': OfficeID, 'companyID': CompanyID, 'btype': btype, 'token': $("#token").text() },
+    //            contentType: "application/json; charset=utf-8",
+    //            success: function (result) {
+    //                waitMsg.hide();
+    //                if (result.IsSucess) {
+
+    //                    // console.log("offcode by sk>>>>", $("#offcode").text());
+    //                    for (var i = 0; i < result.ResponseData.length; i++) {
+    //                        self.GlCodeListBorC.push(result.ResponseData[i].AccountChart);
+    //                    }
+    //                }
+    //                else {
+    //                    msg(result.Message, "WARNING");
+    //                }
+    //            },
+    //            error: function (err) {
+    //                waitMsg.hide();
+    //                msg(err.status + " - " + err.statusText, "FAILURE");
+
+    //            }
+    //        });
+    //    }
+
+
+
+    //    self.GetAccount = function () {
+
+    //        waitMsg("Loading");
+    //        waitMsg.show();
+    //       
+    //        $.ajax({
+    //            dataType: "json",
+    //            cache: false,
+    //            async: false,
+    //            url: '../../../Handlers/Account/OfficeCompanyAccChartHandler.ashx',
+    //            data: { 'method': 'GetAccount', 'args': null },
+    //            contentType: "application/json; charset=utf-8",
+    //            success: function (result) {
+
+    //                var mappedTask = $.map(result.ResponseData, function (item) {
+    //                    return new GetAccounts(item)
+    //                    //return new Company(item)
+    //                });
+    //                self.AccountNumbserList(mappedTask);
+
+    //                waitMsg.hide();
+
+    //            },
+    //            error: function (err) {
+    //                waitMsg.hide();
+    //                msg(err.status + " - " + err.statusText, "FAILURE");
+
+    //            }
+    //        });
+    //    }
+
+    /*********************End GetACChart******************************************/
+
+    self.GetVoucherBySubmissionNo = function () {
+        self.SubmissionNo(getUrlParamVal('SubmissionNumber'));
+
+        if (self.SubmissionNo() == null || self.SubmissionNo() == "" || self.SubmissionNo() == undefined) {
+            return;
+        }
+
+
+        else {
+
+            $('button').hide();
+            $('form').find('input, select, textarea').attr('disabled', 'disabled');
+            $("#txtDr").attr("disabled", true);
+            $("#txtCr").attr("disabled", true);
+            $("#divSubNo").show();
+            $('.editDeleteSection').hide();
+            //$("#subNo").text(self.SubmissionNo());
+
+            $.ajax({
+                dataType: "json",
+                url: '../../Handlers/ACCOUNT/OfficeTranHandler.ashx',
+                data: { 'method': 'GetOfficeTran', 'submissionNo': self.SubmissionNo(), 'token': $("#token").text() },
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                success: function (data) {
+                    if (data.ResponseData == null) {
+                        msg("Submission number is not valid !!!");
+                    }
+                    else {
+                        $("#OfficeNameNep").text(data.ResponseData.OfficeTranDetail[0].OfficeCompanyAccChart.Company.Office.OfficeNameNep);
+                        $("#OfficeID").text(data.ResponseData.OfficeTranDetail[0].OfficeCompanyAccChart.Company.Office.OfficeCode);
+                        $("#CompanyID").text(data.ResponseData.OfficeTranDetail[0].OfficeCompanyAccChart.Company.CompanyID);
+                        $("#CompanyName").text(data.ResponseData.OfficeTranDetail[0].OfficeCompanyAccChart.Company.CompanyName);
+
+                        var officeid = data.ResponseData.OfficeTranDetail[0].OfficeCompanyAccChart.Company.Office.OfficeCode;
+                        var companyid = data.ResponseData.OfficeTranDetail[0].OfficeCompanyAccChart.Company.CompanyID;
+                        self.TranDate(data.ResponseData.TranDate);
+
+                        for (var i = 0; i < self.VoucherTypes().length; i++) {
+                            if (data.ResponseData.VoucherType == ko.toJS(self.VoucherTypes())[i].VoucherTypeID) {
+                                self.SelectedVoucherType(self.VoucherTypes()[i]);
+                            }
+                        }
+
+                        self.VoucherNo(data.ResponseData.VoucherNo);
+                        self.Narration(data.ResponseData.Narration);
+
+
+
+
+                        for (var i = 0; i < data.ResponseData.OfficeTranDetail.length; i++) {
+                            var off =
+                        {
+                            OfficeCode: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.Company.Office.OfficeCode
+                        };
+                            var compID = {
+                                CompanyID: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.Company.CompanyID
+
+                            };
+
+                            var com = {
+                                Office: off,
+                                CompanyID: CompanyID
+                            };
+                            var AccountCharts =
+                    {
+                        AccCode: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.AccountChart.AccCode,
+                        FromDate: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.Company.FromDate
+                    };
+
+                            var OfficeCompanyAccCharts =
+                    {
+                        Company: com,
+                        AccountChart: AccountCharts
+                    };
+
+                            var accounts = {
+                                AccountID: 0,
+                                AccNameNep: data.ResponseData.OfficeTranDetail[i].OfficeCompanyAccChart.AccountChart.AccName
+                            }
+
+                            var subName;
+                            var acno;
+
+                            subName = data.ResponseData.OfficeTranDetail[i].Accounts.AccountName;
+                            acno = data.ResponseData.OfficeTranDetail[i].Accounts.AccountID;
+
+                            var drAmount = "";
+                            var crAmount = "";
+                            if (data.ResponseData.OfficeTranDetail[i].DrCr == "Dr") {
+                                drAmount = data.ResponseData.OfficeTranDetail[i].Amount
+                            }
+                            else if (data.ResponseData.OfficeTranDetail[i].DrCr == "Cr") {
+                                crAmount = data.ResponseData.OfficeTranDetail[i].Amount
+                            }
+
+                            var VoucherDet = {
+                                TranNo: self.TranNo(),
+                                OfficeCompanyAccChart: OfficeCompanyAccCharts,
+                                AcNo: acno,
+                                Accounts: accounts,
+                                AccName: subName,
+                                DrCr: data.ResponseData.OfficeTranDetail[i].DrCr,
+                                Description: data.ResponseData.OfficeTranDetail[i].Description,
+                                Amount: data.ResponseData.OfficeTranDetail[i].Amount,
+                                Dr: drAmount,
+                                Cr: crAmount,
+                                TranSeqNo: null,
+                                EntryBY: data.ResponseData.OfficeTranDetail[i].EntryBY,
+                                EntryDate: data.ResponseData.OfficeTranDetail[i].EntryDate,
+                                Rstatus: data.ResponseData.OfficeTranDetail[i].Rstatus,
+                                Action: ""
+                            };
+
+                            self.OfficeTranDetail.push(new OfficeTranDetail(VoucherDet));
+                        }
+
+                    }
+                },
+                error: function (err) {
+                    msg(err.status + " - " + err.statusText);
+                }
+            });
+        }
+    }
+
+
+    /*********************Validation Voucher Begin ******************************************/
+
+    self.ValidationVoucher = function () {
+        var errMsg = "";
+        var objFocus = null;
+
+
+
+        if (self.SelectedGlCode() == undefined || self.SelectedGlCode == "") {
+            errMsg += "Please select GL Code !!!<br>";
+
+        }
+
+        if ((self.Dr() == null || self.Dr() == "" || self.Dr() == 'undefined') && (self.Cr() == null || self.Cr() == "" || self.Cr() == 'undefined')) {
+            errMsg += "Please Enter Dr or Cr Amounts !!!<br>";
+        }
+
+        var sub = ko.toJS(self.SelectedGlCode).HaveSubs;
+        if (sub == "Y") {
+            if (self.SelectedGLCodeSubsidary() == undefined || self.SelectedGLCodeSubsidary() == "") {
+                errMsg += "Please select GL Code with Subsidary !!!<br>";
+            }
+        }
+
+        if (errMsg !== "") {
+             msg(errMsg,"WARNING");
+
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    /*********************Validation Voucher End ******************************************/
+    /*********************begin calculating sum of Dr column and Cr column ***********************/
+    self.totalDr = ko.computed(function () {
+        var totalDr = 0;
+        for (var i = 0; i < ko.toJS(self.OfficeTranDetail().length); i++) {
+            // totalDr += ko.toJS(self.OfficeTranDetail()[i].Dr());
+            totalDr += isNaN(Number(ko.toJS(self.OfficeTranDetail()[i].Dr()))) ? 0 : Number(ko.toJS(self.OfficeTranDetail()[i].Dr()));
+            // totalDr += Number(ko.toJS(self.OfficeTranDetail()[i].Dr()));
+        }
+        return totalDr;
+        $("#totalDr").text(totalDr);
+
+    });
+
+    self.totalCr = ko.computed(function () {
+        var totalCr = 0;
+        for (var i = 0; i < ko.toJS(self.OfficeTranDetail().length); i++) {
+            // totalCr += Number(ko.toJS(self.OfficeTranDetail()[i].Cr()));
+            totalCr += isNaN(Number(ko.toJS(self.OfficeTranDetail()[i].Cr()))) ? 0 : Number(ko.toJS(self.OfficeTranDetail()[i].Cr()));
+        }
+        return totalCr;
+        $("#totalCr").text(totalCr);
+
+    });
+
+    /*********************End calculating sum of Dr column and Cr column *****************/
+    /*********************Validation Submit Begin ******************************************/
+
+    self.ValidationSubmit = function () {
+        var errMsg = "";
+        var objFocus = null;
+        //            if (self.CompanyID() == undefined || self.CompanyID() == "") {
+        //                errMsg += "Company is not given !!!<br>";
+
+        //            }
+        if (self.TranDate() == undefined || self.TranDate == "") {
+            errMsg += "Please Enter Date !!!<br>";
+        }
+        if (self.SelectedVoucherType() == undefined || self.SelectedVoucherType == "") {
+            errMsg += "Please select Voucher Type !!!<br>";
+
+        }
+        if (self.VoucherNo() == undefined || self.VoucherNo == "") {
+            errMsg += "Please Enter Voucher No !!!<br>";
+
+        }
+        if (self.OfficeTranDetail().length == 0) {
+            errMsg += "Please Add atleast one data in grid !!!<br>";
+        }
+
+        if (parseInt($("#totalCr").text()) != parseInt($("#totalDr").text())) {
+            errMsg += "Dr. and Cr. Amount must be equal !!!<br>";
+
+        }
+
+        if (self.Narration() == "" || self.Narration() == null) {
+            errMsg += "Please Enter Narration !!!<br>";
+
+        }
+        if (errMsg !== "") {
+             msg(errMsg,"WARNING");
+
+            return false;
+        }
+        else {
+            return true;
+        }
+    };
+    /*********************Validation Submit End ******************************************/
+
+    self.totalDr();
+    self.totalCr();
+    self.GetVoucherBySubmissionNo();
+
+}
+/*********************View Model End ******************************************/
+$(document).ready(function () {
+    ValidateSession();
+
+    ko.applyBindings(new OfficeTransactionViewModel());
+
+
+});

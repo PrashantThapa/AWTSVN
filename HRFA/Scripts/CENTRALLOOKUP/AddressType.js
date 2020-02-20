@@ -1,0 +1,325 @@
+﻿
+function AddressType(data) {
+    var self = this;
+
+    self.AddressTypeID = ko.observable(data.AddressTypeID);
+    self.AddressName = ko.observable(data.AddressName);
+    self.AddressNameEnglish = ko.observable(data.AddressNameEnglish);
+    self.Status = ko.observable(data.Status);
+    self.FromDate = ko.observable(data.FromDate);
+    self.Action = ko.observable(data.Action);
+    self.EntryBy = ko.observable(data.EntryBy);
+};
+
+function AddressTypeViewModel() {
+    var self = this;
+
+    self.AddressTypeID = ko.observable();
+    self.AddressName = ko.observable();
+    self.AddressNameEnglish = ko.observable();
+    self.Status = ko.observable(true);
+    self.FromDate = ko.observable();
+    self.AddressTypes = ko.observableArray([]);
+    self.Action = ko.observable("");
+
+    //slected record for edit
+    self.selectedItem = ko.observable();
+    var entryBy = $("#user").text();
+
+    //--------------------------------------------------------------
+    // To Add New Data to  Grid
+    //--------------------------------------------------------------
+
+    self.AddAddressType = function () {
+
+        var errMsg = "";
+
+        var add = self.selectedItem();
+        self.AddressName($("#AddressName").val());
+    
+        //-----------in case to edit/update----------
+
+        if (add != undefined) {
+
+            //validating controls      
+            if (self.Validation()) {
+                add.AddressTypeID(self.AddressTypeID());
+                add.AddressName(self.AddressName());
+                add.AddressNameEnglish(self.AddressNameEnglish());
+                add.Status(self.Status());
+                add.FromDate(self.FromDate());
+
+                var action = self.Action() == "A" ? "A" : "E";
+                add.Action(action);
+               
+
+                self.selectedItem(null);
+
+                var btnAdd = $("button.icon-ok");
+                btnAdd.removeClass("icon-ok").addClass("icon-add");
+                btnAdd.text("Add");
+
+                self.ClearControls();
+            }
+        }
+
+        //---------in case of adding new record to grid----------------
+        else {
+            //validating controls
+            if (self.Validation()) {
+                add = {
+                    AddressTypeID: null,
+                    AddressName: self.AddressName(),
+                    AddressNameEnglish: self.AddressNameEnglish(),
+                    Status: self.Status(),
+                    FromDate: self.FromDate(),
+                    Action: "A",
+                    EntryBy: entryBy
+                };
+
+                if (self.AddressTypes.indexOf(add) > -1) {
+                    return;
+				}
+				var match = ko.utils.arrayFirst(self.AddressTypes(),
+					function (item) {
+						return add.AddressName == ko.toJS(item).AddressName;
+					});
+				if (!match) {
+					self.AddressTypes.push(new AddressType(add));
+				}
+				else {
+					msg('Please already Exists! Please fill the correct Data', 'WARNING');
+				}
+
+
+                var btnAdd = $("button.icon-ok");
+                btnAdd.removeClass("icon-ok").addClass("icon-add");
+                btnAdd.text("Add");
+
+                //--clearing controls------
+
+                self.ClearControls();
+
+            }
+        }
+
+    };
+
+    //--------------------------------------------------------------
+    // To Clear Controls
+    //--------------------------------------------------------------
+    self.ClearControls = function () {
+        self.AddressTypeID("");
+        self.AddressName("");
+        self.AddressNameEnglish("");
+        self.Status(true);
+        self.FromDate("");
+        self.Action("");
+        self.selectedItem(null);
+
+
+        var btnAdd = $("button.icon-ok");
+        btnAdd.removeClass("icon-ok").addClass("icon-add");
+        btnAdd.text("Add");
+    };
+    //--------------------------------------------------------------
+    //NB: To Validate Controls
+    //--------------------------------------------------------------
+    self.Validation = function () {
+
+        var errMsg = "";
+        var objFocus = null;
+
+
+        if (Validate.empty(self.AddressName())) {
+            errMsg = "Please fill Address Type Name !!!<br>";
+        }
+
+        if (Validate.empty(self.AddressNameEnglish())) {
+
+            errMsg += "Please fill Address Type Name English !!!<br>";
+        }
+
+        if (errMsg !== "") {
+             msg(errMsg,"WARNING");
+
+            return false;
+        }
+        else {
+            return true;
+        }
+
+    };
+  
+    //--------------------------------------------------------------
+    // To Load Data Intially
+    //--------------------------------------------------------------
+
+    self.LoadControls = function () {
+
+        waitMsg("Loading");
+        waitMsg.show();
+
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            url: '../../../Handlers/CENTRALLOOKUP/AddressTypeHandler.ashx',
+            data: { 'method': 'GetAddressType', 'addresstypeid': null, 'token':$("#token").text() },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                waitMsg.hide();
+                if (result.IsSucess) {
+                    var mappedTask = $.map(result.ResponseData, function (item) {
+
+                        return new AddressType(item)
+                    });
+
+                    self.AddressTypes(mappedTask);
+                }
+                else {
+
+                    if (!result.IsToken)
+                        msg(result.Message, "WARNING", null, ClearSession);
+                    else
+                        msg(result.Message, "WARNING");
+                }
+
+
+            },
+            error: function (err) {
+                waitMsg.hide();
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+    }
+    //--------------------------------------------------------------
+    // To Remove Grid Data
+    //--------------------------------------------------------------
+    self.DeleteAddressType = function (addresstype) {
+        Confirm('Are you sure to Delete?', 'Confirmation Dialog', function (r) {
+            if (r) {
+                waitMsg("Deleting");
+                waitMsg.show();
+        
+                $.ajax({
+                    dataType: "json",
+                    cache: false,
+                    url: '../../../Handlers/CENTRALLOOKUP/AddressTypeHandler.ashx',
+                    data: { 'method': 'DeleteAddressType', 'addresstypeid': addresstype.AddressTypeID, 'token': $("#token").text() },
+                    success: function (result) {
+                        waitMsg.hide();
+                        if (result.IsSucess) {
+                            self.AddressTypes.remove(addresstype);
+                            msg(result.Message);
+                        }
+                        else {
+                            if (!result.IsToken)
+                                msg(result.Message, "WARNING", null, ClearSession);
+                            else
+                                msg(result.Message, "WARNING");
+                        }
+
+                    },
+                    error: function (err) {
+                        waitMsg.hide();
+                        msg(err.status + " - " + err.statusText, "FAILURE");
+                    }
+                });
+            }
+        });
+    };
+
+
+    //--------------------------------------------------------------
+    //NB: To Edit Grid Data
+    //--------------------------------------------------------------
+
+    self.EditAddressType = function (addresstype) {
+
+        self.AddressTypeID(addresstype.AddressTypeID());
+        self.AddressName(addresstype.AddressName());
+        self.AddressNameEnglish(addresstype.AddressNameEnglish());
+        self.Status(addresstype.Status());
+        self.FromDate(addresstype.FromDate());
+
+        if (addresstype.Action() == "A") {
+            self.Action("A");
+        }
+        else {
+            self.Action("E");
+        }
+        self.selectedItem(addresstype);
+
+
+
+        var btnAdd = $("button.icon-add");
+        btnAdd.removeClass("icon-add").addClass("icon-ok");
+        btnAdd.text("Update");
+
+    }
+
+
+    //--------------------------------------------------------------
+    // To Clear Controls
+    //--------------------------------------------------------------
+    self.ClearAddresType = function () {
+        self.ClearControls();
+        self.AddressTypes.removeAll();
+    };
+
+
+    //--------------------------------------------------------------
+    //NB: To Save
+    //--------------------------------------------------------------
+
+    self.SaveAddressType = function (AddressType) {
+        waitMsg("Saving");
+        waitMsg.show();
+        var jsonData = FilteredJson(ko.toJS(self.AddressTypes));
+        //var jsonData = ko.toJS(self.AddressTypes);
+
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            cache: false,
+            url: '../../Handlers/CENTRALLOOKUP/AddressTypeHandler.ashx',
+            data: { 'method': 'SaveAddressType', 'addtype': JSON.stringify(jsonData), 'token':$("#token").text() },
+            contentType: "applicaton/json; character=utf -8",
+
+            success: function (result) {
+                waitMsg.hide();
+                //msg(result.Message);
+
+                if (result.IsSucess) {
+                    msg(result.Message,'SUCCESS');
+
+                }
+                else {
+                    if (!result.IsToken)
+                        msg(result.Message, "WARNING", null, ClearSession);
+                    else
+                        msg(result.Message, "WARNING");
+                }
+
+            },
+            error: function (err) {
+                waitMsg.hide();
+                msg(err.status + " - " + err.statusText, "FAILURE");
+            }
+
+
+        });
+
+
+
+    };
+    self.LoadControls();
+};
+
+
+$(document).ready(function () {
+    
+    ValidateSession();
+    ko.applyBindings(new AddressTypeViewModel());
+});

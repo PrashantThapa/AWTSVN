@@ -1,0 +1,243 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using Oracle.DataAccess.Client;
+using HRFA.COMMON;
+
+namespace Account.Report.DLL
+{
+    public class DLLFinancialStatementReport
+    {
+        public DataSet GetBalanceSheetReport(int OfficeCode, string ToDate, int HideZero,Int32? costcenterID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+            try
+            {
+                string SP = "APK_ACCOUNTS_REPORT.APR_BALANCESHEET";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+              
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CODE", OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_HIDE_ZERO", HideZero, OracleDbType.Int32, System.Data.ParameterDirection.Input));//
+                paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", costcenterID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":OUT_RET", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+        public DataSet GetProfitAndLossReport(int OfficeCode, string ToDate, int HideZero, Int32? costcenterID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+            try
+            {
+                string SP = "APK_ACCOUNTS_REPORT.APR_PROFITLOSS";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+               
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CODE", OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_HIDE_ZERO", HideZero, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", costcenterID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":OUT_RET", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+        public DataSet GetTrialBalanceReport(int? OfficeCode, string ToDate, int HideZero, Int32? costcenterID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+            try
+            {
+
+                string SP = "APK_ACCOUNTS_REPORT.APK_REPORT_TRIALBALANCE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+               
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CODE", OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_HIDE_ZERO", HideZero, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", costcenterID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":OUT_RET", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                
+                DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+
+
+        public DataSet GetBalanceSheetReportByDateRange(int OfficeCode, string FromDate, string ToDate, int HideZero, Int32? costcenterID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+            try
+            {
+                string SP = "APK_ACCOUNTS_REPORT.APR_BALANCESHEET";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CODE", OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_HIDE_ZERO", HideZero, OracleDbType.Int32, System.Data.ParameterDirection.Input));//
+                paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", costcenterID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":OUT_RET", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+        public DataSet GetProfitAndLossReportByDateRange(int OfficeCode, string FromDate, string ToDate, int HideZero, Int32? costcenterID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+            try
+            {
+                string SP = "APK_ACCOUNTS_REPORT.APR_PROFITLOSS";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CODE", OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_HIDE_ZERO", HideZero, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", costcenterID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":OUT_RET", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+        public DataSet GetTrialBalanceReportByDateRange(int OfficeCode, string FromDate, string ToDate, int HideZero, Int32? costcenterID)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+            try
+            {
+
+                string SP = "APK_ACCOUNTS_REPORT.APK_REPORT_TRIALBALANCE";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CODE", OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_HIDE_ZERO", HideZero, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", costcenterID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":OUT_RET", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+
+        public static DataSet GetChartofAccounts()
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+            try
+            {
+                string SP = "APK_REPORT.APK_GET_CHARTOFACCOUNT";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":OUT_RET", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+                return ds;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+        public DataSet GetBalanceSheetReportConsoli(int OfficeCode, string FromDate, string ToDate, string ReportType)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+            try
+            {
+                string SP = "APK_REPORT.APK_CONSOLIBALANCESHEETRPT";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                
+                paramList.Add(SqlHelper.GetOraParam(":P_REPORT_TYPE_CODE", ReportType, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CODE", OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":REC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+        public DataSet GetTrialBalanceConsoli(int OfficeCode, string FromDate, string ToDate, string ReportType)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn();
+            try
+            {
+                string SP = "APK_REPORT.APK_CONSOLITRIALBALANCERPT";
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_REPORT_TYPE_CODE", ReportType, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_CODE", OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_TO_DATE", ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":REC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+        }
+    }
+}

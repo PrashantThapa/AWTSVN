@@ -1,0 +1,174 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEmpSalaryItem
+    {
+        public string SaveEmpSalaryItem(List<ATTEmpSalaryItem> objEmpSalaryItem, string appID, string modID)
+        {
+            string msg = "";
+            string sp = "";
+            bool flag = false;
+            bool fl = false;
+             Int64? subNo = null;
+            
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+            OracleTransaction tran = dbConn.BeginTransaction();
+
+            try
+            {
+                foreach (ATTEmpSalaryItem objESI in objEmpSalaryItem)
+                {
+                    sp = "DCPR_ADD_EMP_SAL_ITEM";
+                    msg = "Successfully Saved.";
+
+                    if (sp != "")
+                    {
+                        List<OracleParameter> paramList = new List<OracleParameter>
+                        {
+                            SqlHelper.GetOraParam(":p_SUBMISSION_NO", subNo, OracleDbType.Int64, ParameterDirection.InputOutput),
+                            SqlHelper.GetOraParam(":p_EMP_ID", objESI.EmpID, OracleDbType.Int32, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":p_SALARY_ITEM_ID", objESI.SalaryItem.SalaryItemID, OracleDbType.Int16, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":p_FROM_DATE", objESI.FromDate, OracleDbType.Varchar2, ParameterDirection.InputOutput),
+                            SqlHelper.GetOraParam(":p_TO_DATE", objESI.ToDate, OracleDbType.Varchar2, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":p_R_STATUS", objESI.RStatus, OracleDbType.Varchar2, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":p_ENTRY_BY", objESI.EntryBy, OracleDbType.Varchar2, ParameterDirection.Input),
+                            SqlHelper.GetOraParam(":p_ENTRY_DATE", objESI.EntryDate, OracleDbType.Date, ParameterDirection.Input)
+                        };
+
+                        paramList[0].Size = 20;
+                        paramList[3].Size = 30;
+
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+
+                        string esFromDate = paramList[3].Value.ToString();
+                        subNo = Int64.Parse(paramList[0].Value.ToString());
+
+                        DLLEmpSalaryItemRate objEmpSalRate = new DLLEmpSalaryItemRate();
+                        flag = objEmpSalRate.SaveEmpSalaryItemRate(objESI, subNo, esFromDate, tran);
+                        if (objESI.OldSubmissionNo != null && fl == false)
+                        {
+                            DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                            dllUTV.SaveVerifyLog(tran, objESI.EntryBy, objESI.OldSubmissionNo, subNo, appID, modID);
+                            fl = true;
+                        }
+                        paramList.Clear();
+                    }
+                }
+                
+               tran.Commit();
+
+               
+            }
+            catch (Exception ex)
+            {
+                msg = "Error in Saving.";
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+            return msg + "डेटा सुरक्षित भयो । सबमिशन नं. नोट गर्नुहोस् । </br><b>"  + subNo + " </b>";		
+        }
+
+        public string DelEmpSalaryItem(Int32? EmpID, Int32? SalaryItemID)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+            try
+            {
+                string SP = "CPR_DEL_EMP_SALARY_ITEM";
+                string msg = "Salary Item Successfully Removed.";
+                List<OracleParameter> paramList = new List<OracleParameter>
+                {
+                    SqlHelper.GetOraParam(":P_EMP_ID", EmpID, OracleDbType.Int32, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":P_SALARY_ITEM_ID", SalaryItemID, OracleDbType.Int32, ParameterDirection.Input)
+                };
+
+                SqlHelper.ExecuteNonQuery(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+
+        public List<ATTEmpSalaryItem> GetEmpSalaryItem(Int64? submissionNo)
+        {
+            GetConnection conn = new GetConnection();
+            OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+            try
+            {
+                string SP = "DCPR_GET_EMP_SAL_ITEM";
+
+                List<OracleParameter> paramList = new List<OracleParameter>
+                {
+                    SqlHelper.GetOraParam(":p_SUBMISSION_NO", submissionNo, OracleDbType.Int64, ParameterDirection.Input),
+                    SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, ParameterDirection.Output)
+                };
+                DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                List<ATTEmpSalaryItem> lst = new List<ATTEmpSalaryItem>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTEmpSalaryItem obj = new ATTEmpSalaryItem
+                    {
+                        EmpSalaryItemRate = new ATTEmpSalaryItemRate(),
+                        SalaryItem = new ATTSalaryItem(),
+                        Mode = new ATTMode(),
+                        EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString())
+                    };
+                    obj.SalaryItem.SalaryItemID = string.IsNullOrEmpty(drow["SALARY_ITEM_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["SALARY_ITEM_ID"].ToString());
+                    obj.Amount = string.IsNullOrEmpty(drow["AMOUNT"].ToString()) ? (double?)null : double.Parse(drow["AMOUNT"].ToString());
+                    obj.Mode.ModeID = drow["RATE_MODE"].ToString();
+                    obj.EmployeeName = drow["EMP_NAME"].ToString();
+                    obj.SalaryItem.SalaryItemDesc = drow["SALARY_ITEM_DESC"].ToString();
+                    obj.OfficeID = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_CD"].ToString());
+                    obj.CostCenterID = string.IsNullOrEmpty(drow["COSTCENTER_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["COSTCENTER_ID"].ToString());
+                    obj.PostID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["POST_ID"].ToString());
+                    obj.PostDesc = drow["POST_DESC"].ToString();
+                    if (obj.Mode.ModeID == "C")
+                    {
+                        obj.Mode.ModeDesc = "Calculated";
+                    }
+                    else
+                    {
+                        obj.Mode.ModeDesc = "Flat";
+                    }
+                    
+                    lst.Add(obj);
+                }
+
+                return lst;
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                conn.CloseDbConn();
+            }
+        }
+
+      
+    }
+}

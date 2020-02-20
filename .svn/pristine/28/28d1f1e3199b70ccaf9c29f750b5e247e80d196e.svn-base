@@ -1,0 +1,143 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/AdminMaster.Master" AutoEventWireup="true" CodeBehind="SalarySheetAdjustment.aspx.cs" Inherits="HRFA.Modules.FAMS.SalarySheetAdjustment" %>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+	<section class="content">
+		<div class="row pages">
+			<!-- left column -->
+			<div class="col-md-12">
+				<!-- general form elements -->
+				<div class="box box-primary">
+					<div class="box-header with-border">
+						<h3 class="box-title">तलब शीट समायोजन</h3>
+					</div>
+					<!-- /.box-header -->
+					<!-- form start -->
+
+					<form class="" runat="server" id="Form1" role="form">
+						<div class="box-body">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>
+											वर्ष <span class="red">*</span>
+										</label>
+										
+										<input type="text" id="txtYear" data-bind="value: Year" class='required form-control'
+											onkeypress="return isNumberKey(event)" onfocus="UnicodeFocus(event,this);" />
+										</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>
+											महिना <span class="red">*</span>
+										</label>
+										<select id="ddlMonth" class="form-control select2" data-bind='options: Months, optionsText: "MonthName",
+	optionsValue: $data, value: SelectedMonth,
+	optionsCaption: "------छान्नुहोस्-------", event: { change: $data.EnableMonth(SelectedMonth) }'>
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>
+											कार्यालय <span class="red">*</span>
+										</label>
+										<select id="ddlOffice" class="form-control select2" data-bind='  options: Offices, optionsText: "OfficeNameNep",
+	optionsValue: $data, value: SelectedOffice,
+	optionsCaption: "------छान्नुहोस्-------", event: { change: $data.GetData }'>
+										</select>
+									</div>
+
+																	</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>
+											लागत केन्द्र <span class="red">*</span>
+										</label>
+										<select id="Select2" class="form-control select2" data-bind='options: CostCenters,
+	optionsText: "CostCenterName",
+	optionsValue: $data,
+	value: SelectedCostCenter,
+	optionsCaption: "------छान्नुहोस्-------", event: { change: $data.GetSalaryByOffice }'>
+										</select>
+									</div>
+
+
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-6">
+								<div class="form-group">
+									<button class="btn btn-primary" data-bind="click: InitiateVerification">
+										Submit for Verification</button>
+								</div>
+									</div>
+							</div>
+
+
+							<div class="row">
+								<div class="col-md-6">
+									<label>कर्मचारी <span class="red">*</span></label>
+									<select id="lstEmployee" class="form-control select2"
+										data-bind="options: Employees, optionsText: 'EmployeeName', optionsCaption: '------ छान्नुहोस् ------', optionsValue: $data, value: SelectedEmployee, event: { change: $data.GetSalaryItemByEmpID }">
+									</select>
+								</div>
+
+								<div class="col-md-6">
+									<label>कर्मचारीको तलबको सूची</label>
+									<select id="lstSalaryItem" class="form-control select2"
+										data-bind="options: EmpSalaryItems, optionsText: 'SalaryItemDesc', optionsCaption: '----- छान्नुहोस् -----', optionsValue: $data, value: SelectedEmpSalaryItem, event: { change: $data.GetSalaryDetails }">
+									</select>
+								</div>
+
+							</div>
+
+								<div class="row wordlong">
+								<div class="col-md-6">
+								<div class="form-group">
+									<button id="btnSave" class="btn btn-primary" data-bind="click: AdjustSalarySheet">
+										Save</button>
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label><span class="red">नयाँ तलब थप्न को लागि !!!</span></label>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>तलबको सूची</label>
+										<select id="ddlSalaryItem" class="form-control select2" data-bind='options: SalaryItems, optionsText: "SalaryItemDesc",
+	optionsValue: $data, value: SelectedSalaryItem,
+	optionsCaption: "------छान्नुहोस्-------", event: { click: $data.clearSelectedEmpSalary } '>
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-6 padding-left-0">
+									<button id="btnNewItem" class="btn btn-primary" data-bind="click: SaveNewItem">
+										Add New Salary Item</button>
+									<button id="btnPrint" class="btn btn-primary" data-bind="click: PrintSalarySheet">
+										Print</button>
+								</div>
+							</div>
+
+
+
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
+	<script src="../../Scripts/PAYROLL/SalarySheetAdjustment.js" type="text/javascript"></script>
+</asp:Content>

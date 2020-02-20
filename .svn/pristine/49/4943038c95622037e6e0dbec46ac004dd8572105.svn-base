@@ -1,0 +1,348 @@
+﻿/*********************************************************************************
+ Copyright © HRFA PCS System  2016
+*********************************************************************************
+Project              : Copyright © HRFA PCS System  2016  
+File                 :OfficeTransaction.js 
+Description          :This Page contain the Office Transaction Knockout JS Code
+*********************************************************************************
+<Name>                                          <Date>         
+shanjeev kr Sah                              2015.10.15
+shanjeev007@gmail.com                                                            
+*********************************************************************************/
+function OfficeCompanyAccChart(data) {
+    var self = this;
+    self.Company = ko.observable(data.Company);
+    self.AccountChart = ko.observable(data.AccountChart);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.FromDate = ko.observable(data.FromDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.ToDate = ko.observable(data.ToDate);
+    self.TranNo = ko.observable(data.TranNo);
+    self.Action = ko.observable(data.Action);
+    self.Selected = ko.observable(data.Selected);
+}
+
+function Company(data) 
+    {
+        var self = this;
+        self.Office = ko.observable(data.Office);
+        self.CompanyID = ko.observable(data.CompanyID);
+        self.CompanyName = ko.observable(data.CompanyName);
+        self.CompanyNameEng = ko.observable(data.CompanyNameEng);
+        self.EntryBy = ko.observable(data.EntryBy);
+        self.EntryDate = ko.observable(data.EntryDate);
+        self.RStatus = ko.observable(data.RStatus);
+        self.TranNo = ko.observable(data.TranNo);
+        self.Action = ko.observable(data.Action);
+    }
+    function CostCenter(data) {
+        var self = this;
+        if (data != undefined) {
+            self.OfficeCode = ko.observable(data.OfficeCode);
+            self.CostCenterID = ko.observable(data.CostCenterID);
+            self.CostCenterName = ko.observable(data.CostCenterName);
+            self.CostCenterNameEng = ko.observable(data.CostCenterNameEng);
+
+            self.Status = ko.observable(data.Status);
+            self.FromDate = ko.observable(data.FromDate);
+            self.ToDate = ko.observable(data.ToDate);
+            self.EntryBy = ko.observable(data.EntryBy);
+            self.EntryDate = ko.observable(data.EntryDate);
+            self.Action = ko.observable(data.Action);
+        }
+    }
+
+
+function Office(data) {
+    var self = this;
+    self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+    self.OfficeCode = ko.observable(data.OfficeCode);
+}
+
+function AccountChart(data) {
+    var self = this;
+    self.AccCode = ko.observable(data.AccCode);
+    self.AccName = ko.observable(data.AccName);
+    self.GLGroup = ko.observable(data.GLGroup);
+    self.PaACCode = ko.observable(data.PaACCode);
+    self.EntryBy = ko.observable(data.EntryBy);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.TranNo = ko.observable(data.TranNo);
+    self.HeadTran = ko.observable(data.HeadTran);
+    self.Balance = ko.observable(data.Balance);
+    self.GlCode = ko.observable(data.GlCode);
+    self.ACNameEng = ko.observable(data.ACNameEng);
+    self.Action = ko.observable(data.Action);
+
+}
+
+function GLGroup(data) {
+    var self = this;
+    self.GroupID = ko.observable(data.GroupID);
+    self.GroupName = ko.observable(data.GroupName);
+
+}
+
+/*********************Structure Begin ******************************************/
+
+function GetAccounts(data) {
+    var self = this;
+    self.AccountID = ko.observable(data.AccountID);
+    self.AccNameNep = ko.observable(data.AccNameNep);
+    self.AccNameEng = ko.observable(data.AccNameEng);
+    
+
+}
+
+function Accounts(data) {
+    var self = this;
+    AccountID = ko.observable(data.AccountID);
+    AccountDate = ko.observable(data.AccountDate);
+    AccountStatus = ko.observable(data.AccountStatus);
+    SourceTypes = ko.observable(data.SourceTypes);
+    SourceID = ko.observable(data.SourceID);
+    EntryBy = ko.observable(data.EntryBy);
+    EntryDate = ko.observable(data.EntryDate);
+    RStatus = ko.observable(data.RStatus);
+    TranNo = ko.observable(data.TranNo);
+};
+
+function OfficeTranDetail(data) {
+    var self = this;
+    self.TranNo = ko.observable(data.TranNo);
+    self.OfficeCompanyAccChart = ko.observable(data.OfficeCompanyAccChart); //class
+    self.AcNo = ko.observable(data.AcNo);
+    self.Accounts = ko.observable(data.Accounts);
+    self.DrCr = ko.observable(data.DrCr);
+    self.Dr = ko.observable(data.Dr);
+    self.Cr = ko.observable(data.Cr);
+    self.Description = ko.observable(data.Description);
+    self.Amount = ko.observable(data.Amount);
+    self.TranSeqNo = ko.observable(data.TranSeqNo);
+    self.EntryBY = ko.observable(data.EntryBY);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.Action = ko.observable(data.Action);
+};
+
+function OfficeTransaction(data) {
+    var self = this;
+    self.TranNo = ko.observable(data.TranNo);
+    self.TranDate = ko.observable(data.TranDate);
+    self.VoucherType = ko.observable(data.VoucherType);
+    self.VoucherNo = ko.observable(data.VoucherNo);
+    self.TotDr = ko.observable(data.TotDr);
+    self.TotCr = ko.observable(data.TotCr);
+    self.Office = ko.observable(data.Office);
+    self.EntryBY = ko.observable(data.EntryBY);
+    self.EntryDate = ko.observable(data.EntryDate);
+    self.Rstatus = ko.observable(data.Rstatus);
+    self.Action = ko.observable(data.Action);
+    self.Narration = ko.observable(data.Narration);
+    self.OfficeTranDetail = ko.observableArray(data.OfficeTranDetail);
+};
+///*********************Structure End ******************************************/
+
+
+/*********************View Model Begin ******************************************/
+function OfficeTransactionViewModel() {
+    var self = this;
+    self.TranNo = ko.observable();
+    self.TranDate = ko.observable();
+
+    self.VoucherTypes = ko.observableArray([{ 'VoucherTypeName': 'General Voucher', 'VoucherTypeID': 'JV' }, { 'VoucherTypeName': 'Cash Voucher', 'VoucherTypeID': 'C' }, { 'VoucherTypeName': 'Bank Voucher', 'VoucherTypeID': 'B'}]);
+    self.SelectedVoucherType = ko.observable();
+
+    self.VoucherNo = ko.observable();
+    self.TotDr = ko.observable();
+    self.TotCr = ko.observable();
+    self.Office = ko.observable();
+    self.EntryBY = ko.observable();
+    self.EntryDate = ko.observable();
+    self.Rstatus = ko.observable();
+    self.Action = ko.observable();
+    self.OfficeTranDetail = ko.observableArray([]);
+    self.Action = ko.observable();
+    self.Narration = ko.observable();
+
+
+    /**********For grid data Tran details ****/
+    self.SelectedGlCode = ko.observable();
+    self.GlCodeList = ko.observableArray([]);
+    self.GlCodeListBorC = ko.observableArray([]);
+
+    self.AccountNumbserList = ko.observableArray([]);
+    self.SelectedAcNo = ko.observable();
+
+    self.Dr = ko.observable();
+    self.Cr = ko.observable();
+    self.Description = ko.observable();
+    self.CompanyArray = ko.observableArray([]);
+    self.SelectedCompany = ko.observable();
+
+    // cost center
+    self.OfficeCode = ko.observable();
+    self.CostCenterID = ko.observable();
+    self.CostCenterName = ko.observable();
+    self.CostCenterNameEng = ko.observable();
+    self.CostCenters = ko.observableArray([]);
+    self.SelectedCostCenter = ko.observable();
+    self.ParentOffID = ko.observable();
+    self.ParentCostCenterID = ko.observable();
+    self.ParentID = ko.observable();
+    self.OfficeName = ko.observable();
+    self.Offices = ko.observableArray([]);
+    self.SelectedOffice = ko.observable();
+    self.OfficeArray = ko.observableArray([]);
+
+    self.OfficeTranDetail = ko.observableArray([]);
+    self.selectedItem = ko.observable();
+   
+   //#region Function to get all offices
+
+    self.GetOffice = function () {
+        waitMsg("Loading");
+        waitMsg.show();
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/CENTRALLOOKUP/OfficeHandler.ashx',
+            data: { 'method': 'GetAllOffice', 'args': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new Office(item)
+
+                });
+                self.OfficeArray(mappedTask);
+
+                waitMsg.hide();
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+
+    };
+
+ /* Begin Get cost center ***/
+ /* Begin Get cost center ***/
+ self.GetCostCenter = function () {
+        var OfficeCD = ko.toJS(self.SelectedOffice).OfficeCode;
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            url: '/Handlers/FAMS/CostCenterHandler.ashx',
+
+            data: { 'method': 'GetCostCenter', 'officeCode': OfficeCD, 'CostCenterID': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new CostCenter(item)
+                });
+
+                self.CostCenters(mappedTask);
+
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+
+    }
+
+    self.GetOffice();
+  /* End Get cost center*/
+
+ self.Go = function () {
+        var errMsg = "";
+        if (self.SelectedOffice() == undefined) {
+            errMsg += "Please Select Office !!!<br>";
+        }
+        else {
+            if (self.SelectedCostCenter() == undefined) {
+                errMsg += "Please Select Cost Center !!!<br>";
+            }
+
+        }
+
+     
+        if (errMsg == "") {
+           
+            window.location = window.location.origin + "/Modules/ACCOUNTS/OfficeTransaction.aspx?CompanyName=" + ko.toJS(self.SelectedOffice).OfficeCode + "." + ko.toJS(self.SelectedOffice).OfficeNameNep + "." + ko.toJS(self.SelectedCostCenter()).CostCenterID + "." + ko.toJS(self.SelectedCostCenter()).CostCenterName;
+            
+       }
+        else {
+            msg(errMsg, "Warning", "Warning");
+        }
+
+
+    }
+
+    self.GetACChartBorC = function () {
+
+        waitMsg("Loading");
+        waitMsg.show();
+        if (self.SelectedCompany() != undefined) {
+
+            var btype = ko.toJS(self.SelectedVoucherType()).VoucherTypeID; 
+            alert(btype);
+
+            var CompanyName = getUrlParamVal('CompanyName');
+            var values = CompanyName.split('.');
+            var CompanyID = values[2];
+            var OfficeID = values[0];
+
+        }
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '../../../Handlers/Account/OfficeCompanyAccChartHandler.ashx',
+            data: { 'method': 'GetOfficeComanyAcchartBorC', 'OfficeID': OfficeID, 'companyID': CompanyID, 'btype': btype, 'token': $("#token").text() },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                waitMsg.hide();
+                if (result.IsSucess) {
+
+                    // console.log("offcode by sk>>>>", $("#offcode").text());
+                    for (var i = 0; i < result.ResponseData.length; i++) {
+                        self.GlCodeListBorC.push(result.ResponseData[i].AccountChart);
+                    }
+                }
+                else {
+                    msg(result.Message, "WARNING");
+                }
+            },
+            error: function (err) {
+                waitMsg.hide();
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+    }
+};
+/*********************View Model End ******************************************/
+$(document).ready(function () {
+    ValidateSession();
+    var CompanyNames = getUrlParamVal('CompanyName');
+    var values = CompanyNames.split('.');
+    var OfficeID = values[0];
+    var OfficeNameNep = values[1];
+    var CompanyID = values[2];
+    var CompanyName = values[3];
+    $("#OfficeID").text(OfficeID);
+    $("#OfficeNameNep").text(OfficeNameNep);
+    $("#CompanyID").text(CompanyID);
+    $("#CompanyName").text(CompanyName);
+   // alert(OfficeID + CompanyID);
+    ko.applyBindings(new OfficeTransactionViewModel());
+});

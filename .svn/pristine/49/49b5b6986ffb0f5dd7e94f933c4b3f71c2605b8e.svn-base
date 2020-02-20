@@ -1,0 +1,24 @@
+﻿using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+namespace HRFA.Handlers.ACCOUNT
+{
+    /// <summary>
+    /// Summary description for ScheduleHandler
+    /// </summary>
+    public class ScheduleHandler : BaseHandler
+    {
+
+        public object GetSchedule(int? ScheduleID)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLSchedule ObjbllSchedule = new BLLSchedule();
+            response = ObjbllSchedule.GetSchedule(ScheduleID);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        
+    }
+}

@@ -1,0 +1,132 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="EmployeeGradeScaleSetup.aspx.cs"
+	Inherits="HRFA.Modules.PAYROLL.EmployeeGradeScaleSetup" MasterPageFile="~/AdminMaster.Master" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+	<section class="content" id="EmpGradeScaleForm">
+		<div class="row pages">
+			<div class="col-md-12">
+				<!-- general form elements -->
+				<div class="box box-primary">
+					<div class="box-header with-border">
+						<h3 class="box-title">Employee Grade Scale Setup</h3>
+					</div>
+					<form id="form1" runat="server">
+						<div class="box-body">
+
+						<%--	<div class="row">
+
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Post<span class="red">*</span></label>
+										<select id="ddlPostPost" class="form-control select2"
+													 data-bind='options: Posts, optionsText: "PostDesc",
+                    optionsValue: $data, value:SelectedPost, 
+                    optionsCaption:"------ Select one -------"'></select>
+									</div>
+
+								</div>
+								
+								</div>
+									--%>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Level</label>
+										                        <input  class="form-control" id="txtLevel" placeholder="तह"  data-bind="value:EmpLevel"/>
+</div>
+									</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Starting Scale Salary(Rs.)</label>
+										<input class="form-control" id="txtStartingScaleAmount" placeholder="शुरु तलब सकेल रु. " data-bind="value: StartingScaleSalary" />
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="txtGradeAmount">Grade Amount</label>
+										<input class="form-control" id="txtGradeAmount" placeholder="ग्रेड रकम" data-bind="value: GradeAmount" />
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="txtMaxGradeNo">Maximum Grade NUmber</label>
+										<input class="form-control" id="txtMaxGradeNo" placeholder="अधिकतम ग्रेड संख्या" data-bind="value: MaxGradeNo" />
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="txtMaxScaleAmount">Max Scale Salary</label>
+										<input class="form-control" id="txtMaxScaleAmount" placeholder="अंतिम तनबमान रु." data-bind="value: MaxScaleSalary" />
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="txtRemarks">Remarks</label>
+										<textarea class="form-control" id="txtRemarks" rows="3" data-bind="value: Remarks"></textarea>
+									</div>
+								</div>
+
+
+							</div>
+
+							<div class="row">
+								<div class="col-md-6"></div>
+								<div class="col-md-6">
+									    <button type="submit" class="btn btn-primary" data-bind="click: SaveEmployeeGradeScaleInfo">Submit</button>
+											<button type="button" class="btn btn-danger" data-bind="click: ClearControls">Cancel</button>
+
+								</div>
+							</div>
+
+							<div class="row wordlong">
+									<div class="col-md-12">
+										<table data-bind="visible: true" border="0" class="table table-bordered table-striped" id="tblDisplay">
+											<thead>
+												<tr style="background: #006699; color: #ffffff;">
+													<%--<td style="text-align: center;">सबमिशन नं.</td>--%>
+													<td style="text-align: center;">Level</td>
+													<td style="text-align: center;">Starting Scale Salary(Rs.)</td>
+													<td style="text-align: center;">Grade Amount</td>
+													<td style="text-align: center;">Maximum Grade NUmber</td>
+													<td style="text-align: center;">Max Scale Salary</td>
+													<%--<td style="text-align: center;">Remarks</td>--%>
+													<td style="text-align: center;">Status</td>
+													<td style="text-align: center;">Action</td>
+												</tr>
+											</thead>
+											<tbody data-bind="foreach: EmployeeGradeScaleInfoes">
+												<tr>
+													<%--<td><span data-bind="text: SubmissionNo"></span></td>--%>
+													<td><span data-bind="text: EmpLevel"></span></td>
+													<td><span data-bind="text: StartingScaleSalary"></span></td>
+													<td><span data-bind="text: GradeAmount"></span></td>
+													<td><span data-bind="text: MaxGradeNo"></span></td>
+													<td><span data-bind="text: MaxScaleSalary"></span></td>
+													<td><span data-bind="text: RStatus() === 'T' ? 'Verified' : 'Unverified'"></span></td>
+													<td><a data-bind="click: $root.EditEmployeeGradeScaleSetup"><span class="glyphicon glyphicon-edit" title="Edit"></span></a></td>
+
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+
+							</div>
+			
+					</form>
+
+				</div>
+			</div>
+			</div>
+	</section>
+	<script src="../../Scripts/PAYROLL/EmployeeGradeScaleSetup.js" type="text/javascript"></script>
+</asp:Content>

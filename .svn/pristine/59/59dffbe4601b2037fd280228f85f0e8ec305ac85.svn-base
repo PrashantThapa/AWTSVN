@@ -1,0 +1,117 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLMenu
+    {
+
+        public List<ATTMenu> GetMenuListByUser(GenericUser user,int RoleID)
+        {
+			GetConnection GetConn = new GetConnection();
+			//OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+			try
+            {
+                ATTUser u = user as ATTUser;
+                string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_USER_MENUS";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_ROLE_ID", RoleID, OracleDbType.Int16, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(user, CommandType.StoredProcedure, SP, paramList.ToArray());
+                List<ATTMenu> lst = new List<ATTMenu>();
+
+				foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTMenu obj = new ATTMenu();
+                    obj.MenuID = int.Parse(drow["MENU_ID"].ToString());
+                    obj.MenuName = drow["MENU_TEXT"].ToString();
+                    obj.ToolTip = drow["TOOL_TIP"].ToString();
+                    obj.Url = drow["M_URL"].ToString();
+                    obj.UsedIn = drow["USED_IN"].ToString();
+                    obj.OrderNo = string.IsNullOrEmpty(drow["ORDER_NO"].ToString()) ? (int?)null : int.Parse(drow["ORDER_NO"].ToString());
+                    obj.ParentID = string.IsNullOrEmpty(drow["PARENT_ID"].ToString()) ? (int?)null : int.Parse(drow["PARENT_ID"].ToString());
+                    obj.Level = string.IsNullOrEmpty(drow["LEVEL"].ToString()) ? (int?)null : int.Parse(drow["LEVEL"].ToString());
+
+                    if (drow["HAS_CHILD"] != null && drow["HAS_CHILD"].ToString() == "Y")
+                    {
+                        obj.HasChild = true;
+                    }
+                    else
+                    {
+                        obj.HasChild = false;
+                    }
+
+                    lst.Add(obj);
+                }
+
+              
+                return lst;
+            }
+            catch (Exception ex)
+            {
+                return new List<ATTMenu>();
+
+            }
+        }
+
+		internal List<ATTMenu> GetMenuListByUser(ATTPortalLogin user)
+		{
+			throw new NotImplementedException();
+		}
+
+		public List<ATTMenu> GetMenuListByPortalUser(PortalUser user)
+		{
+			try
+			{
+				ATTPortalLogin u = user as ATTPortalLogin;
+				string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_PORTAL_MENUS";
+
+				List<OracleParameter> paramList = new List<OracleParameter>();
+				paramList.Add(SqlHelper.GetOraParam(":p_user_id", u.UserID, OracleDbType.Varchar2, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":p_used_in", 'O', OracleDbType.Varchar2, ParameterDirection.Input));
+				paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+				DataSet ds = SqlHelper.ExecutePortalDataset(user, CommandType.StoredProcedure, SP, paramList.ToArray());
+				List<ATTMenu> lst = new List<ATTMenu>();
+
+				foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+				{
+					ATTMenu obj = new ATTMenu();
+					obj.MenuID = int.Parse(drow["MENU_ID"].ToString());
+					obj.MenuName = drow["MENU_TEXT"].ToString();
+					obj.Url = drow["M_URL"].ToString();
+					obj.UsedIn = drow["USED_IN"].ToString();
+					obj.ParentID = string.IsNullOrEmpty(drow["PARENT_ID"].ToString()) ? (int?)null : int.Parse(drow["PARENT_ID"].ToString());
+
+					//if (drow["HAS_CHILD"] != null && drow["HAS_CHILD"].ToString() == "Y")
+					//{
+					//	obj.HasChild = true;
+					//}
+					//else
+					//{
+					obj.HasChild = false;
+					//}
+
+					lst.Add(obj);
+				}
+
+				
+				return lst;
+			}
+			catch (Exception ex)
+			{
+				return new List<ATTMenu>();
+
+			}
+		}
+
+	}
+}

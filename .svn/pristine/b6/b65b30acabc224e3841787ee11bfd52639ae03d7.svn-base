@@ -1,0 +1,51 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLSchedule
+    {
+       public List<ATTSchedule> GetSchedule(int? scheduleID)
+       {
+           GetConnection getConn = new GetConnection();
+           OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+           List<ATTSchedule> lstSchedule = new List<ATTSchedule>();
+
+           try
+           {
+               string SP = "APR_GET_SCHEDULE";
+
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+
+               DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+               foreach (DataRow drow in ds.Tables[0].Rows)
+               {
+                   ATTSchedule objSchedule = new ATTSchedule();
+                   objSchedule.ScheduleID = string.IsNullOrEmpty(drow["AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["AC_CODE"].ToString());
+                   objSchedule.ScheduleName = drow["SCHEDULE_ID"].ToString();
+
+                   lstSchedule.Add(objSchedule);
+                  }
+
+               return lstSchedule;
+           }
+           catch (Exception ex)
+           {
+
+               throw (ex);
+           }
+           finally
+           {
+               getConn.CloseDbConn();
+           }
+       }
+    }
+}

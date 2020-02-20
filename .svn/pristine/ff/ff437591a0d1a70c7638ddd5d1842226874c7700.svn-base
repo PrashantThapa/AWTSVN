@@ -1,0 +1,179 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using Oracle.DataAccess.Client;
+using System.Configuration;
+
+
+namespace HRFA.DataLayer
+{
+    public class DLLDeputation
+    {
+       public string SaveDeputation(ATTDeputation objDeputation, string appID, string modID)
+       {
+           string sp = "";
+           string msg = "No Data To Save !!!";
+
+           GetConnection GetConn = new GetConnection();
+           OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+           OracleTransaction tran = conn.BeginTransaction();
+
+           try
+           {
+               if (objDeputation.Action == "A")
+               {
+                   sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_EMP_DEPUTATION";
+                   msg = "Successfully Saved.";
+               }
+
+               if (sp != "")
+               {
+                   List<OracleParameter> paramList = new List<OracleParameter>();
+
+                   paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", null, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                   paramList.Add(SqlHelper.GetOraParam(":P_EMP_ID", objDeputation.EmpID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":P_DEP_OFFICE_CD", objDeputation.Office.OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_DEPO_FROM_DATE", objDeputation.DepoFromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":p_DEPO_TO_DATE", objDeputation.DepoToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":P_RESPONSIBILITIES", objDeputation.Responsibilities, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", objDeputation.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", objDeputation.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                   paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", null, OracleDbType.Date, System.Data.ParameterDirection.Input));
+
+                   paramList[0].Size = 20;
+
+                   SqlHelper.ExecuteNonQuery(tran, System.Data.CommandType.StoredProcedure, sp, paramList.ToArray());
+                   objDeputation.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+
+                   if (objDeputation.OldSubmissionNo != null)
+                   {
+                       DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                       dllUTV.SaveVerifyLog(tran, objDeputation.EntryBy, objDeputation.OldSubmissionNo, objDeputation.SubmissionNo, appID, modID);
+
+                   }
+
+                   paramList.Clear();
+               }
+               tran.Commit();
+                return msg + "Data Saved! Please Note The Submission Number" + objDeputation.SubmissionNo + "</b>";
+               //return msg;
+           }
+           catch (Exception ex)
+           {
+               tran.Rollback();
+               return ex.Message;
+           }
+           finally
+           {
+               GetConn.CloseDbConn();
+           }
+       }
+
+       public ATTDeputation GetDeputationByID(int? empID)
+       {
+           GetConnection conn = new GetConnection();
+           OracleConnection dbConn = conn.GetDbConn(conn.LoginUser);
+
+           try
+           {
+               string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_DEPUTATION";
+
+               List<OracleParameter> paramList = new List<OracleParameter>();
+
+               paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", empID, OracleDbType.Int32, ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":p_rc", null, OracleDbType.RefCursor, ParameterDirection.Output));
+               DataSet ds = SqlHelper.ExecuteDataset(dbConn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+               ATTDeputation obj = new ATTDeputation();
+               if (ds.Tables[0].Rows.Count > 0)
+               {
+                   DataRow drow = ds.Tables[0].Rows[0];
+                   obj.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["EMP_ID"].ToString());
+                        //  Convert.ToInt16(drow["EMP_ID"].ToString());
+                   obj.EmpName = drow["EMP_NAME"].ToString();
+
+                   obj.Office.OfficeCode = string.IsNullOrEmpty(drow["DEP_OFFICE_CD"].ToString()) ? (Int16?)null : Int16.Parse(drow["DEP_OFFICE_CD"].ToString());
+                   obj.Office.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+
+                   obj.Post.PostID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_ID"].ToString());
+                   obj.Post.PostDesc = drow["POST_DESC"].ToString();
+
+                   obj.DepoFromDate = drow["DEPO_FROM_DATE"].ToString();
+                   obj.DepoToDate = drow["DEPO_TO_DATE"].ToString();
+                   obj.Responsibilities = drow["RESPONSIBILITIES"].ToString();
+               }
+
+               else
+               {
+                   obj = null;
+               }
+
+
+               return obj;
+
+           }
+           catch (Exception ex)
+           {
+               // tran.Rollback();
+               throw (ex);
+           }
+           finally
+           {
+               conn.CloseDbConn();
+           }
+       }
+
+
+       public List<ATTDeputation> GetDeputationBySubNo(Int64? SubmissionNo)
+       {
+           GetConnection getConn = new GetConnection();
+           OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+           string SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_EMP_DEPUTATION";
+           List<ATTDeputation> lst = new List<ATTDeputation>();
+
+           try
+           {
+               List<OracleParameter> paramList = new List<OracleParameter>();
+               paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", SubmissionNo, OracleDbType.Int64, ParameterDirection.Input));
+               paramList.Add(SqlHelper.GetOraParam(":p_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+               DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+               foreach (DataRow drow in ds.Tables[0].Rows)
+               {
+                   ATTDeputation obj = new ATTDeputation();
+
+                   obj.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["EMP_ID"].ToString());
+                       //Convert.ToInt16(drow["EMP_ID"].ToString());
+                   obj.EmpName = drow["EMP_NAME"].ToString();
+                   obj.Office.OfficeCode = string.IsNullOrEmpty(drow["DEP_OFFICE_CD"].ToString()) ? (Int16?)null : Int16.Parse(drow["DEP_OFFICE_CD"].ToString());
+                       //Convert.ToInt16(drow["DEP_OFFICE_CD"].ToString());
+
+                   //obj.DeputationOffice.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int16?)null : Int16.Parse(drow["OFFICE_CD"].ToString());
+                   obj.Office.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+
+                   obj.Post.PostID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_ID"].ToString());
+                   obj.Post.PostDesc = drow["POST_DESC"].ToString();
+                   
+                   obj.DepoFromDate = drow["DEPO_FROM_DATE"].ToString();
+                   obj.DepoToDate = drow["DEPO_FROM_DATE"].ToString();
+                   obj.Responsibilities = drow["RESPONSIBILITIES"].ToString();
+
+                   lst.Add(obj);
+               }
+               return lst;
+           }
+           catch (Exception ex)
+           {
+               throw (ex);
+           }
+           finally
+           {
+               getConn.CloseDbConn();
+           }
+
+       }
+
+    }
+}

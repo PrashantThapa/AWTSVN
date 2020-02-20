@@ -1,0 +1,77 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+
+namespace HRFA.Handlers.FAMS
+{
+    /// <summary>
+    /// Summary description for CostCenterHandler
+    /// </summary>
+    public class CostCenterHandler : BaseHandler
+    {
+        public object SaveCostCenter(string args)
+        {
+            BLLCostCenter objCostCenterBll = new BLLCostCenter();
+            ATTCostCenter objCostCenterAtt = (ATTCostCenter)JsonUtility.DeSerialize(args, typeof(ATTCostCenter));
+            JsonResponse response = new JsonResponse();
+            try
+            {
+                response.Message = objCostCenterBll.SaveCostCenter(objCostCenterAtt);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+
+
+        public object GetCostCenter(Int32? officeCode, Int16? CostCenterID)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLCostCenter obj = new BLLCostCenter();
+            List<ATTCostCenter> lst = new List<ATTCostCenter>();
+            response.ResponseData = lst;
+            try
+            {
+                response.Message = "Success";
+                response.ResponseData = obj.GetCostCenter(officeCode, CostCenterID);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetAllCostCenter(Int16? CostCenterID)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLCostCenter obj = new BLLCostCenter();
+            List<ATTCostCenter> lst = new List<ATTCostCenter>();
+            response.ResponseData = lst;
+            try
+            {
+                response.Message = "Success";
+                response.ResponseData = obj.GetAllCostCenter(CostCenterID);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+
+        }
+
+    }
+}

@@ -1,0 +1,710 @@
+﻿
+function Office(data) {
+    var self = this;
+    if (data != undefined) {
+        self.OfficeCode = ko.observable(data.OfficeCode);
+        self.OfficeNameNep = ko.observable(data.OfficeNameNep);
+    }
+}
+function FiscalYear(data) {
+    var self = this;
+    if (data != undefined) {
+        self.FiscalYearID = ko.observable(data.FiscalYearID);//FISCAL_YR_ID
+        self.FiscalYearName = ko.observable(data.FiscalYearName);//FISCAL_YEAR
+        self.IsActive = ko.observable(data.IsActive);//ISACTIVE      
+        self.Action = ko.observable(data.Action);
+    }
+}
+function CostCenter(data) {
+    var self = this;
+    if (data != undefined) {
+        self.OfficeCode = ko.observable(data.OfficeCode);
+        self.CostCenterID = ko.observable(data.CostCenterID);
+        self.CostCenterName = ko.observable(data.CostCenterName);
+        self.CostCenterNameEng = ko.observable(data.CostCenterNameEng);
+
+        self.Status = ko.observable(data.Status);
+        self.FromDate = ko.observable(data.FromDate);
+        self.ToDate = ko.observable(data.ToDate);
+        self.EntryBy = ko.observable(data.EntryBy);
+        self.EntryDate = ko.observable(data.EntryDate);
+        self.Action = ko.observable(data.Action);
+    }
+}
+var SalarySheetGenerationViewModel = function () {
+
+    var self = this;
+    self.Year = ko.observable();
+    
+    self.FiscalYears = ko.observableArray([]);
+    self.SelectedFiscalYear = ko.observableArray([]);    
+    self.SelectedOffice = ko.observable();
+    self.SelectedMonth = ko.observable();
+    self.SelectedMonth.subscribe(function (value) {
+        if (value !== undefined) {
+            var YearFromFisclaYear = '';
+            var fisc = ko.toJS(self.SelectedFiscalYear()).FiscalYearName;
+            if (value.MonthID <= 3) {
+                YearFromFisclaYear = '20' + fisc.substring(6, 8);
+            }
+            else if (value.MonthID > 3) {
+                YearFromFisclaYear = fisc.substring(0, 4);
+            }
+            debugger;
+            self.Year(YearFromFisclaYear);          
+        }
+    })
+    self.SelectedCostCenter = ko.observable();
+    self.GetFiscalYears = function () {       
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '/Handlers/CENTRALLOOKUP/FiscalYearHandler.ashx',
+
+            data: { 'method': 'GetFiscalYear', 'fiscalYearID': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new FiscalYear(item)
+                });
+                self.FiscalYears(mappedTask);
+
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+    }
+
+    self.GetFiscalYears();
+    self.Offices = ko.observableArray([]);
+    self.Months = ko.observableArray([
+        { 'MonthID': 1, 'MonthName': 'Baisakh' },
+        { 'MonthID': 2, 'MonthName': 'Jestha' },
+        { 'MonthID': 3, 'MonthName': 'Ashad' },
+        { 'MonthID': 4, 'MonthName': 'Shrawan' },
+        { 'MonthID': 5, 'MonthName': 'Bhadra' },
+        { 'MonthID': 6, 'MonthName': 'Aaswin' },
+        { 'MonthID': 7, 'MonthName': 'Kartik' },
+        { 'MonthID': 8, 'MonthName': 'Mangsir' },
+        { 'MonthID': 9, 'MonthName': 'Poush' },
+        { 'MonthID': 10, 'MonthName': 'Magh' },
+        { 'MonthID': 11, 'MonthName': 'Falgun' },
+        { 'MonthID': 12, 'MonthName': 'Chaitra' }
+    ]);
+    self.SalarySheets = ko.observableArray([]);
+    self.CostCenters = ko.observableArray([]);
+    var entryby = $("#user").text();
+    self.EntryBy = ko.observable(entryby);
+
+
+
+    //Load Office
+    $.ajax({
+        dataType: "json",
+        url: '../../Handlers/CENTRALLOOKUP/OfficeHandler.ashx',
+        data: { 'method': 'GetAllOffice', 'officeCode': null },
+        contentType: "application/json; charset=utf-8",
+        async: false,
+        success: function (data) {
+            var mappedTask = $.map(data.ResponseData, function (item) {
+
+                return new Office(item)
+
+            });
+            self.Offices(mappedTask);
+
+        },
+        error: function (err) {
+            msg(err.status + " - " + err.statusText);
+        }
+    });
+
+
+    self.GetCostCenter = function () {
+        if (ko.toJS(self.SelectedOffice()) != undefined) {
+            var OfficeCD = ko.toJS(self.SelectedOffice()).OfficeCode;
+        }
+        else OfficeCD = null;
+        $.ajax({
+            dataType: "json",
+            cache: false,
+            async: false,
+            url: '/Handlers/FAMS/CostCenterHandler.ashx',
+
+            data: { 'method': 'GetCostCenter', 'officeCode': OfficeCD, 'CostCenterID': null },
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                var mappedTask = $.map(result.ResponseData, function (item) {
+                    return new CostCenter(item)
+                });
+                self.CostCenters(mappedTask);
+
+
+            },
+            error: function (err) {
+                msg(err.status + " - " + err.statusText, "FAILURE");
+
+            }
+        });
+
+    }
+
+    self.GenerateSalarySheet = function () {
+        if (self.Validation()) {
+            if (ko.toJS(self.SelectedOffice) == undefined) {
+
+            }
+            else {
+                var office = ko.toJS(self.SelectedOffice);
+                var officeCode = office.OfficeCode;
+               // var costcenter= ko.toJS(self.SelectedCostCenter);
+               // var costCenterID= costcenter.CostCenterID;
+                var month = ko.toJS(self.SelectedMonth);
+                var monthid = month.MonthID;
+                debugger;
+                $.ajax({
+                    dataType: "json",
+                    url: '../../Handlers/FAMS/SalarySheetHandler.ashx',
+                    data: { 'method': 'GenerateSalary', 'officeCode': officeCode, 'CostCenterID': null, 'year': self.Year, 'month': monthid },
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    success: function (data) {
+                        if (data.IsSucess) {
+                            if (data.ResponseData.length > 0) {
+                                self.SaveSalarySheet(data.ResponseData);
+                            }
+
+                            else {
+								msg("Required data not found.");                                
+                            }
+                        }
+                        else {
+                            msg(data.Message);
+                            self.Year('');
+                            self.SelectedMonth('');
+                        }
+
+
+                    },
+                    error: function (err) {
+                        msg(err.status + " - " + err.statusText);
+                    }
+                });
+            }
+
+
+        }
+	}
+	
+
+	
+	self.SaveSalarySheet = function (data) {
+
+		var employeeList = ko.observableArray([]);
+
+
+        var office = {
+            OfficeCode: ko.toJS(self.SelectedOffice).OfficeCode,
+            OfficeNameNep: ko.toJS(self.SelectedOffice).OfficeNameNep
+        }
+		
+        for (var i = 0; i < data.length; i++) {
+            var salaryitem = {
+                SalaryItemID: data[i].SalaryItem.SalaryItemID,
+                SalaryItemDesc: ""
+            }
+            var costcenter = {
+                CostCenterID: data[i].CostCenter.CostCenterID,
+                CostCenterName: ""
+			}
+			var empData = {
+				'EmpID': data[i].EmpID, 'PostID': data[i].PostID, 'PFromDate': data[i].PFromDate, 'EFromDate': data[i].EFromDate, 'costcenter': costcenter
+			};
+			var match = ko.utils.arrayFirst(employeeList(),
+				function (item) {
+					return empData.EmpID === item.EmpID;
+				});
+			if (!match) {
+				employeeList.push(empData);
+			}
+            var salarysheet = {
+                EmpID: data[i].EmpID,
+                SalaryYear: self.Year(),
+                SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+                SalaryItem: salaryitem,
+                OrignalAmount: data[i].OrignalAmount,
+                EditedAmount: data[i].EditedAmount,
+                Office: office,
+                PostID: data[i].PostID,
+                PFromDate: data[i].PFromDate,
+                EFromDate: data[i].EFromDate,
+                EntryBy: self.EntryBy(),
+                EntryDate: "",
+                RStatus: "F",
+                Action: "A",
+                CostCenter: costcenter
+            };
+
+            self.SalarySheets.push(salarysheet);
+		}
+		
+		var allEmployee = ko.toJS(employeeList);
+		console.log(allEmployee);
+		for (var i = 0; i < allEmployee.length; i++) {
+			console.log(allEmployee[i].EmpID);
+
+			var salaryitemForGradeSalary = {
+				SalaryItemID: 20,   
+				SalaryItemDesc: "Grade Amount"
+			}
+			var salsheetForGradAmount = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForGradeSalary,
+				OrignalAmount: 0,
+				EditedAmount: 0,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForGradAmount);
+
+
+
+
+			var salaryitemForPF = {
+				SalaryItemID: 30,   //pf
+				SalaryItemDesc: "P.F."
+			}
+			var salsheetForPF = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForPF,
+				OrignalAmount: 0,
+				EditedAmount: 0,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForPF);
+			var salaryitemForNLK = {
+				SalaryItemID: 130,   //pf
+				SalaryItemDesc: "N.L.K."
+			}
+			var salsheetForNLK = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForNLK,
+				OrignalAmount: 0,
+				EditedAmount: 0,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForNLK);
+			var salaryitemForWater = {
+				SalaryItemID: 34,   //pf
+				SalaryItemDesc: "Water and Sewerage"
+			}
+			var salsheetForWaterDhal = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForWater,
+				OrignalAmount: 1177,
+				EditedAmount: 1177,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForWaterDhal);
+			var salaryitemForMahangi = {
+				SalaryItemID: 110,   
+				SalaryItemDesc: "Dearness Allawance"
+			}
+			var salsheetForMahngiAllowance = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForMahangi,
+				OrignalAmount: 1000,
+				EditedAmount: 1000,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForMahngiAllowance);
+			var salaryitemForKhaja = {
+				SalaryItemID: 174,   
+				SalaryItemDesc: "Khaja"
+			}
+			var salsheetForKhaja = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForKhaja,
+				OrignalAmount: 35,
+				EditedAmount: 35,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			}
+			self.SalarySheets.push(salsheetForKhaja);
+			var salaryitemForYatayat = {
+				SalaryItemID: 175,
+				SalaryItemDesc: "Yatayat"
+			}
+			var salsheetForYatayat = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForYatayat,
+				OrignalAmount: 25,
+				EditedAmount: 25,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForYatayat);
+			var salaryitemForInsurance = {
+				SalaryItemID: 135,
+				SalaryItemDesc: "Insurance"
+			}
+			var salsheetForInsurance = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForInsurance,
+				OrignalAmount: 0,
+				EditedAmount: 0,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForInsurance);
+			var salaryitemForLuga = {
+				SalaryItemID: 65,
+				SalaryItemDesc: "Dress Allowance"
+			}
+			var salsheetForLuga = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForLuga,
+				OrignalAmount: 700,
+				EditedAmount: 700,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForLuga);
+			var salaryitemForMedical = {
+				SalaryItemID: 60,
+				SalaryItemDesc: "Medical Allowance"
+			}
+			var salsheetForMedicine = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForMedical,
+				OrignalAmount: 100,
+				EditedAmount: 100,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+
+			self.SalarySheets.push(salsheetForMedicine);
+			var salaryitemForFestibal = {
+				SalaryItemID: 32,
+				SalaryItemDesc: "Barsik Utsab Allowance"
+			}
+			var salsheetForFestival = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForFestibal,
+				OrignalAmount: 100,
+				EditedAmount: 100,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForFestival);
+			var salaryitemForPaidLeav = {
+				SalaryItemID: 50,
+				SalaryItemDesc: "Leave Sal. Amount"
+			}
+			var salsheetForPaidLeave = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForPaidLeav,
+				OrignalAmount: 0,
+				EditedAmount: 0,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForPaidLeave);
+			var salaryitemForSST = {
+				SalaryItemID: 140,
+				SalaryItemDesc: "S.S.F. Tax(1%)"
+			}
+			var salsheetForSST = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForSST,
+				OrignalAmount: 1,
+				EditedAmount: 1,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForSST);
+			var salaryitemForSawariTax = {
+				SalaryItemID: 68,
+				SalaryItemDesc: "Sawari Tax"
+			}
+			var salsheetForSwariTAX = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForSawariTax,
+				OrignalAmount: 0,
+				EditedAmount: 0,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForSwariTAX);
+
+			var salaryitemForResidenceTax = {
+				SalaryItemID: 69,
+				SalaryItemDesc: "Residence Tax"
+			}
+			var salsheetForResidenceTAX = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForResidenceTax,
+				OrignalAmount: 0,
+				EditedAmount: 0,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForResidenceTAX);
+
+			var salaryitemForIncomeTax = {
+				SalaryItemID: 150,
+				SalaryItemDesc: "Income Tax"
+			}
+			var salsheetForIncomeTAX = {
+				EmpID: allEmployee[i].EmpID,
+				SalaryYear: self.Year(),
+				SalaryMonth: ko.toJS(self.SelectedMonth).MonthID,
+				SalaryItem: salaryitemForIncomeTax,
+				OrignalAmount: 0,
+				EditedAmount: 0,
+				Office: office,
+				PostID: allEmployee[i].PostID,
+				PFromDate: allEmployee[i].PFromDate,
+				EFromDate: allEmployee[i].EFromDate,
+				EntryBy: self.EntryBy(),
+				EntryDate: "",
+				RStatus: "F",
+				Action: "A",
+				CostCenter: allEmployee[i].costcenter
+			};
+			self.SalarySheets.push(salsheetForIncomeTAX);
+			
+
+		}
+	
+        var url = "../../Handlers/FAMS/SalarySheetHandler.ashx";
+        var method = "SaveSalarySheet";
+
+        var data = { 'method': method, 'args': JSON.stringify(ko.toJS(self.SalarySheets)) };
+        $.post(url, data,
+                                    function (result) {
+                                        var obj = jQuery.parseJSON(result);
+                                        if (obj.IsSucess) {
+                                            msg(obj.Message);
+                                            self.ClearControls();
+                                        }
+                                        else {
+                                            msg(obj.Message, "WARNING");
+                                        }
+
+                                    });
+        self.SalarySheets([]);
+    }
+
+
+    self.PrintSalarySheet = function () {
+        if (self.Validation()) {
+            var data = {
+                OfficeCode: ko.toJS(self.SelectedOffice).OfficeCode,
+                CostCenterID:  ko.toJS(self.SelectedCostCenter).CostCenterID,
+                Year: self.Year(),
+                Month: ko.toJS(self.SelectedMonth).MonthID
+            }
+            var hght = screen.height;
+            var left = (screen.width / 2) - (900 / 2);
+            var url = "../../../Reporting/PAYROLL/ReportHandlers/SalarySheetReportHandler.ashx";
+            var winOption = "width=900,resizable=yes,scrollbars=yes,left=" + 230 + ",height=" + hght + "";
+            OpenWindowWithPost(url, winOption, "NewFile", data);
+        }
+    }
+
+
+    self.Validation = function () {
+        var errMsg = "";
+
+        if (self.SelectedOffice() == undefined) {
+            errMsg += "Please select office!!<br>";
+        }
+        if (Validate.empty(self.Year())) {
+            errMsg += "Please fill year !!!<br>";
+        }
+        if (self.SelectedMonth() == undefined) {
+            errMsg += "Please select month !!!<br>";
+        }
+
+        if (self.SelectedFiscalYear() != undefined && self.Year().length < 4) {
+            errMsg += "Please select Fiscal Year!!!<br>";
+        }
+
+        if (errMsg !== "") {
+             msg(errMsg,"WARNING");
+
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+
+    self.ClearControls = function () {
+        self.SelectedOffice('');
+        self.Year('');
+        self.SelectedMonth('');
+    }
+}
+
+
+$(document).ready(function () {
+
+
+    ValidateSession();
+    var ssgvm = new SalarySheetGenerationViewModel();
+    ko.applyBindings(ssgvm);
+
+    $('#txtYear').keydown(function (e) {
+        if ($('#txtYear').val().length >= 4) {
+            if (e.keyCode != 8)
+                e.preventDefault();
+        }
+
+    });
+});

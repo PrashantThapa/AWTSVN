@@ -1,0 +1,135 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLPunishment
+    {
+        public string SavePunishment(ATTPunishment objPunishment, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+
+                if (objPunishment.Action == "A")
+                {
+                    sp = "DCPR_ADD_EMP_PUNISHMENT";
+                    msg = "Successfully Saved.";
+
+                }
+
+
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", objPunishment.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CD", objPunishment.Office.OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_POST_ID", objPunishment.Post.PostID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_POST_SEQ", objPunishment.OfficeDarbandi.PostSeq, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", objPunishment.EmpID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_SEQ_NO", null, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_PUNISHMENT", objPunishment.Punishment, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_PUNISHMENT_DATE", objPunishment.PunishmentDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_REMARKS", objPunishment.Remarks, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objPunishment.RStatus, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objPunishment.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objPunishment.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList[0].Size = 16;
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    objPunishment.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+                    if (objPunishment.OldSubmissionNo != null)
+                    {
+                        DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                        dllUTV.SaveVerifyLog(tran, objPunishment.EntryBy, objPunishment.OldSubmissionNo, objPunishment.SubmissionNo, appID, modID);
+                    }
+                    
+
+
+                    paramList.Clear();
+                    tran.Commit();
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            //return msg;//objPunishment.SubmissionNo
+            return msg + "</br> Please Note Your Submission No.</br><b>" + objPunishment.SubmissionNo + "</b>";
+
+        }
+
+        public ATTPunishment GetPunishment(Int64? submissionNo)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+            try
+            {
+                string SP = "DCPR_GET_EMP_PUNISHMENT";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", submissionNo, OracleDbType.Int64, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                ATTPunishment objPunishment = new ATTPunishment();
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow drow = ds.Tables[0].Rows[0];
+                    objPunishment.SubmissionNo = string.IsNullOrEmpty(drow["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                    objPunishment.Office.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int16?)null : Int16.Parse(drow["OFFICE_CD"].ToString());
+                    objPunishment.Office.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+                    objPunishment.Post.PostID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_ID"].ToString());
+                    objPunishment.Post.PostDesc = drow["POST_DESC"].ToString();
+                    objPunishment.OfficeDarbandi.PostSeq = string.IsNullOrEmpty(drow["POST_SEQ"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_SEQ"].ToString());
+                    objPunishment.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString());
+                    objPunishment.EmployeeName = drow["EMP_NAME"].ToString();
+                    objPunishment.Punishment = drow["PUNISHMENT"].ToString();
+                    objPunishment.PunishmentDate = drow["PUNISHMENT_DATE"].ToString();
+                    objPunishment.Remarks = drow["REMARKS"].ToString();
+                    objPunishment.RStatus = drow["R_STATUS"].ToString();
+                    objPunishment.EntryBy = drow["ENTRY_BY"].ToString();
+                    objPunishment.EntryDate = drow["ENTRY_DATE"].ToString(); 
+
+                }
+                else {
+                    objPunishment = null;
+                }
+
+                return objPunishment;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+    }
+}

@@ -1,0 +1,179 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLAccountChart
+    {
+       public JsonResponse SaveAccountChart(List<ATTAccountChart> lstAccountChart)
+        {
+
+            JsonResponse response = new JsonResponse();
+
+            try
+            {
+
+                if (response.Message == "")
+                {
+                    DLLAccountChart objdllAccountChart = new DLLAccountChart();
+                    response.Message = objdllAccountChart.SaveAccountChart(lstAccountChart);
+                    response.IsSucess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+            return response;
+        }
+
+       public JsonResponse DeleteAccountChart(int? accCode)
+        {
+
+            JsonResponse response = new JsonResponse();
+
+            try
+            {
+                DLLAccountChart objdllAccountChart = new DLLAccountChart();
+                response.Message = objdllAccountChart.DeleteAccountChart(accCode);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+
+        }
+
+        public JsonResponse GetAccountChart(int? accCode, int? PLgrCode, int? Office_Cd)
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTAccountChart> lstAccountChart = new List<ATTAccountChart>();
+            DLLAccountChart objdllAccountChart = new DLLAccountChart();
+            try
+            {
+                lstAccountChart = objdllAccountChart.GetAccountChart(accCode, PLgrCode, Office_Cd);
+
+                response.ResponseData = lstAccountChart;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+            
+            return response;
+        }
+
+        public JsonResponse GetAccountChartExp(int? accCode)
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTAccountChart> lstAccountChart = new List<ATTAccountChart>();
+            DLLAccountChart objdllAccountChart = new DLLAccountChart();
+            try
+            {
+                lstAccountChart = objdllAccountChart.GetAccountChartExp(accCode);
+
+                response.ResponseData = lstAccountChart;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+            
+            return response;
+        }
+
+        public JsonResponse GetAccountChartSubsideryGL(int? accCode)
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTAccountChart> lstAccountChart = new List<ATTAccountChart>();
+            DLLAccountChart objdllAccountChart = new DLLAccountChart();
+            try
+            {
+                lstAccountChart = objdllAccountChart.GetAccountChartSubsideryGL(accCode);
+
+                response.ResponseData = lstAccountChart;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+
+
+        //GetAccountChartSubsideryGL
+        public JsonResponse GetAccountChartHead(int? accCode)
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTAccountChart> lstAccountChart = new List<ATTAccountChart>();
+            DLLAccountChart objdllAccountChart = new DLLAccountChart();
+            try
+            {
+                lstAccountChart = objdllAccountChart.GetAccountChartHead(accCode);
+
+                response.ResponseData = lstAccountChart;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+
+        public JsonResponse GetAccountChartHeadSubsidery(int? accCode)
+        {
+
+            JsonResponse response = new JsonResponse();
+            List<ATTAccountChart> lstAccountChart = new List<ATTAccountChart>();
+            DLLAccountChart objdllAccountChart = new DLLAccountChart();
+            try
+            {
+                lstAccountChart = objdllAccountChart.GetAccountChartHeadSubsidery(accCode);
+
+                response.ResponseData = lstAccountChart;
+                response.Message = "Success";
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+        }
+        //GetAccountChartHeadSubsidery
+    }
+}

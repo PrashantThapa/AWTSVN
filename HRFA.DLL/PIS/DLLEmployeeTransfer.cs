@@ -1,0 +1,140 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLEmployeeTransfer
+    {
+        public string SaveEmployeeTransfer(ATTEmployeeTransfer objEmployeeTransfer, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                if (objEmployeeTransfer.Action == "A")
+                {
+                    sp = "DCPR_ADD_TRANSFER";
+                    msg = "Successfully Saved !!!";
+                }
+                
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO", null, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_CODE", objEmployeeTransfer.TransferOffice.OfficeCode, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_POST_ID", objEmployeeTransfer.TransferPost.PostID, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_POST_SEQ", objEmployeeTransfer.OfficePostDarbandi.PostSeq, OracleDbType.Int16, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", objEmployeeTransfer.EmpID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_LETTER_ISSUE_DATE", objEmployeeTransfer.LetterIssueDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_DECISION_DATE", objEmployeeTransfer.DecisionDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EFFECTIVE_DATE", objEmployeeTransfer.EffectiveDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_JOIN_DATE", objEmployeeTransfer.JoinDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EFFECTIVE_TILL_DATE", objEmployeeTransfer.EffectiveTillDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUPERVISOR_EMP_ID", objEmployeeTransfer.SupervisorID, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", objEmployeeTransfer.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_TO_DATE", objEmployeeTransfer.ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objEmployeeTransfer.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objEmployeeTransfer.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objEmployeeTransfer.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    //paramList.Add(SqlHelper.GetOraParam(":p_TRANSFER_OFFICE", objEmployeeTransfer.TransferOffice.OfficeCode, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    //paramList.Add(SqlHelper.GetOraParam(":p_TRANSFER_POST", objEmployeeTransfer.TransferPost.PostID, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList[0].Size = 50;
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    objEmployeeTransfer.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+                    if (objEmployeeTransfer.OldSubmissionNo != null)
+                    {
+                        DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                        dllUTV.SaveVerifyLog(tran, objEmployeeTransfer.EntryBy, objEmployeeTransfer.OldSubmissionNo, objEmployeeTransfer.SubmissionNo, appID, modID);
+                    }
+                    
+                    paramList.Clear();
+                    tran.Commit();
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            // return msg;
+            return msg + "Data saved!</br> Please Note your submission number!!</br><b>" + objEmployeeTransfer.SubmissionNo + "</b>";
+          	
+
+        }
+        public List<ATTEmployeeTransfer> GetTransferBySubNo(Int64? SubNo)
+        {
+            string SP = "";
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+           
+            try
+            {
+                    SP = "DCPR_GET_TRANSFER";
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+                    paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", SubNo, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, System.Data.ParameterDirection.Output));
+                    
+                    DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+                    List<ATTEmployeeTransfer> lstEmployeeTransfer = new List<ATTEmployeeTransfer>();
+                    
+                    foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                    {
+                        ATTEmployeeTransfer objEmployeeTransfer = new ATTEmployeeTransfer();
+                        objEmployeeTransfer.SubmissionNo = string.IsNullOrEmpty(drow["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                        objEmployeeTransfer.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString());  
+                        objEmployeeTransfer.EmpName = drow["EMP_NAME"].ToString();
+                        objEmployeeTransfer.TransferOffice.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_CD"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_CD"].ToString());
+                        objEmployeeTransfer.TransferPost.PostID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_ID"].ToString());
+                        objEmployeeTransfer.OfficePostDarbandi.PostSeq = string.IsNullOrEmpty(drow["POST_SEQ"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_SEQ"].ToString()); 
+                        objEmployeeTransfer.FromDate = drow["FROM_DATE"].ToString();
+                        objEmployeeTransfer.ToDate = drow["TO_DATE"].ToString();
+                        objEmployeeTransfer.Status = drow["R_STATUS"].ToString();
+                        objEmployeeTransfer.EntryBy = drow["ENTRY_BY"].ToString();
+                        objEmployeeTransfer.EntryDate = drow["ENTRY_DATE"].ToString();
+                        objEmployeeTransfer.LetterIssueDate = drow["LETTER_ISSUE_DATE"].ToString();
+                        objEmployeeTransfer.DecisionDate = drow["DECISION_DATE"].ToString();
+                        objEmployeeTransfer.EffectiveDate = drow["EFFECTIVE_DATE"].ToString();
+                        objEmployeeTransfer.JoinDate = drow["OFFICE_JOIN_DATE"].ToString();
+                        objEmployeeTransfer.EffectiveTillDate = drow["EFFECTIVE_TILL_DATE"].ToString();
+                        objEmployeeTransfer.SupervisorID = drow["SUPERVISOR_EMP_ID"].ToString();
+                        objEmployeeTransfer.SupervisorName = drow["SUPERVISOR_NAME"].ToString();
+                        objEmployeeTransfer.Office.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+                        objEmployeeTransfer.TransferPost.PostDesc = drow["POST_DESC"].ToString();
+                        lstEmployeeTransfer.Add(objEmployeeTransfer);
+                    }
+                    paramList.Clear();
+                    return lstEmployeeTransfer;
+                    
+                   
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            
+          
+
+        }
+    }
+}

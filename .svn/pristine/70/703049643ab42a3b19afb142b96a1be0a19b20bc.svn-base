@@ -1,0 +1,164 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLOfficeTranDetail
+    {
+       public void SaveOfficeTranDetail(List<ATTOfficeTranDetail> lstOfficeTranDetail, Int64? tranNo,string voucherType, OracleTransaction tran)
+        {
+            string SP = "";
+
+
+            try
+            {
+
+                foreach (ATTOfficeTranDetail objOfficeTranDetail in lstOfficeTranDetail)
+                {
+                    if (objOfficeTranDetail.Action == "E")
+                    {
+                        SP = "APR_EDIT_OFFICE_TRAN_DET";
+                    }
+                    
+                    else if (objOfficeTranDetail.Action == "A")
+                    {
+                        SP = "APR_ADD_OFFICE_TRAN_DET";
+                    }
+
+                if (SP != "")
+                    {
+
+                        if (objOfficeTranDetail.DrCr == "Dr")
+                        {
+                            objOfficeTranDetail.Amount = -(objOfficeTranDetail.Amount);
+                        }
+                        else if (objOfficeTranDetail.DrCr == "Cr")
+                        {
+                            objOfficeTranDetail.Amount = objOfficeTranDetail.Amount;
+                        }
+
+                        List<KeyValuePair<int, int[]>> GlCostCenterIds = new List<KeyValuePair<int, int[]>>(){
+                            new KeyValuePair<int, int[]>(9, new int[12] { 920110, 920120, 920130, 920140, 920150, 920160, 920165, 920170, 920175, 920180, 920185, 920190 }),
+                            new KeyValuePair<int, int[]>(10, new int[7] { 301110, 301120, 301130, 301140, 301150, 301160, 301170 }),
+                        };
+
+                        int GLCode = (int)objOfficeTranDetail.OfficeCompanyAccChart.AccountChart.AccCode;
+                        Int64? CostCenterID = null;
+
+                        foreach (KeyValuePair<int, int[]> kvp in GlCostCenterIds)
+                        {
+                            if (kvp.Value.ToList().Contains(GLCode))
+                                CostCenterID = kvp.Key;
+                        }
+
+                        if (CostCenterID == null)
+                            CostCenterID = objOfficeTranDetail.OfficeCompanyAccChart.Company.CompanyID;
+							
+                        List<OracleParameter> paramList = new List<OracleParameter>();
+                        paramList.Add(SqlHelper.GetOraParam(":P_TRAN_NO", objOfficeTranDetail.TranNo, OracleDbType.Int64, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_AC_CODE", objOfficeTranDetail.OfficeCompanyAccChart.AccountChart.AccCode, OracleDbType.Int64, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ACC_NO", objOfficeTranDetail.AcNo, OracleDbType.Varchar2, ParameterDirection.InputOutput));
+                        paramList.Add(SqlHelper.GetOraParam(":P_DRCR", objOfficeTranDetail.DrCr, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_DESCRIPTION", objOfficeTranDetail.Description, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_AMOUNT",objOfficeTranDetail.Amount , OracleDbType.Double, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_TRAN_SEQ", objOfficeTranDetail.TranSeqNo, OracleDbType.Int32, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_BY", objOfficeTranDetail.EntryBY, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_ENTRY_DATE", objOfficeTranDetail.EntryDate, OracleDbType.Varchar2, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_R_STATUS", objOfficeTranDetail.Rstatus, OracleDbType.Varchar2, ParameterDirection.Input));
+
+                        paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_ID", objOfficeTranDetail.OfficeCompanyAccChart.Company.Office.OfficeCode, OracleDbType.Int64, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_COSTCENTER_ID", CostCenterID, OracleDbType.Int64, ParameterDirection.Input));
+                        paramList.Add(SqlHelper.GetOraParam(":P_FROM_DATE", objOfficeTranDetail.OfficeCompanyAccChart.AccountChart.FromDate, OracleDbType.Varchar2, ParameterDirection.Input));
+
+                       // paramList[2].Size = 20;
+                        SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, SP, paramList.ToArray());
+                        paramList.Clear();
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+        }
+
+       public List<ATTOfficeTranDetail> GetOfficeTranDetail(Int64? tranNo)
+        {
+            GetConnection getConn = new GetConnection();
+            GenericUser user = getConn.LoginUser;
+            OracleConnection dbconn = getConn.GetDbConn(user);
+            try
+            {
+
+                string SP = "APR_GET_OFFICE_TRAN_DET";
+                List<OracleParameter> ParamList = new List<OracleParameter>();
+                ParamList.Add(SqlHelper.GetOraParam(":P_TRAN_NO", tranNo, OracleDbType.Int64, ParameterDirection.Input));
+                ParamList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(dbconn, CommandType.StoredProcedure, SP, ParamList.ToArray());
+
+
+                List<ATTOfficeTranDetail> lstOfficeTranDetail = new List<ATTOfficeTranDetail>();
+
+                foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                {
+                    ATTOfficeTranDetail objOfficeTranDetail = new ATTOfficeTranDetail();
+                    objOfficeTranDetail.OfficeCompanyAccChart = new ATTOfficeCompanyAccChart();
+                    objOfficeTranDetail.OfficeCompanyAccChart.Company = new ATTCompany();
+                    objOfficeTranDetail.OfficeCompanyAccChart.Company.Office = new ATTOffice();
+                     objOfficeTranDetail.TranNo = string.IsNullOrEmpty(drow["TRAN_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["TRAN_NO"].ToString());
+                     objOfficeTranDetail.OfficeCompanyAccChart.AccountChart.AccCode = string.IsNullOrEmpty(drow["AC_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["AC_CODE"].ToString());
+                     objOfficeTranDetail.Accounts.AccountID = drow["ACC_NO"].ToString();
+                     objOfficeTranDetail.OfficeCompanyAccChart.AccountChart.AccName = drow["AC_NAME"].ToString();
+                     objOfficeTranDetail.Accounts.AccountName = drow["ACCNAME"].ToString();
+                    objOfficeTranDetail.DrCr = drow["DRCR"].ToString();
+                    objOfficeTranDetail.Description = drow["DESCRIPTION"].ToString();
+                    if (objOfficeTranDetail.DrCr == "Dr")
+                    {
+                        objOfficeTranDetail.Amount = string.IsNullOrEmpty(drow["AMOUNT"].ToString()) ? (double?)null : (double.Parse(drow["AMOUNT"].ToString()) * -1);
+
+                    }
+                    else
+                    {
+                        objOfficeTranDetail.Amount = string.IsNullOrEmpty(drow["AMOUNT"].ToString()) ? (double?)null : double.Parse(drow["AMOUNT"].ToString());
+                    }
+                    objOfficeTranDetail.TranSeqNo = string.IsNullOrEmpty(drow["TRAN_SEQ"].ToString()) ? (Int32?)null : Int32.Parse(drow["TRAN_SEQ"].ToString());
+                    objOfficeTranDetail.EntryBY = drow["ENTRY_BY"].ToString();
+                    objOfficeTranDetail.EntryDate = drow["ENTRY_DATE"].ToString();
+                    objOfficeTranDetail.Rstatus = drow["R_STATUS"].ToString();
+                    objOfficeTranDetail.OfficeCompanyAccChart.Company.Office.OfficeCode = string.IsNullOrEmpty(drow["OFFICE_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["OFFICE_ID"].ToString());
+                    objOfficeTranDetail.OfficeCompanyAccChart.Company.CompanyID = string.IsNullOrEmpty(drow["COSTCENTER_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["COSTCENTER_ID"].ToString());
+                    objOfficeTranDetail.OfficeCompanyAccChart.Company.Office.OfficeNameNep = drow["OFFICE_NAME_NEPALI"].ToString();
+                    objOfficeTranDetail.OfficeCompanyAccChart.Company.CompanyName = drow["COSTCENTER_NAME"].ToString();
+                    
+                    objOfficeTranDetail.OfficeCompanyAccChart.FromDate = drow["FROM_DATE"].ToString();
+                    objOfficeTranDetail.Action = "";
+                    lstOfficeTranDetail.Add(objOfficeTranDetail);
+
+                }
+
+                return lstOfficeTranDetail;
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+
+        }
+
+       
+    }
+}

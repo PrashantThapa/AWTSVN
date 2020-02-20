@@ -1,0 +1,84 @@
+﻿using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+namespace IDS.Handlers.ACCOUNT
+{
+
+    public class OfficeCompanyAccChartHandler : BaseHandler
+    {
+        public object GetGLCodewithSubsidary(int? OfficeID, int? AccCode, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLOfficeCompanyAccChart ObjbllOfficeCompanyAccChart = new BLLOfficeCompanyAccChart();
+            response = ObjbllOfficeCompanyAccChart.GetGLCodewithSubsidary(OfficeID, AccCode);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object SaveOfficeComAcchart(string args, string token)
+        {
+
+            JsonResponse response = new JsonResponse();
+            BLLOfficeCompanyAccChart ObjbllOfficeCompanyAccChart = new BLLOfficeCompanyAccChart();
+            List<ATTOfficeCompanyAccChart> objOfficeCompanyAccChart = JsonUtility.DeSerialize(args, typeof(List<ATTOfficeCompanyAccChart>)) as List<ATTOfficeCompanyAccChart>;
+            response = ObjbllOfficeCompanyAccChart.SaveOfficeComAcchart(objOfficeCompanyAccChart);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetOfficeComAcchart(int? OfficeID, string token)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLOfficeCompanyAccChart ObjbllOfficeCompanyAccChart = new BLLOfficeCompanyAccChart();
+            response = ObjbllOfficeCompanyAccChart.GetOfficeComAcchart(OfficeID);
+            return JsonUtility.Serialize(response);
+
+        }
+        
+        public object GetOfficeComanyAcchart(int? OfficeID, int? companyID, string P_all, string token, string VType)//for glcode
+        {
+            JsonResponse response = new JsonResponse();
+            BLLOfficeCompanyAccChart ObjbllOfficeCompanyAccChart = new BLLOfficeCompanyAccChart();
+            response = ObjbllOfficeCompanyAccChart.GetOfficeComanyAcchart(OfficeID, companyID, P_all,VType);
+            return JsonUtility.Serialize(response);
+
+        }
+        public object GetOfficeComanyAcchartLedger(int? OfficeID, int? companyID, string P_all, string token, string VType)//for glcode
+        {
+            JsonResponse response = new JsonResponse();
+            BLLOfficeCompanyAccChart ObjbllOfficeCompanyAccChart = new BLLOfficeCompanyAccChart();
+            response = ObjbllOfficeCompanyAccChart.GetOfficeComanyAcchartLedger(OfficeID, companyID, P_all, VType);
+            return JsonUtility.Serialize(response);
+
+        }
+        public object GetOfficeComanyAcchartBorC(int? OfficeID, int? companyID, string btype, string token)//for glcode
+        {
+            JsonResponse response = new JsonResponse();
+            BLLOfficeCompanyAccChart ObjbllOfficeCompanyAccChart = new BLLOfficeCompanyAccChart();
+            response = ObjbllOfficeCompanyAccChart.GetOfficeComanyAcchartBorC(OfficeID, companyID, btype);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetAccount(int? args)//for glcode
+        {
+            JsonResponse response = new JsonResponse();
+            BLLOfficeCompanyAccChart objAccount = new BLLOfficeCompanyAccChart();
+            response = objAccount.GetAccount(args);
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object DeleteOfficeComAcchart(int? OfficeID, string token)
+        {
+
+            JsonResponse response = new JsonResponse();
+            BLLOfficeCompanyAccChart ObjbllOfficeCompanyAccChart = new BLLOfficeCompanyAccChart();
+            response = ObjbllOfficeCompanyAccChart.DeleteOfficeComAcchart(OfficeID);
+            return JsonUtility.Serialize(response);
+        }
+
+        
+    }
+}

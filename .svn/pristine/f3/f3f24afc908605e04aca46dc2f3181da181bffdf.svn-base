@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLPurchaseOrder
+    {
+        public JsonResponse SavePurchaseOrder(List<ATTPurchaseOrder> objPurchaseOrder, string appID, string modID)
+        {
+            JsonResponse response = new JsonResponse();
+
+            try
+            {
+                if (response.Message == "")
+                {
+
+                    DLLPurchaseOrder dllPurchaseOrder = new DLLPurchaseOrder();
+                    response.Message = dllPurchaseOrder.SavePurchaseOrder(objPurchaseOrder,appID,modID);
+                    response.IsSucess = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+
+
+            return response;
+
+        }
+
+        public JsonResponse GetPurchaseOrderBySubmissionNo(Int64? submissionNo)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLPurchaseOrder dllPurchaseOrder = new DLLPurchaseOrder();
+            try
+            {
+                response.ResponseData = dllPurchaseOrder.GetPurchaseOrderBySubmissionNo(submissionNo);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return response;
+        }
+
+
+        public JsonResponse GetBlanketPurchase(Int32? blanketPurchaseID)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLPurchaseOrder dllPurchaseOrder = new DLLPurchaseOrder();
+            try
+            {
+                response.ResponseData = dllPurchaseOrder.GetBlanketPurchase(blanketPurchaseID);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return response;
+        }
+    }
+}

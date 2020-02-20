@@ -1,0 +1,56 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+namespace HRFA.Handlers.PAYROLL
+{ 
+
+    public class EmpGradeHandler : BaseHandler
+    {
+        public object SaveEmpGrade(string args, string appID, string modID)
+        {
+            JsonResponse response = new JsonResponse();
+
+            ATTEmpGradeLoan lstEmpGradeLoan = JsonUtility.DeSerialize(args, typeof(ATTEmpGradeLoan)) as ATTEmpGradeLoan;
+            BLLEmpGrade bllEmpGrade = new BLLEmpGrade();
+            response = bllEmpGrade.SaveEmpGrade(lstEmpGradeLoan, appID, modID);
+
+            return JsonUtility.Serialize(response);
+
+        }
+
+        public object GetEmpGrade(Int64? submissionNo)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLEmpGrade objBLL = new BLLEmpGrade();
+            try
+            {
+                response = objBLL.GetEmpGrade(submissionNo);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+        public object GetEmpGradeByEmpID(Int32? EmpID)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLEmpGrade objBLL = new BLLEmpGrade();
+            try
+            {
+                response = objBLL.GetEmpGradeByEmpID(EmpID);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+
+     
+    }
+}

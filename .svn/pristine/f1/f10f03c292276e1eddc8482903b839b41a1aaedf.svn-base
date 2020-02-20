@@ -1,0 +1,55 @@
+﻿using System;
+using System.Collections.Generic;
+using Oracle.DataAccess.Client;
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+
+namespace HRFA.DataLayer
+{
+    public class DLLSECApplication
+    {
+
+        public  List<ATTApplication> GetAllApplication(Int32 offcode)
+        {
+            GetConnection GetConn = new GetConnection();
+            OracleConnection conn = GetConn.GetDbConn(GetConn.LoginUser);
+            string SP = ConfigurationManager.AppSettings["DatabaseSchema"] + ".CPR_GET_OFFICE_APPLICATION";
+            List<ATTApplication> lst = new List<ATTApplication>();
+            try
+            {
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_OFFICE_ID", offcode, OracleDbType.Int32, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                if ((ds.Tables[0]).Rows.Count > 0)
+                {
+                    foreach (DataRow drow in ((DataTable)ds.Tables[0]).Rows)
+                    {
+                        ATTApplication obj = new ATTApplication();
+                        obj.ApplicationID = drow["APPLICATION_ID"].ToString();
+                        obj.ApplicationDescription = drow["APPLICATION_DESCRIPTION"].ToString();
+                        obj.OrderCode = string.IsNullOrEmpty(drow["ORDER_CODE"].ToString()) ? (Int32?)null : Int32.Parse(drow["ORDER_CODE"].ToString());
+
+                        //obj.OrderCode = Convert.ToInt32(drow["ORDER_CODE"].ToString());
+                        lst.Add(obj);
+                    }
+                }
+                return lst;
+
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                GetConn.CloseDbConn();
+            }
+        }
+    }
+}

@@ -1,0 +1,79 @@
+﻿using System;
+using System.Collections.Generic;
+using HRFA.ATT;
+using HRFA.ATT.PAYROLL;
+using HRFA.BLL;
+using HRFA.BLL.PAYROLL;
+using HRFA.COMMON;
+
+namespace HRFA.Handlers.PAYROLL
+{
+    //public class ABC
+    //{
+    //    public string EAName { get; set; }
+    //    public string EAValue { get; set; }
+    //    public string EntryBy { get; set; }
+    //    public string Action { get; set; }
+    //    public object EAID { get; set; }
+    //}
+
+    //public class RootObject
+    //{
+    //    public int EmpID { get; set; }
+    //    public string EmployeeName { get; set; }
+    //    public int GradeID { get; set; }
+    //    public string CITRs { get; set; }
+    //    public string PFPer { get; set; }
+    //    public string EntryBy { get; set; }
+    //    public int TaxDeduction { get; set; }
+    //    public string RStatus { get; set; }
+    //    public string Action { get; set; }
+    //    public List<ABC> Extrallowancedata { get; set; }
+    //}
+    public class EmpGradeHandler : BaseHandler
+    {
+        public object SaveEmpGrade(string args, string appID, string modID)
+        {
+            JsonResponse response = new JsonResponse();
+
+            ATTSalaryParameter lstEmpGradeLoan = JsonUtility.DeSerialize(args, typeof(ATTSalaryParameter)) as ATTSalaryParameter;
+
+            BLLSalaryParameter bllEmpGrade = new BLLSalaryParameter();
+            response = bllEmpGrade.SaveEmpGrade(lstEmpGradeLoan, appID, modID);
+
+            return JsonUtility.Serialize(response);
+        }
+
+        public object GetEmpGrade(Int64? submissionNo)
+        {
+            JsonResponse response = new JsonResponse();
+			BLLSalaryParameter objBLL = new BLLSalaryParameter();
+            try
+            {
+                response = objBLL.GetEmpGrade(submissionNo);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+
+        public object GetEmpGradeByEmpID(Int32? EmpID)
+        {
+            JsonResponse response = new JsonResponse();
+            BLLEmpGrade objBLL = new BLLEmpGrade();
+            try
+            {
+                response = objBLL.GetEmpGradeByEmpID(EmpID);
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+                response.IsSucess = false;
+            }
+            return JsonUtility.Serialize(response);
+        }
+    }
+}

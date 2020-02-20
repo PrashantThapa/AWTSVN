@@ -1,0 +1,131 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.COMMON;
+using HRFA.DataLayer;
+namespace HRFA.BLL
+{
+    public class BLLBudgetRequest
+    {
+        public JsonResponse ChangeCostCenter(Int32? OfficeCD, Int32? CostCenterID, string fiscalyear, string incomeType)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLBudgetRequest objDll = new DLLBudgetRequest();
+            try
+            {
+                if (fiscalyear != null)
+                {
+                    response.ResponseData = objDll.ChangeCostCenter(OfficeCD, CostCenterID, fiscalyear, incomeType);
+                }
+                else
+                {
+                    response.ResponseData = objDll.ChangeCostCenter(OfficeCD, CostCenterID);
+                }
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public JsonResponse SaveBudgetRequest(ATTBudgetRequest objBudgetRequest, string appID, string modID, string date)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLBudgetRequest objDll = new DLLBudgetRequest();
+            try
+            {
+                response.Message = objDll.SaveBudgetRequest(objBudgetRequest, appID, modID, date);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        public JsonResponse GetCostCenter(Int32? OfficeCD)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLBudgetRequest objDll = new DLLBudgetRequest();
+            try
+            {
+                response.ResponseData = objDll.GetCostCenter(OfficeCD);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        public JsonResponse GetBudgetRequestBySubNo(Int64? SubNo)
+        {
+            JsonResponse response = new JsonResponse();
+            DLLBudgetRequest objDll = new DLLBudgetRequest();
+            try
+            {
+                response.ResponseData = objDll.GetBudgetRequestBySubNo(SubNo);
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        //public JsonResponse GetBudgetItem()
+        //{
+        //    JsonResponse response = new JsonResponse();
+        //    DLLBudgetRequest objDll = new DLLBudgetRequest();
+        //    try
+        //    {
+        //        response.ResponseData = objDll.GetBudgetItem();
+        //        response.IsSucess = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        response.IsSucess = false;
+        //        response.Message = ex.Message;
+        //    }
+        //    return response;
+        //}
+        public JsonResponse GetJob()
+        {
+            JsonResponse response = new JsonResponse();
+            DLLBudgetRequest objDll = new DLLBudgetRequest();
+            try
+            {
+                response.ResponseData = objDll.GetJob();
+                response.IsSucess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSucess = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+        //public JsonResponse GetBudgetItemLst()
+        //{
+        //    JsonResponse response = new JsonResponse();
+        //    DLLBudgetRequest objDll = new DLLBudgetRequest();
+        //    try
+        //    {
+        //        response.ResponseData = objDll.GetBudgetItemLst();
+        //        response.IsSucess = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        response.IsSucess = false;
+        //        response.Message = ex.Message;
+        //    }
+        //    return response;
+        //}
+        
+    }
+}

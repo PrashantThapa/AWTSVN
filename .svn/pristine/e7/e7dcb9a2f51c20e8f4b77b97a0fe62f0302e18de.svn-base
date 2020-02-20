@@ -1,0 +1,24 @@
+﻿using System;
+using HRFA.ATT;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+namespace HRFA.Handlers.FAMS
+{
+    public class TypeHandler : BaseHandler
+    {
+        public object GetTypes(Int16? typeID)
+        {
+            JsonResponse response = new JsonResponse();
+
+            BLLType bllType = new BLLType();
+            response = bllType.GetType(typeID);
+
+            return JsonUtility.Serialize(response);
+
+        }
+       
+
+       
+    }
+}

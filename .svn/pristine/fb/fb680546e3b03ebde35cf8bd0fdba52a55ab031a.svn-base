@@ -1,0 +1,142 @@
+﻿using System;
+using System.Collections.Generic;
+
+using System.Data;
+using HRFA.ATT;
+using HRFA.COMMON;
+using System.Configuration;
+using Oracle.ManagedDataAccess.Client;
+
+namespace HRFA.DataLayer
+{
+    public class DLLAppointment
+    {
+        public string SaveAppointment(ATTAppointment objAppointment, string appID, string modID)
+        {
+            string sp = "";
+            string msg = "";
+           
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+            OracleTransaction tran = conn.BeginTransaction();
+
+            try
+            {
+                if (objAppointment.Action == "E")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_EDIT_APPOINTMENT";
+                    msg = "Successfully Edited.";
+                }
+                else if (objAppointment.Action == "A")
+                {
+                    sp = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_ADD_APPOINTMENT";
+                    msg = "Successfully Saved.";
+
+                }
+
+                
+
+                if (sp != "")
+                {
+                    List<OracleParameter> paramList = new List<OracleParameter>();
+
+                    paramList.Add(SqlHelper.GetOraParam(":p_SUBMISSION_NO",objAppointment.SubmissionNo, OracleDbType.Int64, System.Data.ParameterDirection.InputOutput));
+                    paramList.Add(SqlHelper.GetOraParam(":p_POST_ID", objAppointment.Post.PostID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EMP_ID", objAppointment.EmpID, OracleDbType.Int64, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_APPT_TYPE_ID", objAppointment.AppointmentType.ApptTypeID, OracleDbType.Int32, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_DECISION_DATE", objAppointment.DecisionDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_LETTER_ISSUE_DATE", objAppointment.LetterIssueDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_OFFICE_JOIN_DATE", objAppointment.OfficeJoinDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EFFECTIVE_DATE", objAppointment.EffectiveDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_EFFECTIVE_TILL_DATE", objAppointment.EffectiveTillDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_PROBATION_PERIOD", objAppointment.ProbationPeriod, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_FROM_DATE", objAppointment.FromDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_TO_DATE", objAppointment.ToDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_R_STATUS", objAppointment.Status, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_BY", objAppointment.EntryBy, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+                    paramList.Add(SqlHelper.GetOraParam(":p_ENTRY_DATE", objAppointment.EntryDate, OracleDbType.Varchar2, System.Data.ParameterDirection.Input));
+
+                    paramList[0].Size = 16;
+                    SqlHelper.ExecuteNonQuery(tran, CommandType.StoredProcedure, sp, paramList.ToArray());
+                    objAppointment.SubmissionNo = Int64.Parse(paramList[0].Value.ToString());
+
+                    if (objAppointment.OldSubmissionNo != null)
+                    {
+                        DLLUserTranVerification dllUTV = new DLLUserTranVerification();
+                        dllUTV.SaveVerifyLog(tran, objAppointment.EntryBy, objAppointment.OldSubmissionNo, objAppointment.SubmissionNo, appID, modID);
+                    }
+
+                    paramList.Clear();
+                    tran.Commit();
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                tran.Rollback();
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+            //return msg;
+            return msg + "</br> Data Saved!!!</br>  Please Note Submission Number! </br><b>" + objAppointment.SubmissionNo + "</b>";
+        }
+
+        public ATTAppointment GetAppointment(Int64? submissionNo)
+        {
+            GetConnection getConn = new GetConnection();
+            OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
+
+
+            try
+            {
+                string SP = ConfigurationManager.AppSettings["DatabaseSchemaDirty"] + ".DCPR_GET_APPOINTMENT";
+
+                List<OracleParameter> paramList = new List<OracleParameter>();
+                paramList.Add(SqlHelper.GetOraParam(":P_SUBMISSION_NO", submissionNo, OracleDbType.Int64, ParameterDirection.Input));
+                paramList.Add(SqlHelper.GetOraParam(":P_RC", null, OracleDbType.RefCursor, ParameterDirection.Output));
+
+                DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.StoredProcedure, SP, paramList.ToArray());
+
+                
+                ATTAppointment objAppointment = new ATTAppointment();
+
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    DataRow drow = ds.Tables[0].Rows[0];
+                    objAppointment.SubmissionNo = string.IsNullOrEmpty(drow["SUBMISSION_NO"].ToString()) ? (Int64?)null : Int64.Parse(drow["SUBMISSION_NO"].ToString());
+                    objAppointment.Post.PostID = string.IsNullOrEmpty(drow["POST_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["POST_ID"].ToString());
+                    objAppointment.EmpID = string.IsNullOrEmpty(drow["EMP_ID"].ToString()) ? (Int32?)null : Int32.Parse(drow["EMP_ID"].ToString());
+                    objAppointment.EmployeeName = drow["EMP_NAME"].ToString();
+                    objAppointment.AppointmentType.ApptTypeID = string.IsNullOrEmpty(drow["APPT_TYPE_ID"].ToString()) ? (Int16?)null : Int16.Parse(drow["APPT_TYPE_ID"].ToString());
+                    objAppointment.DecisionDate = drow["DECISION_DATE"].ToString();
+                    objAppointment.LetterIssueDate = drow["LETTER_ISSUE_DATE"].ToString();
+                    objAppointment.OfficeJoinDate = drow["OFFICE_JOIN_DATE"].ToString();
+                    objAppointment.EffectiveDate = drow["EFFECTIVE_DATE"].ToString();
+                    objAppointment.EffectiveTillDate = drow["EFFECTIVE_TILL_DATE"].ToString();
+                    objAppointment.ProbationPeriod = string.IsNullOrEmpty(drow["PROBATION_PERIOD"].ToString()) ? (Int32?)null : Int32.Parse(drow["PROBATION_PERIOD"].ToString());
+                    objAppointment.FromDate = drow["FROM_DATE"].ToString();
+                }
+                else
+                {
+                    objAppointment = null;
+                }
+                return objAppointment;
+
+                
+            }
+            catch (Exception ex)
+            {
+
+                throw (ex);
+            }
+            finally
+            {
+                getConn.CloseDbConn();
+            }
+        }
+    }
+}

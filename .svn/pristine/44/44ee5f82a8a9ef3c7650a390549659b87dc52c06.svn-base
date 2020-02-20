@@ -1,0 +1,25 @@
+﻿using System;
+using HRFA.BLL;
+using HRFA.COMMON;
+
+namespace HRFA.Handlers.FAMS
+{
+    
+    public class UnitHandler : BaseHandler
+    {
+        public object GetUnit(Int16? unitID)
+        {
+            JsonResponse response = new JsonResponse();
+
+            BLLUnit bllUnit = new BLLUnit();
+            response = bllUnit.GetUnit(unitID);
+
+            return JsonUtility.Serialize(response);
+
+        }
+
+        
+
+       
+    }
+}

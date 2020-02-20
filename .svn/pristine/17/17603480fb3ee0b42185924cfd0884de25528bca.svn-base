@@ -1,0 +1,23 @@
+﻿using System;
+
+namespace HRFA.ATT
+{
+    public class ATTSubsidaryAC
+    {
+
+       public string GlCode { get; set; }
+        public Int64 AccCode { get; set; }
+        public string AccName { get; set; }
+        public string ACNo { get; set; }
+        public string ACName { get; set; }
+
+        public string Action { get; set; }
+        public string FromDate { get; set; }
+        public string ToDate { get; set; }
+        public string EntryBy { get; set; }
+        public string EntryDate { get; set; }
+        public string RStatus { get; set; }
+
+        public ATTOffice Office { get; set; }
+    }
+}

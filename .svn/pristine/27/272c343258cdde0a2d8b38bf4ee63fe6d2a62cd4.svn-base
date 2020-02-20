@@ -1,0 +1,1 @@
+﻿<%@ WebHandler Language="C#" CodeBehind="GLGroupHandler.ashx.cs" Class="IDS.Handlers.ACCOUNT.GLGroupHandler" %>
