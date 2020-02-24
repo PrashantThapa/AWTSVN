@@ -164,7 +164,7 @@ namespace HRFA.DataLayer
 		public List<ATTEmployeeAll> GetEmployeeRegistered(int officeCode, int? pageNumber, int? pageSize, Int64? submissionNo)
         {
 			{
-				GetConnection getConn = new GetConnection();
+				 GetConnection getConn = new GetConnection();
 				OracleConnection conn = getConn.GetDbConn(getConn.LoginUser);
 				try
 				{

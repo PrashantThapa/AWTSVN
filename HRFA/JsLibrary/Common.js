@@ -294,13 +294,17 @@ function GetNepaliDate(callback) {
         data: { 'method': 'GetDates' },
         contentType: "application/json; charset=utf-8",
         success: function (result) {
-
+            debugger;
             if (result.IsSucess) {
-
+                debugger;
+                var EngsDate = result.ResponseData.NepaliDate;
                 var nepDate = getNumUnicode(result.ResponseData.NepaliDate);
                 
                 $("#currNepDate").text(nepDate);
+                $("#currEngsDate").text(EngsDate);
+
             }
+            debugger;
         },
         error: function (err) {
             msg(err.status + " - " + err.statusText, "FAILURE", null, ClearSession);
@@ -324,7 +328,6 @@ function GetNepalisDate(callback) {
         success: function (result) {
 
             if (result.IsSucess) {
-
                 var nepsDate = getNumUnicode(result.ResponseData.NepaliDate);
 
                 $("#currNepsDate").text(nepsDate);
@@ -444,6 +447,7 @@ function isZero(evt) {
 //----------------------------------------------------------------------------
 
 function getDate() {
+    //debugger;
     var engDate = getNumEng($("#currNepDate").text());
     return engDate;
 }

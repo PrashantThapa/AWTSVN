@@ -46,5 +46,6 @@ C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\obj\Debug\HRFA.ATT.dll
 C:\Users\Administrator\Desktop\AWTHRSVN\HRFA.ATT\obj\Debug\HRFA.ATT.pdb
 C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.ATT\bin\Debug\HRFA.ATT.dll
 C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.ATT\bin\Debug\HRFA.ATT.pdb
+C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.ATT\obj\Debug\HRFA.ATT.csprojResolveAssemblyReference.cache
 C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.ATT\obj\Debug\HRFA.ATT.dll
 C:\Users\compu\OneDrive\Desktop\AWTHRSVN\HRFA.ATT\obj\Debug\HRFA.ATT.pdb

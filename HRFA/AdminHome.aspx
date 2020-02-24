@@ -17,9 +17,9 @@
       <div class="row  pages">
         <div class="col-lg-3 col-xs-6">
           <!-- small box -->
-          <div class="small-box bg-aqua" data-bind="foreach: EmployeeList">
+          <div class="small-box bg-aqua">
             <div class="inner">
-              <h3 data-bind="value: $data.SymbolNo"></h3>
+              <h3>0</h3>
               <p>Present</p>
             </div>
             <div class="icon">
